@@ -8,8 +8,8 @@ import java.rmi.registry.*;
   STATUS: WORKING
 */
 
-public class DataServer extends UnicastRemoteObject implements RegistryInterface {
-	public static void run(Integer port, String reference, DataServer s, Integer delay) {
+public class DataServer extends UnicastRemoteObject implements DataServerInterface {
+	public static void run(int port, String reference, DataServer s, int delay) {
 		try {
 			Thread.sleep(delay);
 		} catch (InterruptedException e) {
@@ -29,7 +29,12 @@ public class DataServer extends UnicastRemoteObject implements RegistryInterface
 		}
 	}
 
-	public static Integer getPort(String args[]) {
+	// TODO
+	public boolean registerPerson(Person person) throws RemoteException {
+		return false;
+	}
+
+	public static int getPort(String args[]) {
 		try {
 			return Integer.parseInt(args[1]);
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -47,7 +52,7 @@ public class DataServer extends UnicastRemoteObject implements RegistryInterface
 		}
 	}
 
-	public static Registry createAndBindRegistry(Integer port, String reference, DataServer s) throws RemoteException {
+	public static Registry createAndBindRegistry(int port, String reference, DataServer s) throws RemoteException {
 		Registry reg = LocateRegistry.createRegistry(port);
 		reg.rebind(reference, s);
 		return reg;
@@ -67,7 +72,7 @@ public class DataServer extends UnicastRemoteObject implements RegistryInterface
 			System.exit(-1);
 		}
 
-		Integer port = getPort(args);;
+		int port = getPort(args);;
 		String reference = getReference(args);
 		run(port, reference, s, 0);
 	}

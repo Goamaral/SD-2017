@@ -28,7 +28,7 @@ class TCPClient {
         socket = new Socket(args[0], Integer.parseInt(args[1]));
       else
         socket = new Socket("localhost", 12345);
-        
+
       // create streams for writing to and reading from the socket
       inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       outToServer = new PrintWriter(socket.getOutputStream(), true);
