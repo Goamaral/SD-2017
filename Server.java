@@ -16,7 +16,7 @@ public class Server {
 		}
 
 		try {
-			DataServerInterface reg = (DataServerInterface) lookupRegistry(port, reference);
+			DataServerServerInterface reg = (DataServerServerInterface) lookupRegistry(port, reference);
 			System.out.println("TCP Server ready");
 			while(true);
 		} catch (RemoteException e) {

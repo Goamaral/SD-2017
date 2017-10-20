@@ -8,8 +8,6 @@ import java.rmi.registry.LocateRegistry;
 */
 
 public class Console {
-	DataServerConsoleInterface reg;
-
 	public static void run(int port, String reference, int delay) {
 		try {
 			Thread.sleep(delay);
@@ -18,7 +16,7 @@ public class Console {
 		}
 
 		try {
-			this.reg = (DataServerInterface) lookupRegistry(port, reference);
+			DataServerConsoleInterface reg = (DataServerConsoleInterface) lookupRegistry(port, reference);
 			System.out.println("Admin Console ready");
 			while(true);
 		} catch (RemoteException e) {
