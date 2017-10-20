@@ -1,32 +1,56 @@
-import java.util.Date;
+addressimport java.util.Date;
 import java.text.*;
 
 class Person {
-  String tipo;
+  String type;
   String name;
   int id;
   String password;
   Department department;
   int phone;
-  String morada;
+  String address;
   int cc;
   Date ccExpire;
+  List list;
 
   public Person(
-    String tipo, String name, int id, String password, Department department,
-    int phone, String morada, int cc, String ccExpire
+    String type, String name, int id, String password, Department department,
+    int phone, String address, int cc, String ccExpire
   ) {
-    this.tipo = tipo;
+    this.type = type;
     this.name = name;
     this.id = id;
     this.password = password;
     this.department = department;
     this.phone = phone;
-    this.morada = morada;
+    this.address = address;
     this.cc = cc;
+    this.list = null;
 
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     try {
-      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+      this.ccExpire = dateFormat.parse(ccExpire);
+    } catch(ParseException e) {
+      System.out.println("BAD DATE FORMAT: ccExpire is not following the \"yyyy-MM-dd\" date format" );
+    }
+  }
+
+  public Person(
+    String type, String name, int id, String password, Department department,
+    int phone, String address, int cc, String ccExpire, List list
+  ) {
+    this.type = type;
+    this.name = name;
+    this.id = id;
+    this.password = password;
+    this.department = department;
+    this.phone = phone;
+    this.address = address;
+    this.cc = cc;
+    this.list = list;
+
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    try {
       this.ccExpire = dateFormat.parse(ccExpire);
     } catch(ParseException e) {
       System.out.println("BAD DATE FORMAT: ccExpire is not following the \"yyyy-MM-dd\" date format" );

@@ -8,7 +8,7 @@ import java.rmi.registry.*;
   STATUS: WORKING
 */
 
-public class DataServer extends UnicastRemoteObject implements DataServerInterface {
+public class DataServer extends UnicastRemoteObject implements DataServerConsoleInterface {
 	public static void run(int port, String reference, DataServer s, int delay) {
 		try {
 			Thread.sleep(delay);
@@ -17,8 +17,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		}
 
 		try {
-			// TODO: Missing UDP connection
-
 			Registry reg = (Registry) createAndBindRegistry(port, reference, s);
 
 			System.out.println("Server ready Port: " + port + " Reference: " + reference);
