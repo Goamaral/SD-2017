@@ -9,7 +9,12 @@ import java.rmi.registry.*;
 */
 
 public class DataServer extends UnicastRemoteObject implements DataServerConsoleInterface {
-	public static void run(int port, String reference, DataServer s, int delay) {
+	static Registry registry;
+	static DataServer server;
+	static String reference;
+	static int port;
+
+	public static void run(int delay) {
 		try {
 			Thread.sleep(delay);
 		} catch (InterruptedException e) {
@@ -17,13 +22,12 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		}
 
 		try {
-			Registry reg = (Registry) createAndBindRegistry(port, reference, s);
-
+			registry = (Registry) createAndBindRegistry();
 			System.out.println("Server ready Port: " + port + " Reference: " + reference);
 			while(true);
 		} catch (RemoteException e) {
 			System.out.println("Remote failure. Trying to reconnect...");
-			run(port, reference, s, 1000);
+			run(1000);
 		}
 	}
 
@@ -106,9 +110,9 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		}
 	}
 
-	public static Registry createAndBindRegistry(int port, String reference, DataServer s) throws RemoteException {
+	public static Registry createAndBindRegistry() throws RemoteException {
 		Registry reg = LocateRegistry.createRegistry(port);
-		reg.rebind(reference, s);
+		reg.rebind(reference, server);
 		return reg;
 	}
 
@@ -117,18 +121,16 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	}
 
 	public static void main(String args[]) {
-		DataServer s = null;
-
 		try {
-			s = new DataServer();
+			server = new DataServer();
 		} catch (RemoteException e) {
 			System.out.println(e);
 			System.exit(-1);
 		}
 
-		int port = getPort(args);;
-		String reference = getReference(args);
-		run(port, reference, s, 0);
+		port = getPort(args);
+		reference = getReference(args);
+		run(0);
 	}
 
 }
