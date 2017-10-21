@@ -15,7 +15,7 @@ class Person {
 
   public Person(
     String type, String name, int id, String password, Department department,
-    int phone, String address, int cc, String ccExpire
+    int phone, String address, int cc, Date ccExpire
   ) {
     this.type = type;
     this.name = name;
@@ -25,19 +25,13 @@ class Person {
     this.phone = phone;
     this.address = address;
     this.cc = cc;
+    this.ccExpire = ccExpire;
     this.list = null;
-
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      this.ccExpire = dateFormat.parse(ccExpire);
-    } catch(ParseException e) {
-      System.out.println("BAD DATE FORMAT: ccExpire is not following the \"yyyy-MM-dd\" date format" );
-    }
   }
 
   public Person(
     String type, String name, int id, String password, Department department,
-    int phone, String address, int cc, String ccExpire, List list
+    int phone, String address, int cc, Date ccExpire, List list
   ) {
     this.type = type;
     this.name = name;
@@ -47,13 +41,7 @@ class Person {
     this.phone = phone;
     this.address = address;
     this.cc = cc;
+    this.ccExpire = ccExpire;
     this.list = list;
-
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      this.ccExpire = dateFormat.parse(ccExpire);
-    } catch(ParseException e) {
-      System.out.println("BAD DATE FORMAT: ccExpire is not following the \"yyyy-MM-dd\" date format" );
-    }
   }
 }
