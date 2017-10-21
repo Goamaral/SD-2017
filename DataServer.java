@@ -24,7 +24,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		try {
 			registry = (Registry) createAndBindRegistry();
 			System.out.println("Server ready Port: " + port + " Reference: " + reference);
-			while(true);
 		} catch (RemoteException e) {
 			System.out.println("Remote failure. Trying to reconnect...");
 			run(1000);
@@ -131,6 +130,9 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		port = getPort(args);
 		reference = getReference(args);
 		run(0);
+
+
+		
 	}
 
 }
