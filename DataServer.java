@@ -36,6 +36,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		// Person -> Department -> Faculty
 		// Pegas na person, tiras o departamento, tiras a faculdade
 		// Consegues agora inserir a pessoa na base de dados
+		// System.out.println(person);
 
 		return;
 	}
@@ -61,10 +62,18 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return;
 	}
 
-  public Zone[] listZones(String type) throws RemoteException {
+  public Faculty[] listFaculties() throws RemoteException {
 		// Vês se o type é "Faculty" ou "Department" e devolves a lista de
 		// departamentos / faculdades de acordo
-		return null;
+		// Faculty[] ret = new Faculty[1];
+		// ret[0] = new Faculty("FCTUC");
+		// return ret;
+	}
+
+	public Department[] listDepartments(Faculty faculty) throws RemoteException {
+		// Department[] ret = new Department[1];
+		// ret[0] = new Department(faculty, "DEI");
+		// return ret;
 	}
 
   public void createElection(Election election) throws RemoteException {

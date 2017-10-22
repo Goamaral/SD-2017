@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.Date;
 import java.text.*;
 
-class Election {
+class Election implements Serializable {
   String name;
   String description;
   String type;

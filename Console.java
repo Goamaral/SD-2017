@@ -2,16 +2,16 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.util.*;
 import java.lang.Thread.State;
+import java.text.*;
 
 /*
   Create worker class -> thread
-	Job (string instruction, object data)
 */
 
 public class Console {
 	static DataServerConsoleInterface registry;
-	static Scanner scanner = new Scanner(System.in);
-	synchronized static LinkedList<Job> jobs = new LinkedList<Job>();
+	static LinkedList<Job> jobs = new LinkedList<Job>();
+	static Worker worker = null;
 
 	static String[] menuStart = { "Membros", "Faculdades / Departamentos", "Eleicoes" };
 	static String[] menuStartTypes = { "Person", "Zone", "Election" };
@@ -20,6 +20,7 @@ public class Console {
 	static String[] menuPersonTypes = { "Register" };
 
 	static String[] menuRegister = { "Estudante", "Docente", "Funcionario" };
+	static String[] menuRegisterTypes = { "Student", "Teacher", "Employee" };
 
 	public static void run(int port, String reference, int delay) {
 		String action;
@@ -31,12 +32,22 @@ public class Console {
 		}
 
 		try {
-			registry = (DataServerConsoleInterface) lookupRegistry(port, reference);
+			DataServerConsoleInterface r = (DataServerConsoleInterface) lookupRegistry(port, reference);
+			Faculty[] x = r.listFaculties();
+			System.out.println(x);
+			return;/*
+			if (worker == null) {
+				worker = new Worker(jobs, registry);
+			} else {
+				jobs.notify();
+				worker.terminate();
+				worker = new Worker(jobs, registry);
+			}
 			System.out.println("Admin Console ready");
 			while(true) {
 				action = menu("Start", "");
 				executeAction(action);
-			}
+			}*/
 		} catch (RemoteException e) {
 			System.out.println("Remote failure. Trying to reconnect...");
 			run(port, reference, 1000);
@@ -80,88 +91,99 @@ public class Console {
 		boolean exit = false;
 		String next = null;
 		String[] types;
+		Scanner scanner = new Scanner(System.in);
+		String line;
 
 		System.out.println("----------");
 
 		switch (type) {
+			default:
+				return null;
+
 			case "Start":
-				max = menuStart.length;
 				for (String s: menuStart) {
 					System.out.println("[" + i + "] " + s);
 					++i;
 				}
 				types = menuStartTypes;
 				break;
+
 			case "Person":
-				max = menuPerson.length;
 				for (String s: menuPerson) {
 					System.out.println("[" + i + "] " + s);
 					++i;
 				}
 				types = menuPersonTypes;
 				break;
+
 			case "Register":
-				max = menuRegister.length;
 				for (String s: menuRegister) {
 					System.out.println("[" + i + "] " + s);
 					++i;
 				}
-				types = menuRegister;
+				types = menuRegisterTypes;
 				exit = true;
 				break;
-			default:
-				return null;
 		}
 
 		System.out.print("Opcao: ");
-		opcao = scanner.nextInt();
+		line = scanner.nextLine();
 
-		if (opcao >= 0 && opcao <= max) {
+		try {
+			opcao = Integer.parseInt(line);
 			next = types[opcao];
-			flow = new String(flow + " " + next);
+			flow = new String(flow + next + " ");
 			if (!exit) {
 				 return menu(next, flow);
 			}
 			return flow;
-		} else {
+		} catch (Exception e) {
 			System.out.println("Opcao invalida");
 			return menu(type, flow);
 		}
 	}
 
 	public static void executeAction(String action) {
-		Job job;
-		System.out.println(action);
-		switch (action) {
-			default:
-				return;
-			case "Person Register Estudante":
-				Person person = buildPerson();
-				job = new Job("createPerson", person);
+		Job job = null;
+		String[] actions = action.split(" ");
+
+		switch (actions[0]) {
+			case "Person":
+				switch (actions[1]) {
+					case "Register":
+						Person person = buildPerson(actions[2]);
+						job = new Job("createPerson", person);
+						break;
+				}
 				break;
 		}
 
-		synchronized (jobs) {
-			jobs.addFirst(job);
-			System.out.println(worker.getState());
-			if (worker.getState() == Thread.State.BLOCKED) {
-				worker.sem.notify();
+		if (job != null) {
+			synchronized (jobs) {
+				jobs.addFirst(job);
+				System.out.println(worker.getState());
+				if (worker.getState() == Thread.State.BLOCKED) {
+					worker.jobs.notify();
+				}
 			}
 		}
 	}
 
 	public static Person buildPerson(String type) {
 	  String name;
-	  int id;
+	  int number = -1;
 	  String password;
 	  Department department;
-	  int phone;
+	  int phone = -1;
 	  String address;
-	  int cc;
-	  Date ccExpire;
+	  int cc = -1;
+	  Date ccExpire = null;
 		String ccExpireString;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		Scanner scanner = new Scanner(System.in);
+		boolean pass;
 
+		String line;
 		System.out.println("--------------------");
 		System.out.println("Criar membro");
 		System.out.println("--------------------");
@@ -169,8 +191,18 @@ public class Console {
 		System.out.print("Nome: ");
 		name = scanner.nextLine();
 
-		System.out.print("Id: ");
-		id = scanner.nextInt();
+		do {
+			try {
+				System.out.print("Numero de cartao: ");
+				line = scanner.nextLine();
+				number = Integer.parseInt(line);
+				pass = true;
+			} catch (Exception e) {
+				System.out.println("Numero invalido");
+				System.out.println("--------------------");
+				pass = false;
+			}
+		} while (!pass);
 
 		System.out.print("Password: ");
 		password = scanner.nextLine();
@@ -178,26 +210,47 @@ public class Console {
 		System.out.print("Morada: ");
 		address = scanner.nextLine();
 
-		System.out.print("Telefone: ");
-		phone = scanner.nextInt();
-
-		System.out.print("Cartao cidadao: ");
-		cc = scanner.nextInt();
-
-		while(true)
-			System.out.print("Data expiracao (Ex: "10-01-2005"): ");
-			ccExpireString = scanner.nextInt();
-
+		do {
 			try {
-	     	ccExpire = dateFormat.parse(ccExpireString);
+				System.out.print("Telefone: ");
+				line = scanner.nextLine();
+				phone = Integer.parseInt(line);
+				pass = true;
+			} catch (Exception e) {
+				System.out.println("Telefone invalido");
+				System.out.println("--------------------");
+				pass = false;
+			}
+		} while (!pass);
+
+		do {
+			try {
+				System.out.print("Cartao cidadao: ");
+				line = scanner.nextLine();
+				cc = Integer.parseInt(line);
+				pass = true;
+			} catch (Exception e) {
+				System.out.println("Cartao do cidadao invalido");
+				System.out.println("--------------------");
+				pass = false;
+			}
+		} while (!pass);
+
+		do {
+			try {
+				System.out.print("Data expiracao (Ex: \"10-01-2005\"): ");
+				line = scanner.nextLine();
+				ccExpire = dateFormat.parse(line);
+				pass = true;
 	    } catch(ParseException e) {
 	      System.out.println("Data invalida.\nFormato: dia-mes-ano. Dois digitos para mes");
+				pass = false;
 			}
-		}
+		} while (!pass);
 
-		department = pickDepartment();
+		department = pickDepartment(null);
 
-		return new Person(type, name, id, password, department, phone, address, cc, ccExpire);
+		return new Person(type, name, number, password, department, phone, address, cc, ccExpire);
 	}
 
 	public static Department pickDepartment(Faculty faculty) {
@@ -205,9 +258,12 @@ public class Console {
 			faculty = pickFaculty();
 		}
 
-		Department[] departments = registry.listDepartments(faculty);
+		Department[] departments = listDepartments(faculty);
+
 		int i = 0;
 		int opcao;
+		Scanner scanner = new Scanner(System.in);
+		String line;
 
 		System.out.println("--------------------");
 		System.out.println("Escolher departmento\nFaculdade " + faculty.name);
@@ -221,20 +277,44 @@ public class Console {
 		System.out.println("[" + i + "] Adicionar novo departmento");
 
 		System.out.print("Opcao: ");
-		opcao = scanner.nextInt();
+		line = scanner.nextLine();
 
-		if (opcao >= 0 && opcao <= departments.length) {
-			return falculties[opcao];
-		} else if (opcao == departments.length + 1) {
-			return buildDepartment(faculty);
-		} else {
+		try {
+			opcao = Integer.parseInt(line);
+		} catch (Exception e) {
+			System.out.println("Opcao invalida");
+			return pickDepartment(faculty);
+		}
+
+		try {
+			return departments[opcao];
+		} catch (Exception e) {
+			if (opcao == departments.length + 1) {
+				return buildDepartment(faculty);
+			}
 			System.out.println("Opcao invalida");
 			return pickDepartment(faculty);
 		}
 	}
 
+	public static Department[] listDepartments(Faculty faculty) {
+		try {
+			return registry.listDepartments(faculty);
+		} catch (RemoteException e1) {
+			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.exit(0);
+			}
+
+			return listDepartments(faculty);
+		}
+	}
+
 	public static Department buildDepartment(Faculty faculty) {
 		String name;
+		Scanner scanner = new Scanner(System.in);
 
 		System.out.println("--------------------");
 		System.out.println("Criar departmento\nFaculdade " + faculty.name);
@@ -246,10 +326,28 @@ public class Console {
 		return new Department(faculty, name);
 	}
 
+	public static Faculty[] listFaculties() {
+		Faculty[] faculties;
+
+		System.out.println(registry.getClass().getName());
+
+		try {
+			faculties = registry.listFaculties();
+		} catch (Exception e) {
+			System.out.println(e);
+			return listFaculties();
+		}
+
+		return faculties;
+	}
+
 	public static Faculty pickFaculty() {
-		Faculty[] falculties = registry.listFaculties();
+		Faculty[] falculties = listFaculties();
+		String line;
+
 		int i = 0;
 		int opcao;
+		Scanner scanner = new Scanner(System.in);
 
 		System.out.println("--------------------");
 		System.out.println("Escolher faculdade");
@@ -263,13 +361,21 @@ public class Console {
 		System.out.println("[" + i + "] Adicionar nova faculdade");
 
 		System.out.print("Opcao: ");
-		opcao = scanner.nextInt();
+		line = scanner.nextLine();
 
-		if (opcao >= 0 && opcao <= falculties.length) {
+		try {
+			opcao = Integer.parseInt(line);
+		} catch (Exception e) {
+			System.out.println("Opcao invalida");
+			return pickFaculty();
+		}
+
+		try {
 			return falculties[opcao];
-		} else if (opcao == falculties.length + 1) {
-			return buildFaculty();
-		} else {
+		} catch (Exception e) {
+			if (opcao == falculties.length + 1) {
+				return buildFaculty();
+			}
 			System.out.println("Opcao invalida");
 			return pickFaculty();
 		}
@@ -277,6 +383,7 @@ public class Console {
 
 	public static Faculty buildFaculty() {
 		String name;
+		Scanner scanner = new Scanner(System.in);
 
 		System.out.println("--------------------");
 		System.out.println("Criar faculdade");

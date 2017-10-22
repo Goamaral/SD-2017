@@ -1,10 +1,11 @@
+import java.io.Serializable;
 import java.util.Date;
 import java.text.*;
 
-class Person {
+class Person implements Serializable {
   String type;
   String name;
-  int id;
+  int number;
   String password;
   Department department;
   int phone;
@@ -14,12 +15,12 @@ class Person {
   List list;
 
   public Person(
-    String type, String name, int id, String password, Department department,
+    String type, String name, int number, String password, Department department,
     int phone, String address, int cc, Date ccExpire
   ) {
     this.type = type;
     this.name = name;
-    this.id = id;
+    this.number = number;
     this.password = password;
     this.department = department;
     this.phone = phone;
@@ -30,12 +31,12 @@ class Person {
   }
 
   public Person(
-    String type, String name, int id, String password, Department department,
+    String type, String name, int number, String password, Department department,
     int phone, String address, int cc, Date ccExpire, List list
   ) {
     this.type = type;
     this.name = name;
-    this.id = id;
+    this.number = number;
     this.password = password;
     this.department = department;
     this.phone = phone;

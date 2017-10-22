@@ -1,4 +1,6 @@
-class VotingTable {
+import java.io.Serializable;
+
+class VotingTable implements Serializable {
   Zone zone;
   Election election;
 
