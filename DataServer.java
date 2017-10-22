@@ -2,17 +2,21 @@ import java.rmi.*;
 import java.rmi.server.*;
 import java.net.*;
 import java.rmi.registry.*;
-
+import java.sql.*;
 /*
   RMI SERVER - RMI + UDP
-  STATUS: WORKING
+  STATUS: NOT WORKING
 */
+
+
 
 public class DataServer extends UnicastRemoteObject implements DataServerConsoleInterface {
 	static Registry registry;
 	static DataServer server;
 	static String reference;
 	static int port;
+
+	static boolean debug = true;
 
 	public static void run(int delay) {
 		try {
@@ -35,7 +39,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		// Person -> Department -> Faculty
 		// Pegas na person, tiras o departamento, tiras a faculdade
 		// Consegues agora inserir a pessoa na base de dados
-		// System.out.println(person);
 
 		return;
 	}
@@ -60,20 +63,12 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		// Identificas se é faculdade ou departamento e removes
 		return;
 	}
-
-  public Faculty[] listFaculties() throws RemoteException {
-		// Vês se o type é "Faculty" ou "Department" e devolves a lista de
-		// departamentos / faculdades de acordo
-		// Faculty[] ret = new Faculty[1];
-		// ret[0] = new Faculty("FCTUC");
-		// return ret;
-	}
-
-	public Department[] listDepartments(Faculty faculty) throws RemoteException {
-		// Department[] ret = new Department[1];
-		// ret[0] = new Department(faculty, "DEI");
-		// return ret;
-	}
+  public Faculty[] listFaculties() throws RemoteException{
+  	return null;
+  }
+  public Department[] listDepartments(Faculty faculty) throws RemoteException{
+  	return null;
+  }
 
   public void createElection(Election election) throws RemoteException {
 		return;
@@ -143,6 +138,80 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		super();
 	}
 
+
+	
+	public static void loadDriverClass() throws Exception {
+		if(debug) System.out.println("loadDriverClass()");
+		try{
+			//step1 load the driver class  
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		}catch(Exception e){ 
+			System.out.println(e); 
+		}
+	}
+
+	public static Connection createConnectionObject() throws Exception {
+		if(debug) System.out.println("createConnectionObject()");
+		Connection con;
+		try{
+			//step2 create  the connection object  
+			con = DriverManager.getConnection(  
+			"jdbc:oracle:thin:@localhost:1521:xe","bd","bd");
+			return con;
+		}catch(Exception e){ 
+			System.out.println(e);
+			return null;
+		}
+	}
+
+	public static Statement createStatementObject(Connection con) throws Exception {
+		if(debug) System.out.println("createStatementObject(Connection con)");
+		Statement stmt;
+		try{
+			//step3 create the statement object  
+			stmt = con.createStatement();  
+			return stmt;
+		}catch(Exception e){ 
+			System.out.println(e); 
+			return null;
+		}
+	}
+
+	public static void executeQuery(Statement stmt) throws Exception {
+		if(debug) System.out.println("executeQuery(Statement stmt)");
+		try{
+			//step4 execute query  
+			ResultSet rs=stmt.executeQuery("select * from faculty");  
+			while(rs.next())  
+				System.out.println(rs.getString(1));
+		}catch(Exception e){ 
+			System.out.println(e); 
+		}
+	}
+
+	public static void closeConnectionObject(Connection con) throws Exception {
+		if(debug) System.out.println("closeConnectionObject(Connection con)");
+		try{
+			//step5 close the connection object  
+			con.close();  
+		}catch(Exception e){ 
+			System.out.println(e); 
+		}
+	}
+
+	public static void connectOracle() throws Exception {
+		if(debug) System.out.println("connectOracle()");
+		try{    
+			loadDriverClass();
+			Connection con = createConnectionObject();
+			Statement stmt = createStatementObject(con);
+			executeQuery(stmt);
+		}catch(Exception e){ 
+			System.out.println(e); 
+		}
+	}
+
+
 	public static void main(String args[]) {
 		try {
 			server = new DataServer();
@@ -154,8 +223,14 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		port = getPort(args);
 		reference = getReference(args);
 		run(0);
-
-
+		
+		try{
+			connectOracle();
+		}catch(Exception e){
+			System.out.println(e); 
+		}
+		
+		return;
 		
 	}
 

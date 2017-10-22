@@ -9,12 +9,12 @@ Creates table "election", which has a unique id for referencing.
 Each "election" line represents an election of a list (from a pool of lists).
 */
 CREATE TABLE election
-(elId           int                 PRIMARY KEY,
- elName         VARCHAR(255)        NOT NULL,
- elDesc         VARCHAR(255),
- elType         VARCHAR(6)          NOT NULL,
- elStart        DATE                NOT NULL,
- elEnd          DATE                NOT NULL  
+(electionId           int                 PRIMARY KEY,
+ electionName         VARCHAR(255)        NOT NULL,
+ electionDesc         VARCHAR(255),
+ electionType         VARCHAR(6)          NOT NULL,
+ electionStart        DATE                NOT NULL,
+ electionEnd          DATE                NOT NULL  
 );
 
 /*
@@ -43,9 +43,9 @@ Each "votingList" line represents a group of people who want to get elected
 CREATE TABLE votingList
 (listId         int                 NOT NULL        PRIMARY KEY,
  listName       VARCHAR(30)         NOT NULL,
- elID           int, 
-                                    FOREIGN KEY (elID) 
-                                        REFERENCES election(elId)
+ electionID           int, 
+                                    FOREIGN KEY (electionID) 
+                                        REFERENCES election(electionId)
 );
 
 
