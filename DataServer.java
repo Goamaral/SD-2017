@@ -63,12 +63,31 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		// Identificas se é faculdade ou departamento e removes
 		return;
 	}
+<<<<<<< HEAD
   public Faculty[] listFaculties() throws RemoteException{
   	return null;
   }
   public Department[] listDepartments(Faculty faculty) throws RemoteException{
   	return null;
   }
+=======
+
+  public Faculty[] listFaculties() throws RemoteException {
+		// Vês se o type é "Faculty" ou "Department" e devolves a lista de
+		// departamentos / faculdades de acordo
+		// Faculty[] ret = new Faculty[1];
+		// ret[0] = new Faculty("FCTUC");
+		// return ret;
+		return null;
+	}
+
+	public Department[] listDepartments(Faculty faculty) throws RemoteException {
+		// Department[] ret = new Department[1];
+		// ret[0] = new Department(faculty, "DEI");
+		// return ret;
+		return null;
+	}
+>>>>>>> 98d005bb2b3bd59b0cb7319aee49d743c5bd7978
 
   public void createElection(Election election) throws RemoteException {
 		return;
@@ -231,7 +250,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		}
 		
 		return;
-		
 	}
 
 }
