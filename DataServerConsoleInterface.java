@@ -1,4 +1,5 @@
 import java.rmi.*;
+import java.util.*;
 
 public interface DataServerConsoleInterface extends Remote {
   // People
@@ -8,18 +9,18 @@ public interface DataServerConsoleInterface extends Remote {
   public void createZone(Zone zone) throws RemoteException;
   public void updateZone(Zone zone, Zone newZone) throws RemoteException;
   public void removeZone(Zone zone) throws RemoteException;
-  public Faculty[] listFaculties() throws RemoteException;
-  public Department[] listDepartments(Faculty faculty) throws RemoteException;
+  public ArrayList<Faculty> listFaculties() throws RemoteException;
+  public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException;
 
   // Elections
   public void createElection(Election election) throws RemoteException;
-  public Election[] listElections(String type) throws RemoteException;
+  public ArrayList<Election> listElections(String type) throws RemoteException;
 
   // Lists
   public void createList(List list) throws RemoteException;
-  public List[] listLists(Election type) throws RemoteException;
+  public ArrayList<List> listLists(Election type) throws RemoteException;
   public void removeList(List list) throws RemoteException;
-  public Person[] listCandidates(List list) throws RemoteException;
+  public ArrayList<Person> listCandidates(List list) throws RemoteException;
 
   // List candidates
   public void addCandidate(List list, Person person) throws RemoteException;

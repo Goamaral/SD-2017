@@ -6,4 +6,8 @@ class Zone implements Serializable {
   public Zone(String name) {
     this.name = name;
   }
+
+  public String toString() {
+    return new String(this.getClass().getName() + this.name);
+  }
 }

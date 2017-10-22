@@ -2,6 +2,7 @@ import java.rmi.*;
 import java.rmi.server.*;
 import java.net.*;
 import java.rmi.registry.*;
+import java.util.*;
 
 /*
   RMI SERVER - RMI + UDP
@@ -35,7 +36,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		// Person -> Department -> Faculty
 		// Pegas na person, tiras o departamento, tiras a faculdade
 		// Consegues agora inserir a pessoa na base de dados
-		// System.out.println(person);
+		System.out.println(person.toString());
 
 		return;
 	}
@@ -61,27 +62,33 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return;
 	}
 
-  public Faculty[] listFaculties() throws RemoteException {
+  public ArrayList<Faculty> listFaculties() throws RemoteException {
 		// Vês se o type é "Faculty" ou "Department" e devolves a lista de
 		// departamentos / faculdades de acordo
-		// Faculty[] ret = new Faculty[1];
-		// ret[0] = new Faculty("FCTUC");
-		// return ret;
-		return null;
+		ArrayList<Faculty> faculties = new ArrayList<Faculty>();
+		faculties.add(new Faculty("FCTUC"));
+
+		Faculty[] test = new Faculty[faculties.size()];
+		test = faculties.toArray(test);
+		System.out.println(Arrays.toString(test));
+		return faculties;
 	}
 
-	public Department[] listDepartments(Faculty faculty) throws RemoteException {
-		// Department[] ret = new Department[1];
-		// ret[0] = new Department(faculty, "DEI");
-		// return ret;
-		return null;
+	public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException {
+		ArrayList<Department> departments = new ArrayList<Department>();
+		departments.add(new Department(faculty, "DEI"));
+
+		Department[] test = new Department[departments.size()];
+		test = departments.toArray(test);
+		System.out.println(Arrays.toString(test));
+		return departments;
 	}
 
   public void createElection(Election election) throws RemoteException {
 		return;
 	}
 
-  public Election[] listElections(String type) throws RemoteException {
+  public ArrayList<Election> listElections(String type) throws RemoteException {
 		return null;
 	}
 
@@ -89,7 +96,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return;
 	}
 
-  public List[] listLists(Election type) throws RemoteException {
+  public ArrayList<List> listLists(Election type) throws RemoteException {
 		return null;
 	}
 
@@ -97,7 +104,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return;
 	}
 
-  public Person[] listCandidates(List list) throws RemoteException {
+  public ArrayList<Person> listCandidates(List list) throws RemoteException {
 		return null;
 	}
 

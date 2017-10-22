@@ -9,6 +9,7 @@ import java.text.*;
 */
 
 public class Console {
+	static boolean TEST = false;
 	static DataServerConsoleInterface registry;
 	static LinkedList<Job> jobs = new LinkedList<Job>();
 	static Worker worker = null;
@@ -32,22 +33,29 @@ public class Console {
 		}
 
 		try {
-			DataServerConsoleInterface r = (DataServerConsoleInterface) lookupRegistry(port, reference);
-			Faculty[] x = r.listFaculties();
-			System.out.println(x);
-			return;/*
-			if (worker == null) {
-				worker = new Worker(jobs, registry);
+			registry = (DataServerConsoleInterface) lookupRegistry(port, reference);
+
+			if (!TEST) {
+				if (worker == null) {
+					worker = new Worker(jobs, registry);
+				} else {
+					jobs.notify();
+					worker.terminate();
+					worker = new Worker(jobs, registry);
+				}
+				System.out.println("Admin Console ready");
+				while(true) {
+					action = menu("Start", "");
+					executeAction(action);
+				}
 			} else {
-				jobs.notify();
-				worker.terminate();
-				worker = new Worker(jobs, registry);
+				try {
+					ArrayList<Faculty> faculties = registry.listFaculties();
+					System.out.println(faculties);
+				} catch (Exception e) {
+					System.out.println("Error" + e);
+				}
 			}
-			System.out.println("Admin Console ready");
-			while(true) {
-				action = menu("Start", "");
-				executeAction(action);
-			}*/
 		} catch (RemoteException e) {
 			System.out.println("Remote failure. Trying to reconnect...");
 			run(port, reference, 1000);
@@ -161,9 +169,9 @@ public class Console {
 		if (job != null) {
 			synchronized (jobs) {
 				jobs.addFirst(job);
-				System.out.println(worker.getState());
-				if (worker.getState() == Thread.State.BLOCKED) {
-					worker.jobs.notify();
+				if (worker.getState() == Thread.State.WAITING) {
+					jobs.notify();
+					System.out.println("WORKER NOTIFIED");
 				}
 			}
 		}
@@ -258,7 +266,7 @@ public class Console {
 			faculty = pickFaculty();
 		}
 
-		Department[] departments = listDepartments(faculty);
+		ArrayList<Department> departments = listDepartments(faculty);
 
 		int i = 0;
 		int opcao;
@@ -287,9 +295,9 @@ public class Console {
 		}
 
 		try {
-			return departments[opcao];
+			return departments.get(opcao);
 		} catch (Exception e) {
-			if (opcao == departments.length + 1) {
+			if (opcao == departments.size()) {
 				return buildDepartment(faculty);
 			}
 			System.out.println("Opcao invalida");
@@ -297,7 +305,7 @@ public class Console {
 		}
 	}
 
-	public static Department[] listDepartments(Faculty faculty) {
+	public static ArrayList<Department> listDepartments(Faculty faculty) {
 		try {
 			return registry.listDepartments(faculty);
 		} catch (RemoteException e1) {
@@ -326,15 +334,13 @@ public class Console {
 		return new Department(faculty, name);
 	}
 
-	public static Faculty[] listFaculties() {
-		Faculty[] faculties;
-
-		System.out.println(registry.getClass().getName());
+	public static ArrayList<Faculty> listFaculties() {
+		ArrayList<Faculty> faculties = null;
 
 		try {
 			faculties = registry.listFaculties();
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println("listFaculties" + e + faculties.getClass().getName());
 			return listFaculties();
 		}
 
@@ -342,7 +348,7 @@ public class Console {
 	}
 
 	public static Faculty pickFaculty() {
-		Faculty[] falculties = listFaculties();
+		ArrayList<Faculty> falculties = listFaculties();
 		String line;
 
 		int i = 0;
@@ -371,9 +377,9 @@ public class Console {
 		}
 
 		try {
-			return falculties[opcao];
+			return falculties.get(opcao);
 		} catch (Exception e) {
-			if (opcao == falculties.length + 1) {
+			if (opcao == falculties.size()) {
 				return buildFaculty();
 			}
 			System.out.println("Opcao invalida");
