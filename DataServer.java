@@ -67,12 +67,14 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		// Faculty[] ret = new Faculty[1];
 		// ret[0] = new Faculty("FCTUC");
 		// return ret;
+		return null;
 	}
 
 	public Department[] listDepartments(Faculty faculty) throws RemoteException {
 		// Department[] ret = new Department[1];
 		// ret[0] = new Department(faculty, "DEI");
 		// return ret;
+		return null;
 	}
 
   public void createElection(Election election) throws RemoteException {
@@ -156,7 +158,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		run(0);
 
 
-		
+
 	}
 
 }
