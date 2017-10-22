@@ -5,20 +5,13 @@ import java.rmi.registry.*;
 import java.sql.*;
 import java.util.*;
 
-/*
-  RMI SERVER - RMI + UDP
-  STATUS: NOT WORKING
-*/
-
-
-
 public class DataServer extends UnicastRemoteObject implements DataServerConsoleInterface {
 	static Registry registry;
 	static DataServer server;
 	static String reference;
 	static int port;
 
-	static boolean debug = true;
+	static boolean debug = false;
 
 	public static void run(int delay) {
 		try {
@@ -155,8 +148,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	public DataServer() throws RemoteException {
 		super();
 	}
-
-
 
 	public static void loadDriverClass() throws Exception {
 		if(debug) System.out.println("loadDriverClass()");
