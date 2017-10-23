@@ -18,7 +18,12 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	static String reference;
 	static int port;
 
-	static boolean debug = true;
+	static String dbUsername = "bd";
+	static String dbPassword = "bd"; // use environment variable later
+
+
+
+	static boolean debug = false;
 
 	public static void run(int delay) {
 		try {
@@ -130,7 +135,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 
 	public static int getPort(String args[]) {
 		try {
-			return Integer.parseInt(args[1]);
+			return Integer.parseInt(args[0]);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return 7000;
 		} catch (NumberFormatException e) {
@@ -140,7 +145,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 
 	public static String getReference(String args[]) {
 		try {
-			return args[2].toString();
+			return args[1].toString();
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return "iVotas";
 		}
@@ -157,79 +162,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	}
 
 
-
-	public static void loadDriverClass() throws Exception {
-		if(debug) System.out.println("loadDriverClass()");
-		try{
-			//step1 load the driver class
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-		}catch(Exception e){
-			System.out.println(e);
-		}
-	}
-
-	public static Connection createConnectionObject() throws Exception {
-		if(debug) System.out.println("createConnectionObject()");
-		Connection con;
-		try{
-			//step2 create  the connection object
-			con = DriverManager.getConnection(
-			"jdbc:oracle:thin:@localhost:1521:xe","bd","bd");
-			return con;
-		}catch(Exception e){
-			System.out.println(e);
-			return null;
-		}
-	}
-
-	public static Statement createStatementObject(Connection con) throws Exception {
-		if(debug) System.out.println("createStatementObject(Connection con)");
-		Statement stmt;
-		try{
-			//step3 create the statement object
-			stmt = con.createStatement();
-			return stmt;
-		}catch(Exception e){
-			System.out.println(e);
-			return null;
-		}
-	}
-
-	public static void executeQuery(Statement stmt) throws Exception {
-		if(debug) System.out.println("executeQuery(Statement stmt)");
-		try{
-			//step4 execute query
-			ResultSet rs=stmt.executeQuery("select * from faculty");
-			while(rs.next())
-				System.out.println(rs.getString(1));
-		}catch(Exception e){
-			System.out.println(e);
-		}
-	}
-
-	public static void closeConnectionObject(Connection con) throws Exception {
-		if(debug) System.out.println("closeConnectionObject(Connection con)");
-		try{
-			//step5 close the connection object
-			con.close();
-		}catch(Exception e){
-			System.out.println(e);
-		}
-	}
-
-	public static void connectOracle() throws Exception {
-		if(debug) System.out.println("connectOracle()");
-		try{
-			loadDriverClass();
-			Connection con = createConnectionObject();
-			Statement stmt = createStatementObject(con);
-			executeQuery(stmt);
-		}catch(Exception e){
-			System.out.println(e);
-		}
-	}
-
-
 	public static void main(String args[]) {
 		try {
 			server = new DataServer();
@@ -243,10 +175,18 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		run(0);
 
 		try{
-			connectOracle();
-		}catch(Exception e){
-			System.out.println(e);
-		}
+			OracleCon database = new OracleCon("bd","bd");
+			ResultSet faculties = database.query("select * from faculty");
+
+			while(faculties.next()){
+				System.out.println(faculties.getString(1));
+			}
+			
+			//database.closeConnection();
+
+			
+
+		}catch (Exception e) {System.out.println(e);}
 
 		return;
 	}
