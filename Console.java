@@ -24,28 +24,39 @@ public class Console {
 
 		String[] menuRegister = { "Estudante", "Docente", "Funcionario" };
 		String[] menuRegisterTypes = { "Student", "Teacher", "Employee" };
-		menus.put("Register", new Menu(menuRegister, menuRegister));
+		menus.put("Register", new Menu(menuRegister, menuRegisterTypes));
 
 		String[] menuZone = { "Faculdades", "Departamentos" };
 		String[] menuZoneTypes = { "Faculty", "Department" };
 		menus.put("Zone", new Menu(menuZone, menuZoneTypes));
 
-		String[] menuElection = { "Eleicao Geral", "Eleicao Nucleo de Estudantes", "Listas", "Mesas de Voto" };
-		String[] menuElectionTypes = { "General", "Nucleus", "Lists", "VotingTable" };
+		String[] menuElection = { "Eleicao Geral", "Eleicao Nucleo de Estudantes" };
+		String[] menuElectionTypes = { "General", "Nucleus" };
 		menus.put("Election", new Menu(menuElection, menuElectionTypes));
 
-		String[] menuGeneral = { "Criar" };
-		String[] menuGeneralTypes = { "Add" };
+		String[] menuGeneral = { "Criar", "Listas", "Mesas de Voto" };
+		String[] menuGeneralTypes = { "Add", "List", "VotingTable" };
 		Menu m1 = new Menu(menuGeneral, menuGeneralTypes);
 		menus.put("General", m1);
 		menus.put("Nucleus", m1);
+
+		String[] menuList = { "Candidatos", "Criar", "Remover" };
+		String[] menuListTypes = { "Candidate", "Create", "Remove" };
+		menus.put("List", new Menu(menuLists, menuListTypes));
+
+		String[] menuCandidate = { "Adicionar", "Remover", "Listar" };
+		String[] menuCandidateTypes = { "Add", "Remove", "Log" };
+		menus.put("Candidate", new Menu(menuCandidate, menuCandidateTypes););
+
+		String[] menuVotingTable = { "Adicionar", "Remover" };
+		String[] menuVotingTableTypes = { "Add", "Remove" };
+		menus.put("VotingTable", new Menu(menuVotingTable, menuVotingTableTypes));
 
 		String[] menuFaculty = { "Criar", "Editar", "Remover" };
 		String[] menuFacultyTypes = { "Add", "Edit", "Remove" };
 		Menu m2 = new Menu(menuFaculty, menuFacultyTypes);
 		menus.put("Faculty", m2);
 		menus.put("Department", m2);
-
 
 		setSecurityPolicies();
 		int port = getPort(args);
@@ -108,17 +119,19 @@ public class Console {
 		int i = 0;
 		int opcao = -1;
 		int max = 0;
-		boolean exit = false;
 		String next = null;
 		Menu menu = null;
 		Scanner scanner = new Scanner(System.in);
 		String line;
-		String[] endings = { "Register", "Faculty", "Department", "General", "Nucleus" };
+		String[] endings = { "Student", "Teacher", "Employee", "Add", "Edit", "Remove", "Create", "Log" };
 
 		System.out.println("----------");
 		if (debug) System.out.println("TYPE: " + type);
 
-		exit = Arrays.asList(endings).contains(type);
+		if (Arrays.asList(endings).contains(type)) {
+			if (debug) System.out.println("FLOW: " + flow);
+			return flow;
+		}
 
 		menu = menus.get(type);
 
@@ -133,13 +146,8 @@ public class Console {
 		try {
 			opcao = Integer.parseInt(line);
 			next = menu.types[opcao];
-			if (!exit) {
-				flow = new String(flow + next + " ");
-				return menu(next, flow);
-			}
-			flow = new String(flow + next);
-			if (debug) System.out.println("END: " + next);
-			return flow;
+			flow = new String(flow + next + " ");
+			return menu(next, flow);
 		} catch (Exception e) {
 			if (debug) System.out.println(e);
 			System.out.println("Opcao invalida");
@@ -207,10 +215,95 @@ public class Console {
 			case "Election":
 				switch (actions[1]) {
 					case "General":
-						data1 = buildElection("Geral", "General");
+						switch (actions[2]) {
+							case "Add":
+								data1 = buildElection("Geral", "General");
+								break;
+
+							case "List":
+								switch (actions[3]) {
+									case "Create":
+										// TODO data1 = buildList();
+										break;
+
+									case "Remove":
+										// TODO data1 = pickList();
+										break;
+
+									case "Candidate":
+										switch (actions[4]) {
+											case "Add":
+												// TODO data1 = pickList();
+												// TODO data2 = pickPerson();
+												break;
+
+											case "Remove":
+												// TODO data1 = pickList();
+												// TODO data2 = pickPerson();
+												break;
+
+											case "Log":
+												// TODO listCandidates();
+												return;
+										}
+										break;
+								}
+								break;
+
+							case "VotingTable":
+								switch (actions[3]) {
+									case "Add":
+										// TODO data1 = buildVotingTable();
+										break;
+
+									case "Remove":
+										// TODO data1 = listVotingTables();
+										break;
+								}
+								break;
+						}
 						break;
+
 					case "Nucleus":
-						data1 = buildElection("Nucleo de Estudantes", "Nucleus");
+						switch (actions[3]) {
+							case "Create":
+								// TODO data1 = buildList();
+								break;
+
+							case "Remove":
+								// TODO data1 = pickList();
+								break;
+
+							case "Candidate":
+								switch (actions[4]) {
+									case "Add":
+										// TODO data1 = pickList();
+										// TODO data2 = pickPerson();
+										break;
+
+									case "Remove":
+										// TODO data1 = pickList();
+										// TODO data2 = pickPerson();
+										break;
+
+									case "Log":
+										// TODO listCandidates();
+										return;
+								}
+								break;
+								
+							case "VotingTable":
+								switch (actions[3]) {
+									case "Add":
+										// TODO data1 = buildVotingTable();
+										break;
+
+									case "Remove":
+										// TODO data1 = listVotingTables();
+										break;
+								}
+								break;
+						}
 						break;
 				}
 				break;

@@ -29,6 +29,7 @@ class ConsoleWorker extends Thread {
                   case "Person Register":
                     this.registry.createPerson((Person)job.data1);
                     break;
+                    
                   case "Zone Faculty Add":
                   case "Zone Department Add":
                     switch (job.data1.getClass().getName()) {
@@ -40,6 +41,7 @@ class ConsoleWorker extends Thread {
                         break;
                     }
                     break;
+
                   case "Zone Faculty Edit":
                   case "Department Edit":
                     switch (job.data1.getClass().getName()) {
@@ -51,16 +53,50 @@ class ConsoleWorker extends Thread {
                         break;
                     }
                     break;
+
                   case "Zone Faculty Remove":
                     this.registry.removeZone((Faculty)job.data1);
                     break;
+
                   case "Zone Department Remove":
                     this.registry.removeZone((Department)job.data1);
                     break;
+
                   case "Election General Add":
                   case "Election Nucleus Add":
                     this.registry.createElection((Election)job.data1);
                     break;
+
+                  case "Election General List Create":
+                  case "Election Nucleus List Create":
+                    this.registry.createList((List)data1);
+                    break;
+
+                  case "Election General List Remove":
+                  case "Election Nucleus List Remove":
+                    this.registry.removeList((List)data1);
+                    break;
+
+                  case "Election General List Candidate Add":
+                  case "Election Nucleus List Candidate Add":
+                    this.registry.addCandidate((List)data1, (Person)data2);
+                    break;
+
+                  case "Election General List Candidate Remove":
+                  case "Election Nucleus List Candidate Remove":
+                    this.registry.addCandidate((List)data1, (Person)data2);
+                    break;
+
+                  case "Election General VotingTable Add":
+                  case "Election Nucleus VotingTable Add":
+                    this.registry.createVotingTable((VotingTable)data1);
+                    break;
+
+                  case "Election General VotingTable Remove":
+                  case "Election Nucleus VotingTable Remove":
+                    this.registry.removeVotingTable((VotingTable)data1);
+                    break;
+
                 }
               } catch (RemoteException e) {
                 System.out.println("WORKER FAILED " + e);
