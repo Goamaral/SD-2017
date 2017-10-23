@@ -11,15 +11,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	static String reference;
 	static int port;
 
-<<<<<<< HEAD
-	static String dbUsername = "bd";
-	static String dbPassword = "bd"; // use environment variable later
-
-
-
-=======
->>>>>>> 4045c451fa573f25316ad670e0a23b0674946858
-	static boolean debug = false;
 
 	public static void run(int delay) {
 		try {
