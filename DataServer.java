@@ -6,13 +6,14 @@ import java.sql.*;
 import java.util.*;
 
 public class DataServer extends UnicastRemoteObject implements DataServerConsoleInterface {
-	static Registry registry;
+	static DataServerConsoleInterface backupRegistry;
+	static Registry serverRegistry;
 	static DataServer server;
 	static String reference;
 	static int port;
 
 
-	public static void run(int delay) {
+	public static void runServer(int delay) {
 		try {
 			Thread.sleep(delay);
 		} catch (InterruptedException e) {
@@ -20,11 +21,30 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		}
 
 		try {
-			registry = (Registry) createAndBindRegistry();
+			serverRegistry = (Registry) createAndBindRegistry();
 			System.out.println("Server ready Port: " + port + " Reference: " + reference);
 		} catch (RemoteException e) {
-			System.out.println("Remote failure. Trying to reconnect...");
-			run(1000);
+			System.out.println("Remote failure:\n" + e );
+			runBackupServer(0);
+		}
+	}
+
+	public static void runBackupServer(int delay){
+		try {
+			Thread.sleep(delay);
+		} catch (InterruptedException e) {
+			System.exit(0);
+		}
+
+		try {
+			backupRegistry = (DataServerConsoleInterface) lookupRegistry(port, reference);
+			System.out.println("Backup server ready Port: " + port + " Reference: " + reference);
+		} catch (RemoteException e) {
+			System.out.println("Remote failure: " + e + "\nTrying to reconnect...");
+			runBackupServer(1500);
+		} catch (NotBoundException e) {
+			System.out.println("Remote failure: " + e + "\nTrying to reconnect...");
+			runBackupServer(1500);
 		}
 	}
 
@@ -144,6 +164,16 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return reg;
 	}
 
+
+	public static Remote lookupRegistry(int port, String reference) throws RemoteException, NotBoundException {
+		return LocateRegistry.getRegistry(port).lookup(reference);
+	}
+
+	public static void setSecurityPolicies() {
+		System.getProperties().put("java.security.policy", "policy.all");
+		System.setSecurityManager(new SecurityManager());
+	}
+
 	public DataServer() throws RemoteException {
 		super();
 	}
@@ -156,10 +186,11 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 			System.out.println(e);
 			System.exit(-1);
 		}
-
+		setSecurityPolicies();
 		port = getPort(args);
 		reference = getReference(args);
-		run(0);
+
+		runServer(0);
 
 		try{
 			OracleCon database = new OracleCon("bd","bd");
