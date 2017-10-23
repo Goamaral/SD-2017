@@ -52,15 +52,14 @@ class ConsoleWorker extends Thread {
                     }
                     break;
                   case "Zone Faculty Remove":
+                    this.registry.removeZone((Faculty)job.data1);
+                    break;
                   case "Zone Department Remove":
-                    switch (job.data1.getClass().getName()) {
-                      case "Faculty":
-                        this.registry.removeZone((Faculty)job.data1);
-                        break;
-                      case "Department":
-                        this.registry.removeZone((Department)job.data1);
-                        break;
-                    }
+                    this.registry.removeZone((Department)job.data1);
+                    break;
+                  case "Election General Add":
+                  case "Election Nucleus Add":
+                    this.registry.createElection((Election)job.data1);
                     break;
                 }
               } catch (RemoteException e) {
