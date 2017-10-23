@@ -4,24 +4,42 @@ import java.util.*;
 import java.lang.Thread.State;
 import java.text.*;
 
-/*
-  Create worker class -> thread
-*/
-
 public class Console {
-	static boolean TEST = false;
+	static boolean debug = true;
 	static DataServerConsoleInterface registry;
 	static LinkedList<Job> jobs = new LinkedList<Job>();
-	static Worker worker = null;
+	static ConsoleWorker worker = null;
+	static Hashtable<String, Menu> menus = new Hashtable<String, Menu>();
 
-	static String[] menuStart = { "Membros", "Faculdades / Departamentos", "Eleicoes" };
-	static String[] menuStartTypes = { "Person", "Zone", "Election" };
+	public static void main(String args[]) {
+		setSecurityPolicies();
+		int port = getPort(args);;
+		String reference = getReference(args);
 
-	static String[] menuPerson = { "Registar membro" };
-	static String[] menuPersonTypes = { "Register" };
+		String[] menuStart = { "Membros", "Faculdades / Departamentos", "Eleicoes" };
+		String[] menuStartTypes = { "Person", "Zone", "Election" };
+		menus.put("Start", new Menu(menuStart, menuStartTypes));
 
-	static String[] menuRegister = { "Estudante", "Docente", "Funcionario" };
-	static String[] menuRegisterTypes = { "Student", "Teacher", "Employee" };
+		String[] menuPerson = { "Registar membro" };
+		String[] menuPersonTypes = { "Register" };
+		menus.put("Person", new Menu(menuPerson, menuPersonTypes));
+
+		String[] menuRegister = { "Estudante", "Docente", "Funcionario" };
+		String[] menuRegisterTypes = { "Student", "Teacher", "Employee" };
+		menus.put("Register", new Menu(menuRegister, menuRegister));
+
+		// DOING
+		String[] menuZone = { "Faculdades", "Departamentos" };
+		String[] menuZoneTypes = { "Faculty", "Department" };
+		menus.put("Zone", new Menu(menuZone, menuZoneTypes));
+
+		String[] menuFaculty = { "Adicionar", "Editar", "Remover" };
+		String[] menuFacultyTypes = { "Add", "Edit", "Remove" };
+		menus.put("Faculty", new Menu(menuFaculty, menuFacultyTypes));
+		menus.put("Department", new Menu(menuFaculty, menuFacultyTypes));
+
+		run(port, reference, 0);
+	}
 
 	public static void run(int port, String reference, int delay) {
 		String action;
@@ -35,26 +53,17 @@ public class Console {
 		try {
 			registry = (DataServerConsoleInterface) lookupRegistry(port, reference);
 
-			if (!TEST) {
-				if (worker == null) {
-					worker = new Worker(jobs, registry);
-				} else {
-					jobs.notify();
-					worker.terminate();
-					worker = new Worker(jobs, registry);
-				}
-				System.out.println("Admin Console ready");
-				while(true) {
-					action = menu("Start", "");
-					executeAction(action);
-				}
+			if (worker == null) {
+				worker = new ConsoleWorker(jobs, registry);
 			} else {
-				try {
-					ArrayList<Faculty> faculties = registry.listFaculties();
-					System.out.println(faculties);
-				} catch (Exception e) {
-					System.out.println("Error" + e);
-				}
+				jobs.notify();
+				worker.terminate();
+				worker = new ConsoleWorker(jobs, registry);
+			}
+			System.out.println("Admin Console ready");
+			while(true) {
+				action = menu("Start", "");
+				executeAction(action);
 			}
 		} catch (RemoteException e) {
 			System.out.println("Remote failure. Trying to reconnect...");
@@ -94,44 +103,25 @@ public class Console {
 
 	public static String menu(String type, String flow) {
 		int i = 0;
-		int opcao;
+		int opcao = -1;
 		int max = 0;
 		boolean exit = false;
 		String next = null;
-		String[] types;
+		Menu menu = null;
 		Scanner scanner = new Scanner(System.in);
 		String line;
+		String[] endings = { "Register", "Faculty", "Department" };
 
 		System.out.println("----------");
+		if (debug) System.out.println("TYPE: " + type);
 
-		switch (type) {
-			default:
-				return null;
+		exit = Arrays.asList(endings).contains(type);
 
-			case "Start":
-				for (String s: menuStart) {
-					System.out.println("[" + i + "] " + s);
-					++i;
-				}
-				types = menuStartTypes;
-				break;
+		menu = menus.get(type);
 
-			case "Person":
-				for (String s: menuPerson) {
-					System.out.println("[" + i + "] " + s);
-					++i;
-				}
-				types = menuPersonTypes;
-				break;
-
-			case "Register":
-				for (String s: menuRegister) {
-					System.out.println("[" + i + "] " + s);
-					++i;
-				}
-				types = menuRegisterTypes;
-				exit = true;
-				break;
+		for (String s: menu.menu) {
+			System.out.println("[" + i + "] " + s);
+			++i;
 		}
 
 		System.out.print("Opcao: ");
@@ -139,13 +129,16 @@ public class Console {
 
 		try {
 			opcao = Integer.parseInt(line);
-			next = types[opcao];
-			flow = new String(flow + next + " ");
+			next = menu.types[opcao];
 			if (!exit) {
-				 return menu(next, flow);
+				flow = new String(flow + next + " ");
+				return menu(next, flow);
 			}
+			flow = new String(flow + next);
+			if (debug) System.out.println("END: " + next);
 			return flow;
 		} catch (Exception e) {
+			if (debug) System.out.println(e);
 			System.out.println("Opcao invalida");
 			return menu(type, flow);
 		}
@@ -154,27 +147,120 @@ public class Console {
 	public static void executeAction(String action) {
 		Job job = null;
 		String[] actions = action.split(" ");
+		Object data1 = null;
+		Object data2 = null;
+		Faculty faculty;
+		Department department;
+
+		if (debug) System.out.println(action);
 
 		switch (actions[0]) {
 			case "Person":
 				switch (actions[1]) {
 					case "Register":
-						Person person = buildPerson(actions[2]);
-						job = new Job("createPerson", person);
+						data1 = buildPerson(actions[2]);
 						break;
+				}
+				break;
+			case "Zone":
+				switch (actions[1]) {
+					case "Faculty":
+						switch (actions[2]) {
+							case "Add":
+								data1 = buildFaculty();
+								break;
+							case "Edit":
+								faculty = pickFaculty();
+								data1 = faculty;
+								data2 = editFaculty(faculty);
+								if (data2 == null) return;
+								break;
+							case "Remove":
+								data1 = pickFaculty();
+								break;
+						}
+					break;
+
+					case "Department":
+						switch (actions[2]) {
+							case "Add":
+								faculty = pickFaculty();
+								data1 = buildDepartment(faculty);
+								break;
+							case "Edit":
+								faculty = pickFaculty();
+								department = pickDepartment(faculty);
+								data1 = department;
+								data2 = editDepartment(department);
+								if (data2 == null) return;
+								break;
+							case "Remove":
+								faculty = pickFaculty();
+								data1 = pickDepartment(faculty);
+								break;
+						}
+					break;
 				}
 				break;
 		}
 
-		if (job != null) {
+		if (data1 != null) {
+			if (data2 == null) {
+				job = new Job(action, data1);
+			} else job = new Job(action, data1, data2);
+
 			synchronized (jobs) {
 				jobs.addFirst(job);
 				if (worker.getState() == Thread.State.WAITING) {
 					jobs.notify();
-					System.out.println("WORKER NOTIFIED");
 				}
 			}
 		}
+	}
+
+	public static Department editDepartment(Department department) {
+		Scanner scanner = new Scanner(System.in);
+		String line;
+		String name = department.name;
+		Faculty faculty = department.faculty;
+
+		System.out.println("----------");
+		System.out.println("Nome: " + department.name);
+		System.out.print("Editar? [s/N]: ");
+
+		line = scanner.nextLine();
+		if (line.equals("s")) {
+			System.out.print("Novo nome: ");
+			name = scanner.nextLine();
+		}
+
+		System.out.println("Faculdade: " + department.faculty.name);
+		System.out.print("Editar? [s/N]: ");
+
+		line = scanner.nextLine();
+		if (line.equals("s")) {
+			faculty = editFaculty(department.faculty);
+		}
+
+		return new Department(faculty, name);
+	}
+
+	public static Faculty editFaculty(Faculty faculty) {
+		Scanner scanner = new Scanner(System.in);
+		String line;
+		String name = faculty.name;
+
+		System.out.println("----------");
+		System.out.println("Nome: " + faculty.name);
+		System.out.print("Editar? [s/N]: ");
+
+		line = scanner.nextLine();
+		if (line.equals("s")) {
+			System.out.print("Novo nome: ");
+			name = scanner.nextLine();
+		}
+
+		return new Faculty(name);
 	}
 
 	public static Person buildPerson(String type) {
@@ -399,13 +485,6 @@ public class Console {
 		name = scanner.nextLine();
 
 		return new Faculty(name);
-	}
-
-	public static void main(String args[]) {
-		setSecurityPolicies();
-		int port = getPort(args);;
-		String reference = getReference(args);
-		run(port, reference, 0);
 	}
 
 }
