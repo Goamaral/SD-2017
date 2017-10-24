@@ -11,6 +11,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	static DataServer server;
 	static String reference;
 	static int port;
+	static int socketPort = 7002;
 
 
 	public static void runServer(int delay) {
@@ -23,12 +24,59 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		try {
 			serverRegistry = (Registry) createAndBindRegistry();
 			System.out.println("Server ready Port: " + port + " Reference: " + reference);
+
+			while(true){
+	            try{
+	            	byte[] buf = new byte[256];
+	            	DatagramPacket packet = new DatagramPacket(buf, buf.length);
+	            	DatagramSocket socket = new DatagramSocket(socketPort);
+					System.out.println("Listenting on port: " + socketPort);
+	            	socket.receive(packet);
+	            	InetAddress returnAddress = packet.getAddress();
+	            	int returnPort = packet.getPort();
+		            String received = new String(packet.getData(), 0, packet.getLength());
+		            System.out.println("Recieved: " + received);
+		            String returnMessage = "pong";
+		            buf = returnMessage.getBytes();
+		            packet = new DatagramPacket(buf, buf.length, returnAddress, returnPort);
+		            System.out.println("Sending: " + returnMessage);
+		            socket.send(packet);
+			   		socket.close();
+	            }catch(Exception e) {
+	            	System.out.println(e);
+	            }
+			}
 		} catch (RemoteException e) {
 			System.out.println("Remote failure:\n" + e );
 			runBackupServer(0);
 		}
 	}
+/*
+	public static String listen() {
+		byte[] buf = new byte[256];
+		while (true) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.exit(0);
+			}
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            try{
+            	MulticastSocket socket = new MulticastSocket(socketPort);
+				System.out.println("Listenting");
+            	socket.receive(packet);
+            	socket.close();
 
+	            String received = new String(packet.getData(), 0, packet.getLength());
+	            System.out.println(received);
+	            return received;
+            }catch(Exception e) {
+            	System.out.println(e);
+            	return null;
+            } 
+        }
+	}
+*/
 	public static void runBackupServer(int delay){
 		try {
 			Thread.sleep(delay);
@@ -39,15 +87,65 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		try {
 			backupRegistry = (DataServerConsoleInterface) lookupRegistry(port, reference);
 			System.out.println("Backup server ready Port: " + port + " Reference: " + reference);
-		} catch (RemoteException e) {
-			System.out.println("Remote failure: " + e + "\nTrying to reconnect...");
-			runBackupServer(1500);
-		} catch (NotBoundException e) {
+			int tries = 5;
+			while(tries > 0){
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					System.exit(0);
+				}
+
+
+				try{
+					byte[] buf = new byte[256];
+					String msg = "ping";
+        			buf = msg.getBytes(); 
+					InetAddress sendAddress = InetAddress.getByName("localhost");
+					DatagramPacket packet = new DatagramPacket(buf, buf.length, sendAddress, socketPort);
+
+					DatagramSocket socket = new DatagramSocket(socketPort+1);
+
+					System.out.println("Sending: " + msg);
+		        	socket.send(packet);
+
+		        	socket.receive(packet);
+	            	InetAddress returnAddress = packet.getAddress();
+	            	int returnPort = packet.getPort();
+		            String received = new String(packet.getData(), 0, packet.getLength());
+		            System.out.println("Recieved: " + received);
+
+		        	socket.close();
+				}catch(Exception e){
+					System.out.println(e);
+				}
+
+
+				tries--;
+			}
+
+		} catch (Exception e) {
 			System.out.println("Remote failure: " + e + "\nTrying to reconnect...");
 			runBackupServer(1500);
 		}
 	}
+/*
+	public static void sendMessage(int sendPort, String msg) {
+		byte[] buf = new byte[256];
+        buf = msg.getBytes();
+		try{
+			InetAddress sendAddress = InetAddress.getByName("localhost");
+			DatagramPacket packet = new DatagramPacket(buf, buf.length, sendAddress, sendPort);
 
+			MulticastSocket socket = new MulticastSocket(port);
+			System.out.println("Sending: " + msg);
+        	socket.send(packet);
+
+        	socket.close();
+		}catch(Exception e){
+			System.out.println(e);
+		}
+    }
+*/
 	// DataServer Console Interface Methods
 	public void createPerson(Person person) throws RemoteException {
 		// Person -> Department -> Faculty
