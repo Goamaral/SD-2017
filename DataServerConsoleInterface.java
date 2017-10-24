@@ -9,6 +9,7 @@ public interface DataServerConsoleInterface extends Remote {
   public void createZone(Zone zone) throws RemoteException;
   public void updateZone(Zone zone, Zone newZone) throws RemoteException;
   public void removeZone(Zone zone) throws RemoteException;
+  public void createFaculty(Faculty faculty) throws RemoteException;
   public ArrayList<Faculty> listFaculties() throws RemoteException;
   public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException;
 

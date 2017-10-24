@@ -12,6 +12,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	static String reference;
 	static int port;
 	static int socketPort = 7002;
+	static OracleCon database;
 
 
 	public static void runServer(int delay) {
@@ -51,39 +52,8 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 			runBackupServer(0);
 		}
 	}
-/*
-	public static String listen() {
-		byte[] buf = new byte[256];
-		while (true) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				System.exit(0);
-			}
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
-            try{
-            	MulticastSocket socket = new MulticastSocket(socketPort);
-				System.out.println("Listenting");
-            	socket.receive(packet);
-            	socket.close();
 
-	            String received = new String(packet.getData(), 0, packet.getLength());
-	            System.out.println(received);
-	            return received;
-            }catch(Exception e) {
-            	System.out.println(e);
-            	return null;
-            } 
-        }
-	}
-*/
 	public static void runBackupServer(int delay){
-		try {
-			Thread.sleep(delay);
-		} catch (InterruptedException e) {
-			System.exit(0);
-		}
-
 		try {
 			backupRegistry = (DataServerConsoleInterface) lookupRegistry(port, reference);
 			System.out.println("Backup server ready Port: " + port + " Reference: " + reference);
@@ -95,57 +65,37 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 					System.exit(0);
 				}
 
-
+				DatagramSocket socket = new DatagramSocket(socketPort+1);
 				try{
 					byte[] buf = new byte[256];
 					String msg = "ping";
         			buf = msg.getBytes(); 
 					InetAddress sendAddress = InetAddress.getByName("localhost");
 					DatagramPacket packet = new DatagramPacket(buf, buf.length, sendAddress, socketPort);
-
-					DatagramSocket socket = new DatagramSocket(socketPort+1);
-
 					System.out.println("Sending: " + msg);
 		        	socket.send(packet);
-
+		        	socket.setSoTimeout(1000);
 		        	socket.receive(packet);
 	            	InetAddress returnAddress = packet.getAddress();
 	            	int returnPort = packet.getPort();
 		            String received = new String(packet.getData(), 0, packet.getLength());
 		            System.out.println("Recieved: " + received);
-
-		        	socket.close();
-				}catch(Exception e){
-					System.out.println(e);
-				}
-
-
-				tries--;
+		        	tries = 5;
+				}catch (SocketTimeoutException e) {
+	                // timeout exception.
+	                System.out.println("Timeout reached!!! " + tries);
+	                tries--;
+	            }catch (Exception e){}
+	            socket.close();
 			}
+			runServer(0);
 
 		} catch (Exception e) {
 			System.out.println("Remote failure: " + e + "\nTrying to reconnect...");
 			runBackupServer(1500);
 		}
 	}
-/*
-	public static void sendMessage(int sendPort, String msg) {
-		byte[] buf = new byte[256];
-        buf = msg.getBytes();
-		try{
-			InetAddress sendAddress = InetAddress.getByName("localhost");
-			DatagramPacket packet = new DatagramPacket(buf, buf.length, sendAddress, sendPort);
 
-			MulticastSocket socket = new MulticastSocket(port);
-			System.out.println("Sending: " + msg);
-        	socket.send(packet);
-
-        	socket.close();
-		}catch(Exception e){
-			System.out.println(e);
-		}
-    }
-*/
 	// DataServer Console Interface Methods
 	public void createPerson(Person person) throws RemoteException {
 		// Person -> Department -> Faculty
@@ -164,28 +114,39 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return;
 	}
 
-  public void updateZone(Zone zone, Zone newZone) throws RemoteException {
+  	public void updateZone(Zone zone, Zone newZone) throws RemoteException {
 		// Identificas se é faculdade ou departamento e atualizas com os novos dados
 		// o departamento ou faculdade
 
 		return;
 	}
 
-  public void removeZone(Zone zone) throws RemoteException {
+  	public void removeZone(Zone zone) throws RemoteException {
 		// Identificas se é faculdade ou departamento e removes
 		return;
 	}
 
-  public ArrayList<Faculty> listFaculties() throws RemoteException {
-		// Vês se o type é "Faculty" ou "Department" e devolves a lista de
-		// departamentos / faculdades de acordo
-		ArrayList<Faculty> faculties = new ArrayList<Faculty>();
-		faculties.add(new Faculty("FCTUC"));
+	public void createFaculty(Faculty faculty) throws RemoteException{
+		try{
+			database.insert("INSERT INTO faculty VALUES ('" + faculty.name + "')");
+		}catch(Exception e){System.out.println(e);}
+	}
 
-		Faculty[] test = new Faculty[faculties.size()];
-		test = faculties.toArray(test);
-		System.out.println(Arrays.toString(test));
-		return faculties;
+  	public ArrayList<Faculty> listFaculties() throws RemoteException {
+  		ArrayList<Faculty> faculties = new ArrayList<Faculty>();
+  		try{
+	  		ResultSet resultQuery = database.query("SELECT facName FROM faculty");
+			while(resultQuery.next()){
+				faculties.add(new Faculty(resultQuery.getString(1)));
+			}
+			// Vês se o type é "Faculty" ou "Department" e devolves a lista de
+			// departamentos / faculdades de acordo
+
+			Faculty[] test = new Faculty[faculties.size()];
+			test = faculties.toArray(test);
+			System.out.println(Arrays.toString(test));
+			return faculties;
+		} catch(Exception e){System.out.println(e);return null;}
 	}
 
 	public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException {
@@ -287,22 +248,14 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		setSecurityPolicies();
 		port = getPort(args);
 		reference = getReference(args);
+		database = new OracleCon("bd","bd");
+		
 
 		runServer(0);
 
-		try{
-			OracleCon database = new OracleCon("bd","bd");
-			ResultSet faculties = database.query("select * from faculty");
-
-			while(faculties.next()){
-				System.out.println(faculties.getString(1));
-			}
-
-			//database.closeConnection();
+		
 
 
-
-		}catch (Exception e) {System.out.println(e);}
 
 		return;
 	}
