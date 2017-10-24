@@ -6,15 +6,17 @@ class Election implements Serializable {
   String name;
   String description;
   String type;
+  String subtype;
   Date start;
   Date end;
   Department department;
 
-  public Election(String name, Department department, Date start, Date end, String type) {
+  public Election(String name, Department department, Date start, Date end, String type, String subtype) {
     this.name = name;
     this.description = description;
     this.department = department;
     this.type = type;
+    this.subtype = subtype;
     this.start = start;
     this.end = end;
   }

@@ -4,6 +4,8 @@ import java.util.*;
 import java.lang.Thread.State;
 import java.text.*;
 
+// TODO protect listing against DataServer Failure
+
 public class Console {
 	static boolean debug = true;
 	static DataServerConsoleInterface registry;
@@ -34,19 +36,25 @@ public class Console {
 		String[] menuElectionTypes = { "General", "Nucleus" };
 		menus.put("Election", new Menu(menuElection, menuElectionTypes));
 
-		String[] menuGeneral = { "Criar", "Listas", "Mesas de Voto" };
-		String[] menuGeneralTypes = { "Add", "List", "VotingTable" };
-		Menu m1 = new Menu(menuGeneral, menuGeneralTypes);
-		menus.put("General", m1);
-		menus.put("Nucleus", m1);
+		String[] menuNucleus = { "Criar", "Listas", "Mesas de Voto" };
+		String[] menuNucleusTypes = { "Add", "List", "VotingTable" };
+		menus.put("Nucleus", new Menu(menuNucleus, menuNucleusTypes));
+
+		String[] menuGeneral = { "Estudante", "Docente", "Funcionario" };
+		String[] menuGeneralTypes = { "Student-Election", "Teacher-Election", "Employee-Election" };
+		menus.put("General", new Menu(menuGeneral, menuGeneralTypes));
+
+		menus.put("Student-Election", new Menu(menuNucleus, menuNucleusTypes));
+		menus.put("Teacher-Election", new Menu(menuNucleus, menuNucleusTypes));
+		menus.put("Employee-Election", new Menu(menuNucleus, menuNucleusTypes));
 
 		String[] menuList = { "Candidatos", "Criar", "Remover" };
 		String[] menuListTypes = { "Candidate", "Create", "Remove" };
-		menus.put("List", new Menu(menuLists, menuListTypes));
+		menus.put("List", new Menu(menuList, menuListTypes));
 
 		String[] menuCandidate = { "Adicionar", "Remover", "Listar" };
 		String[] menuCandidateTypes = { "Add", "Remove", "Log" };
-		menus.put("Candidate", new Menu(menuCandidate, menuCandidateTypes););
+		menus.put("Candidate", new Menu(menuCandidate, menuCandidateTypes));
 
 		String[] menuVotingTable = { "Adicionar", "Remover" };
 		String[] menuVotingTableTypes = { "Add", "Remove" };
@@ -54,9 +62,8 @@ public class Console {
 
 		String[] menuFaculty = { "Criar", "Editar", "Remover" };
 		String[] menuFacultyTypes = { "Add", "Edit", "Remove" };
-		Menu m2 = new Menu(menuFaculty, menuFacultyTypes);
-		menus.put("Faculty", m2);
-		menus.put("Department", m2);
+		menus.put("Faculty", new Menu(menuFaculty, menuFacultyTypes));
+		menus.put("Department", new Menu(menuFaculty, menuFacultyTypes));
 
 		setSecurityPolicies();
 		int port = getPort(args);
@@ -123,12 +130,16 @@ public class Console {
 		Menu menu = null;
 		Scanner scanner = new Scanner(System.in);
 		String line;
-		String[] endings = { "Student", "Teacher", "Employee", "Add", "Edit", "Remove", "Create", "Log" };
+		String[] endings = {
+			"Student", "Teacher", "Employee", "Add", "Edit", "Remove", "Create",
+			"Log"
+		};
 
 		System.out.println("----------");
 		if (debug) System.out.println("TYPE: " + type);
 
 		if (Arrays.asList(endings).contains(type)) {
+			flow = new String(flow + type);
 			if (debug) System.out.println("FLOW: " + flow);
 			return flow;
 		}
@@ -162,150 +173,97 @@ public class Console {
 		Object data2 = null;
 		Faculty faculty;
 		Department department;
+		String subtype = null;
+		List list;
+		Election election;
+		ArrayList<Person> candidates;
 
 		if (debug) System.out.println(action);
 
-		switch (actions[0]) {
-			case "Person":
-				switch (actions[1]) {
-					case "Register":
-						data1 = buildPerson(actions[2]);
-						break;
-				}
-				break;
-			case "Zone":
-				switch (actions[1]) {
-					case "Faculty":
-						switch (actions[2]) {
-							case "Add":
-								data1 = buildFaculty();
-								break;
-							case "Edit":
-								faculty = pickFaculty();
-								data1 = faculty;
-								data2 = editFaculty(faculty);
-								if (data2 == null) return;
-								break;
-							case "Remove":
-								data1 = pickFaculty();
-								break;
-						}
-					break;
-
-					case "Department":
-						switch (actions[2]) {
-							case "Add":
-								faculty = pickFaculty();
-								data1 = buildDepartment(faculty);
-								break;
-							case "Edit":
-								department = pickDepartment(null);
-								data1 = department;
-								data2 = editDepartment(department);
-								if (data2 == null) return;
-								break;
-							case "Remove":
-								data1 = pickDepartment(null);
-								break;
-						}
-					break;
-				}
+		switch (action) {
+			case "Person Register Student":
+			case "Person Register Teacher":
+			case "Person Register Employee":
+				data1 = buildPerson(actions[2]);
 				break;
 
-			case "Election":
-				switch (actions[1]) {
-					case "General":
-						switch (actions[2]) {
-							case "Add":
-								data1 = buildElection("Geral", "General");
-								break;
+			case "Zone Faculty Add":
+				data1 = buildFaculty();
+				break;
+			case "Zone Faculty Edit":
+				data1 = pickFaculty();
+				faculty = (Faculty)data1;
+				data2 = editFaculty(faculty);
+				break;
+			case "Zone Faculty Remove":
+				data1 = pickFaculty();
+				break;
 
-							case "List":
-								switch (actions[3]) {
-									case "Create":
-										// TODO data1 = buildList();
-										break;
+			case "Zone Department Add":
+				data1 = buildDepartment(pickFaculty());
+				break;
+			case "Zone Department Edit":
+				data1 = pickDepartment(pickFaculty());
+				department = (Department) data1;
+				data2 = editDepartment(department);
+				break;
+			case "Zone Department Remove":
+				data1 = pickDepartment(pickFaculty());
+				break;
 
-									case "Remove":
-										// TODO data1 = pickList();
-										break;
-
-									case "Candidate":
-										switch (actions[4]) {
-											case "Add":
-												// TODO data1 = pickList();
-												// TODO data2 = pickPerson();
-												break;
-
-											case "Remove":
-												// TODO data1 = pickList();
-												// TODO data2 = pickPerson();
-												break;
-
-											case "Log":
-												// TODO listCandidates();
-												return;
-										}
-										break;
-								}
-								break;
-
-							case "VotingTable":
-								switch (actions[3]) {
-									case "Add":
-										// TODO data1 = buildVotingTable();
-										break;
-
-									case "Remove":
-										// TODO data1 = listVotingTables();
-										break;
-								}
-								break;
-						}
-						break;
-
-					case "Nucleus":
-						switch (actions[3]) {
-							case "Create":
-								// TODO data1 = buildList();
-								break;
-
-							case "Remove":
-								// TODO data1 = pickList();
-								break;
-
-							case "Candidate":
-								switch (actions[4]) {
-									case "Add":
-										// TODO data1 = pickList();
-										// TODO data2 = pickPerson();
-										break;
-
-									case "Remove":
-										// TODO data1 = pickList();
-										// TODO data2 = pickPerson();
-										break;
-
-									case "Log":
-										// TODO listCandidates();
-										return;
-								}
-								break;
-								
-							case "VotingTable":
-								switch (actions[3]) {
-									case "Add":
-										// TODO data1 = buildVotingTable();
-										break;
-
-									case "Remove":
-										// TODO data1 = listVotingTables();
-										break;
-								}
-								break;
-						}
-						break;
+			case "Election General Student-Election Add":
+			case "Election General Teacher-Election Add":
+			case "Election General Employee-Election Add":
+			case "Election Nucleus Add":
+				if (actions.length == 4) {
+					subtype = actions[2].split("-")[0];
 				}
+				data1 = buildElection(actions[1], subtype);
+				break;
+			case "Election General Student-Election List Candidate Add":
+			case "Election General Teacher-Election List Candidate Add":
+			case "Election General Employee-Election List Candidate Add":
+			case "Election General Student-Election List Candidate Remove":
+			case "Election General Teacher-Election List Candidate Remove":
+			case "Election General Employee-Election List Candidate Remove":
+			case "Election Nucleus Candidate Add":
+			case "Election Nucleus Candidate Remove":
+				if (actions.length == 6) {
+					subtype = actions[2].split("-")[0];
+				}
+				data1 = pickList(pickElection(actions[1], subtype));
+				list = (List) data1;
+				data2 = pickCandidate(list);
+				break;
+			case "Election General Student-Election List Candidate Log":
+			case "Election General Teacher-Election List Candidate Log":
+			case "Election General Employee-Election List Candidate Log":
+			case "Election Nucleus Candidate Log":
+				if (actions.length == 6) {
+					subtype = actions[2].split("-")[0];
+				}
+				list = pickList(pickElection(actions[1], subtype));
+				candidates = listCandidates(list);
+				return;
+
+			case "Election General Student-Election VotingTable Add":
+			case "Election General Teacher-Election VotingTable Add":
+			case "Election General Employee-Election VotingTable Add":
+			case "Election Nucleus VotingTable Add":
+				if (actions.length == 5) {
+					subtype = actions[2].split("-")[0];
+				}
+				// NOTE data1 = buildVotingTable(pickElection(actions[1], subtype));
+				break;
+			case "Election General Student-Election VotingTable Remove":
+			case "Election General Teacher-Election VotingTable Remove":
+			case "Election General Employee-Election VotingTable Remove":
+			case "Election Nucleus VotingTable Remove":
+				if (actions.length == 5) {
+					subtype = actions[2].split("-")[0];
+				}
+
+				// NOTE data1 = pickVotingTable(pickElection(actions[1], subtype), pickDepartment(pickFaculty()));
 				break;
 		}
 
@@ -323,7 +281,198 @@ public class Console {
 		}
 	}
 
-	public static Election buildElection(String title, String type) {
+	public static VotingTable pickVotingTable(Election election, Department department) {
+		// NOTE
+		return null;
+	}
+
+	public static VotingTable buildVotingTable(Election election) {
+		//NOTE
+		return null;
+	}
+
+	public static Person pickCandidate(List list) {
+		ArrayList<Person> candidates = listCandidates(list);
+		String subtype;
+
+		int i = 0;
+		int opcao;
+		Scanner scanner = new Scanner(System.in);
+		String line;
+
+		System.out.println("--------------------");
+		System.out.println("Escolher membro");
+		System.out.println("--------------------");
+
+		for (Person candidate : candidates) {
+			System.out.println("[" + i + "] " + candidate.name);
+			++i;
+		}
+
+		System.out.println("[" + i + "] Registar novo membro");
+
+		System.out.print("Opcao: ");
+		line = scanner.nextLine();
+
+		try {
+			opcao = Integer.parseInt(line);
+		} catch (Exception e) {
+			System.out.println("Opcao invalida");
+			return pickCandidate(list);
+		}
+
+		try {
+			return candidates.get(opcao);
+		} catch (Exception e) {
+			if (opcao == candidates.size()) {
+				if (list.election.subtype != null)
+					return buildPerson(list.election.subtype);
+
+				subtype = menu("Register", "");
+				return buildPerson(subtype);
+			}
+			System.out.println("Opcao invalida");
+			return pickCandidate(list);
+		}
+	}
+
+	public static ArrayList<Person> listCandidates(List list) {
+		try {
+			return registry.listCandidates(list);
+		} catch (RemoteException e1) {
+			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.exit(0);
+			}
+			return listCandidates(list);
+		}
+	}
+
+	public static List pickList(Election election) {
+		ArrayList<List> lists = listLists(election);
+
+		int i = 0;
+		int opcao;
+		Scanner scanner = new Scanner(System.in);
+		String line;
+
+		System.out.println("--------------------");
+		System.out.println("Escolher lista");
+		System.out.println("--------------------");
+
+		for (List list : lists) {
+			System.out.println("[" + i + "] " + list.name);
+			++i;
+		}
+
+		System.out.println("[" + i + "] Adicionar nova lista");
+
+		System.out.print("Opcao: ");
+		line = scanner.nextLine();
+
+		try {
+			opcao = Integer.parseInt(line);
+		} catch (Exception e) {
+			System.out.println("Opcao invalida");
+			return pickList(election);
+		}
+
+		try {
+			return lists.get(opcao);
+		} catch (Exception e) {
+			if (opcao == lists.size()) {
+				return buildList(election);
+			}
+			System.out.println("Opcao invalida");
+			return pickList(election);
+		}
+	}
+
+	public static ArrayList<List> listLists(Election election) {
+		try {
+			return registry.listLists(election);
+		} catch (RemoteException e1) {
+			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.exit(0);
+			}
+			return listLists(election);
+		}
+	}
+
+	public static List buildList(Election election) {
+		String name;
+		Scanner scanner = new Scanner(System.in);
+
+		System.out.println("--------------------");
+		System.out.println("Criar lista");
+		System.out.println("--------------------");
+
+		System.out.print("Nome: ");
+		name = scanner.nextLine();
+
+		return new List(election, name);
+	}
+
+	public static Election pickElection(String type, String subtype) {
+		ArrayList<Election> elections = listElections(type, subtype);
+
+		int i = 0;
+		int opcao;
+		Scanner scanner = new Scanner(System.in);
+		String line;
+
+		System.out.println("--------------------");
+		System.out.println("Escolher eleicao");
+		System.out.println("--------------------");
+
+		for (Election election : elections) {
+			System.out.println("[" + i + "] " + election.name);
+			++i;
+		}
+
+		System.out.println("[" + i + "] Adicionar nova eleicao");
+
+		System.out.print("Opcao: ");
+		line = scanner.nextLine();
+
+		try {
+			opcao = Integer.parseInt(line);
+		} catch (Exception e) {
+			System.out.println("Opcao invalida");
+			return pickElection(type, subtype);
+		}
+
+		try {
+			return elections.get(opcao);
+		} catch (Exception e) {
+			if (opcao == elections.size()) {
+				return buildElection(type, subtype);
+			}
+			System.out.println("Opcao invalida");
+			return pickElection(type, subtype);
+		}
+	}
+
+	public static ArrayList<Election> listElections(String type, String subtype) {
+		try {
+			return registry.listElections(type, subtype);
+		} catch (RemoteException e1) {
+			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.exit(0);
+			}
+			return listElections(type, subtype);
+		}
+	}
+
+	public static Election buildElection(String type, String subtype) {
 		String name;
 	  String description;
 	  Date start = null;
@@ -337,7 +486,7 @@ public class Console {
 		Scanner scanner = new Scanner(System.in);
 
 		System.out.println("--------------------");
-		System.out.println("Criar eleicao " + title);
+		System.out.println("Criar eleicao ");
 		System.out.println("--------------------");
 
 		System.out.print("Nome: ");
@@ -358,22 +507,26 @@ public class Console {
 			}
 		} while (!pass);
 
-		// DOING end must me bigger than start
 		do {
 			try {
 				System.out.print("Data fim (Ex: \"10-01-2005 14:30\"): ");
 				line = scanner.nextLine();
 				end = dateFormat.parse(line);
-				pass = true;
+				if (end.compareTo(start) <= 0) {
+					System.out.println("A data tem que ser depois de " + dateFormat.format(start));
+					pass = false;
+				} else pass = true;
 	    } catch(ParseException e) {
 	      System.out.println("Data invalida");
 				pass = false;
 			}
 		} while (!pass);
 
-		department = pickDepartment(null);
+		faculty = pickFaculty();
 
-		return new Election(name, department, start, end, type);
+		department = pickDepartment(faculty);
+
+		return new Election(name, department, start, end, type, subtype);
 	}
 
 	public static Department editDepartment(Department department) {
@@ -507,10 +660,6 @@ public class Console {
 	}
 
 	public static Department pickDepartment(Faculty faculty) {
-		if (faculty == null) {
-			faculty = pickFaculty();
-		}
-
 		ArrayList<Department> departments = listDepartments(faculty);
 
 		int i = 0;
@@ -580,16 +729,18 @@ public class Console {
 	}
 
 	public static ArrayList<Faculty> listFaculties() {
-		ArrayList<Faculty> faculties = null;
-
 		try {
-			faculties = registry.listFaculties();
-		} catch (Exception e) {
-			System.out.println("listFaculties" + e + faculties.getClass().getName());
+			return registry.listFaculties();
+		} catch (RemoteException e1) {
+			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.exit(0);
+			}
+
 			return listFaculties();
 		}
-
-		return faculties;
 	}
 
 	public static Faculty pickFaculty() {

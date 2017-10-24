@@ -14,11 +14,11 @@ public interface DataServerConsoleInterface extends Remote {
 
   // Elections
   public void createElection(Election election) throws RemoteException;
-  public ArrayList<Election> listElections(String type) throws RemoteException;
+  public ArrayList<Election> listElections(String type, String subtype) throws RemoteException;
 
   // Lists
   public void createList(List list) throws RemoteException;
-  public ArrayList<List> listLists(Election type) throws RemoteException;
+  public ArrayList<List> listLists(Election election) throws RemoteException;
   public void removeList(List list) throws RemoteException;
   public ArrayList<Person> listCandidates(List list) throws RemoteException;
 
