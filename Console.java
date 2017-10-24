@@ -12,9 +12,7 @@ public class Console {
 	static Hashtable<String, Menu> menus = new Hashtable<String, Menu>();
 
 	public static void main(String args[]) {
-		setSecurityPolicies();
-		int port = getPort(args);;
-		String reference = getReference(args);
+		String action;
 
 		String[] menuStart = { "Membros", "Faculdades / Departamentos", "Eleicoes" };
 		String[] menuStartTypes = { "Person", "Zone", "Election" };
@@ -26,51 +24,57 @@ public class Console {
 
 		String[] menuRegister = { "Estudante", "Docente", "Funcionario" };
 		String[] menuRegisterTypes = { "Student", "Teacher", "Employee" };
-		menus.put("Register", new Menu(menuRegister, menuRegister));
+		menus.put("Register", new Menu(menuRegister, menuRegisterTypes));
 
-		// DOING
 		String[] menuZone = { "Faculdades", "Departamentos" };
 		String[] menuZoneTypes = { "Faculty", "Department" };
 		menus.put("Zone", new Menu(menuZone, menuZoneTypes));
 
-		String[] menuFaculty = { "Adicionar", "Editar", "Remover" };
+		String[] menuElection = { "Eleicao Geral", "Eleicao Nucleo de Estudantes" };
+		String[] menuElectionTypes = { "General", "Nucleus" };
+		menus.put("Election", new Menu(menuElection, menuElectionTypes));
+
+		String[] menuGeneral = { "Criar", "Listas", "Mesas de Voto" };
+		String[] menuGeneralTypes = { "Add", "List", "VotingTable" };
+		Menu m1 = new Menu(menuGeneral, menuGeneralTypes);
+		menus.put("General", m1);
+		menus.put("Nucleus", m1);
+
+		String[] menuList = { "Candidatos", "Criar", "Remover" };
+		String[] menuListTypes = { "Candidate", "Create", "Remove" };
+		menus.put("List", new Menu(menuLists, menuListTypes));
+
+		String[] menuCandidate = { "Adicionar", "Remover", "Listar" };
+		String[] menuCandidateTypes = { "Add", "Remove", "Log" };
+		menus.put("Candidate", new Menu(menuCandidate, menuCandidateTypes););
+
+		String[] menuVotingTable = { "Adicionar", "Remover" };
+		String[] menuVotingTableTypes = { "Add", "Remove" };
+		menus.put("VotingTable", new Menu(menuVotingTable, menuVotingTableTypes));
+
+		String[] menuFaculty = { "Criar", "Editar", "Remover" };
 		String[] menuFacultyTypes = { "Add", "Edit", "Remove" };
-		menus.put("Faculty", new Menu(menuFaculty, menuFacultyTypes));
-		menus.put("Department", new Menu(menuFaculty, menuFacultyTypes));
+		Menu m2 = new Menu(menuFaculty, menuFacultyTypes);
+		menus.put("Faculty", m2);
+		menus.put("Department", m2);
 
-		run(port, reference, 0);
-	}
+		setSecurityPolicies();
+		int port = getPort(args);
+		String reference = getReference(args);
+		lookupRegistry(port, reference);
 
-	public static void run(int port, String reference, int delay) {
-		String action;
-
-		try {
-			Thread.sleep(delay);
-		} catch (InterruptedException e) {
-			System.exit(0);
+		if (worker == null) {
+			worker = new ConsoleWorker(jobs, registry);
+		} else {
+			jobs.notify();
+			worker.terminate();
+			worker = new ConsoleWorker(jobs, registry);
 		}
+		System.out.println("Admin Console ready");
 
-		try {
-			registry = (DataServerConsoleInterface) lookupRegistry(port, reference);
-
-			if (worker == null) {
-				worker = new ConsoleWorker(jobs, registry);
-			} else {
-				jobs.notify();
-				worker.terminate();
-				worker = new ConsoleWorker(jobs, registry);
-			}
-			System.out.println("Admin Console ready");
-			while(true) {
-				action = menu("Start", "");
-				executeAction(action);
-			}
-		} catch (RemoteException e) {
-			System.out.println("Remote failure. Trying to reconnect...");
-			run(port, reference, 1000);
-		} catch (NotBoundException e) {
-			System.out.println("Remote failure. Trying to reconnect...");
-			run(port, reference, 1000);
+		while(true) {
+			action = menu("Start", "");
+			executeAction(action);
 		}
 	}
 
@@ -92,8 +96,18 @@ public class Console {
 		}
 	}
 
-	public static Remote lookupRegistry(int port, String reference) throws RemoteException, NotBoundException {
-		return LocateRegistry.getRegistry(port).lookup(reference);
+	public static void lookupRegistry(int port, String reference) {
+		try {
+			registry = (DataServerConsoleInterface)LocateRegistry.getRegistry(port).lookup(reference);
+		} catch (Exception e1) {
+			System.out.println("Remote failure. Trying to reconnect...");
+			try {
+				Thread.sleep(1000);
+			} catch (Exception e2) {
+				System.exit(0);
+			}
+			lookupRegistry(port, reference);
+		}
 	}
 
 	public static void setSecurityPolicies() {
@@ -105,17 +119,19 @@ public class Console {
 		int i = 0;
 		int opcao = -1;
 		int max = 0;
-		boolean exit = false;
 		String next = null;
 		Menu menu = null;
 		Scanner scanner = new Scanner(System.in);
 		String line;
-		String[] endings = { "Register", "Faculty", "Department" };
+		String[] endings = { "Student", "Teacher", "Employee", "Add", "Edit", "Remove", "Create", "Log" };
 
 		System.out.println("----------");
 		if (debug) System.out.println("TYPE: " + type);
 
-		exit = Arrays.asList(endings).contains(type);
+		if (Arrays.asList(endings).contains(type)) {
+			if (debug) System.out.println("FLOW: " + flow);
+			return flow;
+		}
 
 		menu = menus.get(type);
 
@@ -130,13 +146,8 @@ public class Console {
 		try {
 			opcao = Integer.parseInt(line);
 			next = menu.types[opcao];
-			if (!exit) {
-				flow = new String(flow + next + " ");
-				return menu(next, flow);
-			}
-			flow = new String(flow + next);
-			if (debug) System.out.println("END: " + next);
-			return flow;
+			flow = new String(flow + next + " ");
+			return menu(next, flow);
 		} catch (Exception e) {
 			if (debug) System.out.println(e);
 			System.out.println("Opcao invalida");
@@ -188,18 +199,112 @@ public class Console {
 								data1 = buildDepartment(faculty);
 								break;
 							case "Edit":
-								faculty = pickFaculty();
-								department = pickDepartment(faculty);
+								department = pickDepartment(null);
 								data1 = department;
 								data2 = editDepartment(department);
 								if (data2 == null) return;
 								break;
 							case "Remove":
-								faculty = pickFaculty();
-								data1 = pickDepartment(faculty);
+								data1 = pickDepartment(null);
 								break;
 						}
 					break;
+				}
+				break;
+
+			case "Election":
+				switch (actions[1]) {
+					case "General":
+						switch (actions[2]) {
+							case "Add":
+								data1 = buildElection("Geral", "General");
+								break;
+
+							case "List":
+								switch (actions[3]) {
+									case "Create":
+										// TODO data1 = buildList();
+										break;
+
+									case "Remove":
+										// TODO data1 = pickList();
+										break;
+
+									case "Candidate":
+										switch (actions[4]) {
+											case "Add":
+												// TODO data1 = pickList();
+												// TODO data2 = pickPerson();
+												break;
+
+											case "Remove":
+												// TODO data1 = pickList();
+												// TODO data2 = pickPerson();
+												break;
+
+											case "Log":
+												// TODO listCandidates();
+												return;
+										}
+										break;
+								}
+								break;
+
+							case "VotingTable":
+								switch (actions[3]) {
+									case "Add":
+										// TODO data1 = buildVotingTable();
+										break;
+
+									case "Remove":
+										// TODO data1 = listVotingTables();
+										break;
+								}
+								break;
+						}
+						break;
+
+					case "Nucleus":
+						switch (actions[3]) {
+							case "Create":
+								// TODO data1 = buildList();
+								break;
+
+							case "Remove":
+								// TODO data1 = pickList();
+								break;
+
+							case "Candidate":
+								switch (actions[4]) {
+									case "Add":
+										// TODO data1 = pickList();
+										// TODO data2 = pickPerson();
+										break;
+
+									case "Remove":
+										// TODO data1 = pickList();
+										// TODO data2 = pickPerson();
+										break;
+
+									case "Log":
+										// TODO listCandidates();
+										return;
+								}
+								break;
+								
+							case "VotingTable":
+								switch (actions[3]) {
+									case "Add":
+										// TODO data1 = buildVotingTable();
+										break;
+
+									case "Remove":
+										// TODO data1 = listVotingTables();
+										break;
+								}
+								break;
+						}
+						break;
 				}
 				break;
 		}
@@ -216,6 +321,59 @@ public class Console {
 				}
 			}
 		}
+	}
+
+	public static Election buildElection(String title, String type) {
+		String name;
+	  String description;
+	  Date start = null;
+	  Date end = null;
+	  Department department;
+		Faculty faculty;
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+		boolean pass;
+		String line;
+		Scanner scanner = new Scanner(System.in);
+
+		System.out.println("--------------------");
+		System.out.println("Criar eleicao " + title);
+		System.out.println("--------------------");
+
+		System.out.print("Nome: ");
+		name = scanner.nextLine();
+
+		System.out.print("Descricao: ");
+		description = scanner.nextLine();
+
+		do {
+			try {
+				System.out.print("Data inicio (Ex: \"10-01-2005 14:30\"): ");
+				line = scanner.nextLine();
+				start = dateFormat.parse(line);
+				pass = true;
+	    } catch(ParseException e) {
+	      System.out.println("Data invalida");
+				pass = false;
+			}
+		} while (!pass);
+
+		// DOING end must me bigger than start
+		do {
+			try {
+				System.out.print("Data fim (Ex: \"10-01-2005 14:30\"): ");
+				line = scanner.nextLine();
+				end = dateFormat.parse(line);
+				pass = true;
+	    } catch(ParseException e) {
+	      System.out.println("Data invalida");
+				pass = false;
+			}
+		} while (!pass);
+
+		department = pickDepartment(null);
+
+		return new Election(name, department, start, end, type);
 	}
 
 	public static Department editDepartment(Department department) {
@@ -273,11 +431,12 @@ public class Console {
 	  int cc = -1;
 	  Date ccExpire = null;
 		String ccExpireString;
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-		Scanner scanner = new Scanner(System.in);
-		boolean pass;
 
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		boolean pass;
 		String line;
+		Scanner scanner = new Scanner(System.in);
+
 		System.out.println("--------------------");
 		System.out.println("Criar membro");
 		System.out.println("--------------------");
@@ -337,7 +496,7 @@ public class Console {
 				ccExpire = dateFormat.parse(line);
 				pass = true;
 	    } catch(ParseException e) {
-	      System.out.println("Data invalida.\nFormato: dia-mes-ano. Dois digitos para mes");
+	      System.out.println("Data invalida");
 				pass = false;
 			}
 		} while (!pass);

@@ -297,10 +297,10 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 			while(faculties.next()){
 				System.out.println(faculties.getString(1));
 			}
-			
+
 			//database.closeConnection();
 
-			
+
 
 		}catch (Exception e) {System.out.println(e);}
 
