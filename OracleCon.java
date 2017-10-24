@@ -42,16 +42,8 @@ class OracleCon {
 
             con = DriverManager.getConnection(
             "jdbc:oracle:thin:@localhost:1521:xe",username,password);
-
+            System.out.println("Connected to Oracle Database");
             stmt = con.createStatement();
-
-            /*
-            ResultSet rs = stmt.executeQuery("select * from emp");
-            while(rs.next())
-                System.out.println(rs.getString(1));
-
-            con.close();
-            */
 
         }catch(Exception e){ 
             System.out.println(e);

@@ -15,6 +15,31 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	static OracleCon database;
 
 
+	public static void main(String args[]) {
+		// create RMI Server
+		try {
+			server = new DataServer();
+		} catch (RemoteException e) {
+			System.out.println(e);
+			System.exit(-1);
+		}
+		// set security policies
+		setSecurityPolicies();
+
+		// set port and reference for RMI Server
+		port = getPort(args);
+		reference = getReference(args);
+
+		// connect to oracle database
+		database = new OracleCon("bd","bd");
+
+		// run RMI Server
+		runServer(0);
+
+		return;
+	}
+
+
 	public static void runServer(int delay) {
 		try {
 			Thread.sleep(delay);
@@ -123,39 +148,56 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 
   	public void removeZone(Zone zone) throws RemoteException {
 		// Identificas se é faculdade ou departamento e removes
-		return;
+		String message;
+		if(zone instanceof Faculty)
+			message = "DELETE FROM faculty WHERE facName = '" + zone.name + "'";
+		else
+			message = "DELETE FROM department WHERE depName = '" + zone.name + "'";
+
+		changeData(message);
 	}
 
+
+
 	public void createFaculty(Faculty faculty) throws RemoteException{
-		try{
-			database.insert("INSERT INTO faculty VALUES ('" + faculty.name + "')");
-		}catch(Exception e){System.out.println(e);}
+		String message = "INSERT INTO faculty VALUES ('" + faculty.name + "')";
+		changeData(message);
 	}
 
   	public ArrayList<Faculty> listFaculties() throws RemoteException {
   		ArrayList<Faculty> faculties = new ArrayList<Faculty>();
+  		String message = "SELECT facName FROM faculty";
+  		ResultSet resultSet = fetchData(message);
   		try{
-	  		ResultSet resultQuery = database.query("SELECT facName FROM faculty");
-			while(resultQuery.next()){
-				faculties.add(new Faculty(resultQuery.getString(1)));
+			while(resultSet.next()){
+				faculties.add(new Faculty(
+					resultSet.getString(1)	// facName
+					));
 			}
-			// Vês se o type é "Faculty" ou "Department" e devolves a lista de
-			// departamentos / faculdades de acordo
+		}catch(SQLException e) {
+			System.out.println("Error on listFaculties(): " + e);
+			return null;
+		}
 
-			Faculty[] test = new Faculty[faculties.size()];
-			test = faculties.toArray(test);
-			System.out.println(Arrays.toString(test));
-			return faculties;
-		} catch(Exception e){System.out.println(e);return null;}
+		return faculties;
 	}
 
 	public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException {
-		ArrayList<Department> departments = new ArrayList<Department>();
-		departments.add(new Department(faculty, "DEI"));
-
-		Department[] test = new Department[departments.size()];
-		test = departments.toArray(test);
-		System.out.println(Arrays.toString(test));
+  		ArrayList<Department> departments = new ArrayList<Department>();
+		String message = "SELECT * FROM department WHERE facName = '" + faculty.name + "'";
+  		ResultSet resultSet = fetchData(message);
+  		try{
+			while(resultSet.next()){
+				departments.add(new Department(
+					new Faculty(resultSet.getString(2)),	// Faculty
+					resultSet.getString(1)	// depName
+					));
+			}
+		}catch(SQLException e) {
+			System.out.println("Error on listFaculties(): " + e);
+			return null;
+		}
+		
 		return departments;
 	}
 
@@ -199,6 +241,28 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return;
 	}
 
+
+	public void changeData(String message){
+		try{
+			database.insert(message);
+			System.out.println(message);
+		}catch(Exception e){
+			System.out.println("Error in changeData(" + message + "): " + e);
+		}
+	}
+
+	public ResultSet fetchData(String message){
+		try{
+	  		ResultSet resultQuery = database.query(message);
+	  		System.out.println(message);
+			return resultQuery;
+		} catch(Exception e){
+			System.out.println("Error in fetchData(" + message + "): " + e);
+			return null;
+		}
+	}
+
+
 	public static int getPort(String args[]) {
 		try {
 			return Integer.parseInt(args[0]);
@@ -238,26 +302,5 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	}
 
 
-	public static void main(String args[]) {
-		try {
-			server = new DataServer();
-		} catch (RemoteException e) {
-			System.out.println(e);
-			System.exit(-1);
-		}
-		setSecurityPolicies();
-		port = getPort(args);
-		reference = getReference(args);
-		database = new OracleCon("bd","bd");
-		
-
-		runServer(0);
-
-		
-
-
-
-		return;
-	}
 
 }
