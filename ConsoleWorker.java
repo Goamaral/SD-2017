@@ -26,78 +26,63 @@ class ConsoleWorker extends Thread {
               try {
                 System.out.println("WORKING ON " + job.instruction);
                 switch (job.instruction) {
-                  case "Person Register":
-                    this.registry.createPerson((Person)job.data1);
-                    break;
-                    
-                  case "Zone Faculty Add":
-                  case "Zone Department Add":
-                    switch (job.data1.getClass().getName()) {
-                      case "Faculty":
-                        this.registry.createZone((Faculty)job.data1);
-                        break;
-                      case "Department":
-                        this.registry.createZone((Department)job.data1);
-                        break;
-                    }
-                    break;
+                  case "Person Register Student":
+            			case "Person Register Teacher":
+            			case "Person Register Employee":
+                    this.registry.createPerson((Person)data1);
+            				break;
 
-                  case "Zone Faculty Edit":
-                  case "Department Edit":
-                    switch (job.data1.getClass().getName()) {
-                      case "Faculty":
-                        this.registry.updateZone((Faculty)job.data1, (Faculty)job.data2);
-                        break;
-                      case "Department":
-                        this.registry.updateZone((Department)job.data1, (Department)job.data2);
-                        break;
-                    }
-                    break;
+            			case "Zone Faculty Add":
+                    this.registry.createZone((Faculty)data1);
+            				break;
+            			case "Zone Faculty Edit":
+                    this.registry.updateZone((Faculty)data1, (Faculty)data2);
+            				break;
+            			case "Zone Faculty Remove":
+                    this.registry.removeZone((Faculty)data1);
+            				break;
 
-                  case "Zone Faculty Remove":
-                    this.registry.removeZone((Faculty)job.data1);
-                    break;
+            			case "Zone Department Add":
+                    this.registry.createZone((Department)data1);
+            				break;
+            			case "Zone Department Edit":
+                    this.registry.updateZone((Department)data1, (Department)data2);
+            				break;
+            			case "Zone Department Remove":
+                    this.registry.removeZone((Department)data1);
+            				break;
 
-                  case "Zone Department Remove":
-                    this.registry.removeZone((Department)job.data1);
-                    break;
-
-                  case "Election General Add":
-                  case "Election Nucleus Add":
-                    this.registry.createElection((Election)job.data1);
-                    break;
-
-                  case "Election General List Create":
-                  case "Election Nucleus List Create":
-                    this.registry.createList((List)data1);
-                    break;
-
-                  case "Election General List Remove":
-                  case "Election Nucleus List Remove":
-                    this.registry.removeList((List)data1);
-                    break;
-
-                  case "Election General List Candidate Add":
-                  case "Election Nucleus List Candidate Add":
+            			case "Election General Student-Election Add":
+            			case "Election General Teacher-Election Add":
+            			case "Election General Employee-Election Add":
+            			case "Election Nucleus Add":
+                    this.registry.createElection((Election)data1);
+            				break;
+            			case "Election General Student-Election List Candidate Add":
+            			case "Election General Teacher-Election List Candidate Add":
+            			case "Election General Employee-Election List Candidate Add":
+            			case "Election Nucleus Candidate Add":
                     this.registry.addCandidate((List)data1, (Person)data2);
+            				break;
+                  case "Election General Student-Election List Candidate Remove":
+            			case "Election General Teacher-Election List Candidate Remove":
+            			case "Election General Employee-Election List Candidate Remove":
+                  case "Election Nucleus Candidate Remove":
+                    this.registry.removeCandidate((List)data1, (Person)data2);
                     break;
-
-                  case "Election General List Candidate Remove":
-                  case "Election Nucleus List Candidate Remove":
-                    this.registry.addCandidate((List)data1, (Person)data2);
-                    break;
-
-                  case "Election General VotingTable Add":
-                  case "Election Nucleus VotingTable Add":
+            			case "Election General Student-Election VotingTable Add":
+            			case "Election General Teacher-Election VotingTable Add":
+            			case "Election General Employee-Election VotingTable Add":
+            			case "Election Nucleus VotingTable Add":
                     this.registry.createVotingTable((VotingTable)data1);
-                    break;
-
-                  case "Election General VotingTable Remove":
-                  case "Election Nucleus VotingTable Remove":
+            				break;
+            			case "Election General Student-Election VotingTable Remove":
+            			case "Election General Teacher-Election VotingTable Remove":
+            			case "Election General Employee-Election VotingTable Remove":
+            			case "Election Nucleus VotingTable Remove":
                     this.registry.removeVotingTable((VotingTable)data1);
                     break;
-
-                }
+            		}
               } catch (RemoteException e) {
                 System.out.println("WORKER FAILED " + e);
                 synchronized (jobs) {

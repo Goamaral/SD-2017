@@ -4,8 +4,6 @@ import java.util.*;
 import java.lang.Thread.State;
 import java.text.*;
 
-// TODO protect listing against DataServer Failure
-
 public class Console {
 	static boolean debug = true;
 	static DataServerConsoleInterface registry;
