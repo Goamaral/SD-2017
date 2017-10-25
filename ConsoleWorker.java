@@ -29,58 +29,58 @@ class ConsoleWorker extends Thread {
                   case "Person Register Student":
             			case "Person Register Teacher":
             			case "Person Register Employee":
-                    this.registry.createPerson((Person)data1);
+                    this.registry.createPerson((Person)job.data1);
             				break;
 
             			case "Zone Faculty Add":
-                    this.registry.createZone((Faculty)data1);
+                    this.registry.createZone((Faculty)job.data1);
             				break;
             			case "Zone Faculty Edit":
-                    this.registry.updateZone((Faculty)data1, (Faculty)data2);
+                    this.registry.updateZone((Faculty)job.data1, (Faculty)job.data2);
             				break;
             			case "Zone Faculty Remove":
-                    this.registry.removeZone((Faculty)data1);
+                    this.registry.removeZone((Faculty)job.data1);
             				break;
 
             			case "Zone Department Add":
-                    this.registry.createZone((Department)data1);
+                    this.registry.createZone((Department)job.data1);
             				break;
             			case "Zone Department Edit":
-                    this.registry.updateZone((Department)data1, (Department)data2);
+                    this.registry.updateZone((Department)job.data1, (Department)job.data2);
             				break;
             			case "Zone Department Remove":
-                    this.registry.removeZone((Department)data1);
+                    this.registry.removeZone((Department)job.data1);
             				break;
 
             			case "Election General Student-Election Add":
             			case "Election General Teacher-Election Add":
             			case "Election General Employee-Election Add":
             			case "Election Nucleus Add":
-                    this.registry.createElection((Election)data1);
+                    this.registry.createElection((Election)job.data1);
             				break;
             			case "Election General Student-Election List Candidate Add":
             			case "Election General Teacher-Election List Candidate Add":
             			case "Election General Employee-Election List Candidate Add":
             			case "Election Nucleus Candidate Add":
-                    this.registry.addCandidate((List)data1, (Person)data2);
+                    this.registry.addCandidate((List)job.data1, (Person)job.data2);
             				break;
                   case "Election General Student-Election List Candidate Remove":
             			case "Election General Teacher-Election List Candidate Remove":
             			case "Election General Employee-Election List Candidate Remove":
                   case "Election Nucleus Candidate Remove":
-                    this.registry.removeCandidate((List)data1, (Person)data2);
+                    this.registry.removeCandidate((List)job.data1, (Person)job.data2);
                     break;
             			case "Election General Student-Election VotingTable Add":
             			case "Election General Teacher-Election VotingTable Add":
             			case "Election General Employee-Election VotingTable Add":
             			case "Election Nucleus VotingTable Add":
-                    this.registry.createVotingTable((VotingTable)data1);
+                    this.registry.createVotingTable((VotingTable)job.data1);
             				break;
             			case "Election General Student-Election VotingTable Remove":
             			case "Election General Teacher-Election VotingTable Remove":
             			case "Election General Employee-Election VotingTable Remove":
             			case "Election Nucleus VotingTable Remove":
-                    this.registry.removeVotingTable((VotingTable)data1);
+                    this.registry.removeVotingTable((VotingTable)job.data1);
                     break;
             		}
               } catch (RemoteException e) {
