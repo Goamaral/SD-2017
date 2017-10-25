@@ -23,8 +23,16 @@ class OracleCon {
             ResultSet rs = stmt.executeQuery(string);
             return rs;
         }catch(Exception e) {
-            System.out.println(e);
+            System.out.println("Error on query(\"" + string + "\"): "+ e);
             return null;
+        }
+    }
+
+    public void insert(String string) throws Exception {
+        try {
+            stmt.executeUpdate(string);
+        }catch(Exception e) {
+            System.out.println("Error on insert(\"" + string + "\"): "+ e);
         }
     }
 
@@ -34,16 +42,8 @@ class OracleCon {
 
             con = DriverManager.getConnection(
             "jdbc:oracle:thin:@localhost:1521:xe",username,password);
-
+            System.out.println("Connected to Oracle Database");
             stmt = con.createStatement();
-
-            /*
-            ResultSet rs = stmt.executeQuery("select * from emp");
-            while(rs.next())
-                System.out.println(rs.getString(1));
-
-            con.close();
-            */
 
         }catch(Exception e){ 
             System.out.println(e);
