@@ -251,7 +251,7 @@ public class Console {
 				if (actions.length == 5) {
 					subtype = actions[2].split("-")[0];
 				}
-				// NOTE data1 = buildVotingTable(pickElection(actions[1], subtype));
+				data1 = buildVotingTable(pickElection(actions[1], subtype), pickDepartment(pickFaculty()));
 				break;
 			case "Election General Student-Election VotingTable Remove":
 			case "Election General Teacher-Election VotingTable Remove":
@@ -261,7 +261,7 @@ public class Console {
 					subtype = actions[2].split("-")[0];
 				}
 
-				// NOTE data1 = pickVotingTable(pickElection(actions[1], subtype), pickDepartment(pickFaculty()));
+				data1 = pickVotingTable(pickElection(actions[1], subtype));
 				break;
 		}
 
@@ -279,14 +279,62 @@ public class Console {
 		}
 	}
 
-	public static VotingTable pickVotingTable(Election election, Department department) {
-		// NOTE
-		return null;
+	public static VotingTable pickVotingTable(Election election) {
+		ArrayList<VotingTable> votingTables = listVotingTables(election);
+
+		int i = 0;
+		int opcao;
+		Scanner scanner = new Scanner(System.in);
+		String line;
+
+		System.out.println("--------------------");
+		System.out.println("Escolher mesa de votacao");
+		System.out.println("--------------------");
+
+		for (VotingTable votingTable : votingTables) {
+			System.out.println("[" + i + "] " + votingTable.department.name);
+			++i;
+		}
+
+		System.out.println("[" + i + "] Registar nova mesa votacao");
+
+		System.out.print("Opcao: ");
+		line = scanner.nextLine();
+
+		try {
+			opcao = Integer.parseInt(line);
+		} catch (Exception e) {
+			System.out.println("Opcao invalida");
+			return pickVotingTable(election);
+		}
+
+		try {
+			return votingTables.get(opcao);
+		} catch (Exception e) {
+			if (opcao == votingTables.size()) {
+				return buildVotingTable(election, pickDepartment(pickFaculty()));
+			}
+			System.out.println("Opcao invalida");
+			return pickVotingTable(election);
+		}
 	}
 
-	public static VotingTable buildVotingTable(Election election) {
-		//NOTE
-		return null;
+	public static ArrayList<VotingTable> listVotingTables(Election election) {
+		try {
+			return registry.listVotingTables(election);
+		} catch (RemoteException e1) {
+			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.exit(0);
+			}
+			return listVotingTables(election);
+		}
+	}
+
+	public static VotingTable buildVotingTable(Election election, Department department) {
+		return new VotingTable(election, department);
 	}
 
 	public static Person pickCandidate(List list) {

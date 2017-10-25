@@ -94,7 +94,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 				try{
 					byte[] buf = new byte[256];
 					String msg = "ping";
-        			buf = msg.getBytes(); 
+        			buf = msg.getBytes();
 					InetAddress sendAddress = InetAddress.getByName("localhost");
 					DatagramPacket packet = new DatagramPacket(buf, buf.length, sendAddress, socketPort);
 					System.out.println("Sending: " + msg);
@@ -197,7 +197,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 			System.out.println("Error on listFaculties(): " + e);
 			return null;
 		}
-		
+
 		return departments;
 	}
 
@@ -205,7 +205,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return;
 	}
 
-  public ArrayList<Election> listElections(String type) throws RemoteException {
+  public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
 		return null;
 	}
 
@@ -239,6 +239,10 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 
   public void removeVotingTable(VotingTable votingTable) throws RemoteException {
 		return;
+	}
+
+	public ArrayList<VotingTable> listVotingTables(Election election) throws RemoteException {
+		return null;
 	}
 
 
