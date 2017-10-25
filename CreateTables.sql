@@ -12,7 +12,7 @@ CREATE TABLE election
 (electionId           int                 PRIMARY KEY,
  electionName         VARCHAR(255)        NOT NULL,
  electionDesc         VARCHAR(255),
- electionType         VARCHAR(6)          NOT NULL,
+ electionType         VARCHAR(255)        NOT NULL,
  electionStart        DATE                NOT NULL,
  electionEnd          DATE                NOT NULL  
 );

@@ -4,6 +4,7 @@ import java.net.*;
 import java.rmi.registry.*;
 import java.sql.*;
 import java.util.*;
+import java.text.*;
 
 public class DataServer extends UnicastRemoteObject implements DataServerConsoleInterface {
 	static DataServerConsoleInterface backupRegistry;
@@ -31,7 +32,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		reference = getReference(args);
 
 		// connect to oracle database
-		database = new OracleCon("bd","bd");
+		database = new OracleCon("bd","bd", true);
 
 		// run RMI Server
 		runServer(0);
@@ -123,19 +124,32 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 
 	// DataServer Console Interface Methods
 	public void createPerson(Person person) throws RemoteException {
-		// Person -> Department -> Faculty
-		// Pegas na person, tiras o departamento, tiras a faculdade
-		// Consegues agora inserir a pessoa na base de dados
-		System.out.println(person.toString());
-		return;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		String message = "INSERT INTO person VALUES (" +
+			"'"    + person.type +
+			"', '" + person.name +
+			"', "  + person.number + 
+			", '"  + person.password + 
+			"', '" + person.department.name +
+			"', "  + person.phone + 
+			", '"  + person.address + 
+			"', "  + person.cc +
+			", '"  + dateFormat.format(person.ccExpire) +
+			"', "  + getListID(person.list) +
+			")";
+		changeData(message);
 	}
 
   public void createZone(Zone zone) throws RemoteException {
-		// Usas o instanceof para ver se é faculdade ou departamento
-		// Se for faculdade inseres na tabela se ainda nao existir
-		// Se for departamento, pegas na faculdade do departamento,
-		// adicionas se ainda nao existir e depois adicionas o departamento se ja nao existir
-
+  	String message;
+		if(zone instanceof Faculty){
+			message = "INSERT INTO faculty VALUES ('" + zone.name + "')";
+		} else if(zone instanceof Department) {
+			Department department = (Department) zone; 
+			message = "INSERT INTO department VALUES ('" + department.name + "', " + department.faculty.name+ ")";
+		} else {
+			System.out.println("Error in createZone("+ zone +"): Not Department or Faculty");
+		}
 		return;
 	}
 
@@ -149,14 +163,18 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
   	public void removeZone(Zone zone) throws RemoteException {
 		// Identificas se é faculdade ou departamento e removes
 		String message;
-		if(zone instanceof Faculty)
+		if(zone instanceof Faculty) {
 			message = "DELETE FROM faculty WHERE facName = '" + zone.name + "'";
-		else
+		}
+		else if (zone instanceof Department) {
 			message = "DELETE FROM department WHERE depName = '" + zone.name + "'";
-
+		}
+		else {
+			System.out.println("Error in removeZone("+ zone +"): Not Department or Faculty");
+			return;
+		}
 		changeData(message);
 	}
-
 
 
 	public void createFaculty(Faculty faculty) throws RemoteException{
@@ -171,7 +189,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
   		try{
 			while(resultSet.next()){
 				faculties.add(new Faculty(
-					resultSet.getString(1)	// facName
+					resultSet.getString("facName")
 					));
 			}
 		}catch(SQLException e) {
@@ -184,13 +202,13 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 
 	public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException {
   		ArrayList<Department> departments = new ArrayList<Department>();
-		String message = "SELECT * FROM department WHERE facName = '" + faculty.name + "'";
+		String message = "SELECT faculty, depName FROM department WHERE facName = '" + faculty.name + "'";
   		ResultSet resultSet = fetchData(message);
   		try{
 			while(resultSet.next()){
 				departments.add(new Department(
-					new Faculty(resultSet.getString(2)),	// Faculty
-					resultSet.getString(1)	// depName
+					new Faculty(resultSet.getString("faculty")),	
+					resultSet.getString("depName")	
 					));
 			}
 		}catch(SQLException e) {
@@ -245,8 +263,85 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return null;
 	}
 
+	private int getListID(List list) {
+		String message = "SELECT listID FROM votingList WHERE listName = '" + list.name
+		+ "' AND electionID = " + getElectionID(list.election);
+		ResultSet resultSet = fetchData(message);
+		int listID = -1; // if an error occurs, return an invalid ID
+  		try{
+			while(resultSet.next()){
+				listID = resultSet.getInt("listID");
+			}
+			return listID;
+		}catch(SQLException e) {
+			System.out.println("Error on getListID("+ list +"): " + e);
+			return -1;
+		}
+	}
 
-	public void changeData(String message){
+	private int createListID(List list) {
+
+		// check if list already exists
+		if(getListID(list) == -1){
+			System.out.println("List already exists: " + list);
+			return -1;
+		}
+
+		// get MAX ID
+		String message = "SELECT MAX(listID) FROM votingList";
+		ResultSet resultSet = fetchData(message);
+		int maxListID = 0; // the first listID created will have this value
+		try{
+			while(resultSet.next()){
+				maxListID = resultSet.getInt("listID");
+			}
+			return maxListID;
+		}catch(SQLException e) {
+			System.out.println("Error on createListID("+ list +"): " + e);
+			return -1;
+		}
+	}
+
+	private int getElectionID(Election election) {
+		String message = "SELECT electionID FROM election WHERE electionName = '" + election.name
+		+ "' AND electionType = '" + election.type + "'";
+		ResultSet resultSet = fetchData(message);
+		int electionID = -1; // if an error occurs, return an invalid ID
+  		try{
+			while(resultSet.next()){
+				electionID = resultSet.getInt("electionID");
+			}
+			return electionID;
+		}catch(SQLException e) {
+			System.out.println("Error on getElectionID("+ election +"): " + e);
+			return -1;
+		}
+	}
+	
+	private int createElectionID(Election election) {
+
+		// check if election already exists
+		if(getElectionID(election) == -1){
+			System.out.println("Election already exists: " + election);
+			return -1;
+		}
+
+		// get MAX ID
+		String message = "SELECT MAX(electionID) FROM election";
+		ResultSet resultSet = fetchData(message);
+		int maxElectionID = 0; // the first electionID created will have this value
+		try{
+			while(resultSet.next()){
+				maxElectionID = resultSet.getInt("electionID");
+			}
+			return maxElectionID;
+		}catch(SQLException e) {
+			System.out.println("Error on createElectionID("+ election +"): " + e);
+			return -1;
+		}
+	}
+
+	public void changeData(String message) {
 		try{
 			database.insert(message);
 			System.out.println(message);
@@ -255,7 +350,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		}
 	}
 
-	public ResultSet fetchData(String message){
+	public ResultSet fetchData(String message) {
 		try{
 	  		ResultSet resultQuery = database.query(message);
 	  		System.out.println(message);
