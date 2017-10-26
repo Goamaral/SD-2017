@@ -11,6 +11,8 @@ class Election implements Serializable {
   Date end;
   Department department;
 
+	public static final long serialVersionUID = 2848095557101780926L;
+
   public Election(String name, Department department, Date start, Date end, String type, String subtype) {
     this.name = name;
     this.description = description;

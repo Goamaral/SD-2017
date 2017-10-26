@@ -2,10 +2,10 @@ import java.util.*;
 import java.rmi.*;
 
 class ConsoleWorker extends Thread {
-  static LinkedList<Job> jobs;
-  static Job job;
-  static Object lock = new Object();
-  static boolean end = false;
+  LinkedList<Job> jobs;
+  Job job;
+  Object lock = new Object();
+  boolean end = false;
   DataServerConsoleInterface registry;
 
   public void run() {
@@ -96,7 +96,7 @@ class ConsoleWorker extends Thread {
                   }
 
                   try {
-                    this.sleep(1000);
+                    Thread.sleep(1000);
                     System.out.println("WORKER RETRYING...");
                   } catch (InterruptedException e2) {
                     System.out.println(e2);

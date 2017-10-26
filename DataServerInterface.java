@@ -1,7 +1,7 @@
 import java.rmi.*;
 import java.util.*;
 
-public interface DataServerConsoleInterface extends Remote {
+public interface DataServerInterface extends Remote {
   // People
   public void createPerson(Person person) throws RemoteException;
 
