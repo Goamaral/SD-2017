@@ -247,7 +247,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
   	public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
   		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
   		ArrayList<Election> elections = new ArrayList<Election>();
-		String message = "SELECT name, electionStart, electionEnd FROM department WHERE electionType = '" + type 
+		String message = "SELECT electionName, electionStart, electionEnd FROM department WHERE electionType = '" + type 
 						+ "' AND electionSubType = '" + subtype + "'";
   		ResultSet resultSet = fetchData(message);
   		try{
@@ -275,8 +275,22 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		changeData(message);
 	}
 
-  public ArrayList<List> listLists(Election type) throws RemoteException {
-		return null;  
+  public ArrayList<List> listLists(Election election) throws RemoteException {
+	  	ArrayList<List> lists = new ArrayList<List>();
+		String message = "SELECT listName FROM votingList WHERE electionID = " + getElectionID(election) ;
+  		ResultSet resultSet = fetchData(message);
+  		try{
+			while(resultSet.next()){
+				lists.add(new List( election, 
+									resultSet.getString(1)
+				));
+			}
+		}catch(Exception e) {
+			System.out.println("Error on listLists(): " + e);
+			return null;
+		}
+
+		return lists;
 	}
 
   public void removeList(List list) throws RemoteException {
