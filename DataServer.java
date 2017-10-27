@@ -6,7 +6,10 @@ import java.sql.*;
 import java.util.*;
 import java.text.*;
 
-public class DataServer extends UnicastRemoteObject implements DataServerConsoleInterface {
+public class DataServer
+	extends UnicastRemoteObject
+	implements DataServerConsoleInterface, DataServerServerInterface
+{
 	static DataServerConsoleInterface backupRegistry;
 	static Registry serverRegistry;
 	static DataServer server;

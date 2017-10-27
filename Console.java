@@ -68,19 +68,25 @@ public class Console {
 		String reference = getReference(args);
 		lookupRegistry(port, reference);
 
-		if (worker == null) {
-			worker = new ConsoleWorker(jobs, registry);
-		} else {
-			jobs.notify();
-			worker.terminate();
-			worker = new ConsoleWorker(jobs, registry);
-		}
-		System.out.println("Admin Console ready");
+		try {
+			if (worker == null) {
+				worker = new ConsoleWorker(jobs, registry);
+			} else {
+				jobs.notify();
+				worker.terminate();
+				worker = new ConsoleWorker(jobs, registry);
+			}
+			System.out.println("Consola de Administracao");
+			System.out.println("RMI => localhost:" + port + "\\" + reference);
 
-		while(true) {
-			action = menu("Start", "");
-			executeAction(action);
+			while(true) {
+				action = menu("Start", "");
+				executeAction(action);
+			}
+		} catch (Exception e) {
+			main(args);
 		}
+
 	}
 
 	public static int getPort(String args[]) {
@@ -97,7 +103,7 @@ public class Console {
 		try {
 			return args[2].toString();
 		} catch (ArrayIndexOutOfBoundsException e) {
-			return "iVotas";
+			return "iVotasConsole";
 		}
 	}
 
