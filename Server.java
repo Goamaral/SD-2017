@@ -5,7 +5,7 @@ import java.util.*;
 import java.lang.Thread.State;
 import java.io.*;
 
-public class Server {
+class Server {
 	static DataServerInterface registry;
 	static ServerSocket listenSocket;
 	static int portRMI = 7000;
@@ -15,6 +15,8 @@ public class Server {
 	static ArrayList<String> terminalIDs = new ArrayList<String>();
 	static ArrayList<TerminalConnection> terminals = new ArrayList<TerminalConnection>();
 	static VotingTableAutentication auth = null;
+	static ArrayList<VotingTable> votingTables = new ArrayList<VotingTable>();
+	static VoteSender voteSender = null;
 
 	public static void main(String args[]) {
 		TerminalConnection terminalConnection;
@@ -24,19 +26,29 @@ public class Server {
 
 		setSecurityPolicies();
 		getOptions(args);
-		// NOTE lookupRegistry(portRMI, referenceRMI);
-
+		lookupRegistry(portRMI, referenceRMI);
 		createServerSocket();
+		getVotingTables();
+
 		System.out.println("Mesa de voto");
 		if (debug) {
 			System.out.println("RMI => localhost:" + portRMI + "\\" + referenceRMI);
 			System.out.println("TCP => localhost:" + portTCP);
 		}
 
+		for (TerminalConnection terminal : terminals) {
+			terminal.terminate();
+		}
+
+		if (voteSender != null) {
+			voteSender.terminate();
+			voteSender = new VoteSender(terminalIDs, registry);
+		} else voteSender = new VoteSender(terminalIDs, registry);
+
 		if (auth != null) {
 			auth.terminate();
-			auth = new VotingTableAutentication(terminalIDs, terminals, registry);
-		} else auth = new VotingTableAutentication(terminalIDs, terminals, registry);
+			auth = new VotingTableAutentication(terminalIDs, terminals, registry, votingTables);
+		} else auth = new VotingTableAutentication(terminalIDs, terminals, registry, votingTables);
 
 		while(true) {
 			terminalSocket = waitForRequest();
@@ -51,21 +63,110 @@ public class Server {
 					terminalIDs.add(terminalReference);
 				}
 
-
 				synchronized (terminals) {
 					if (terminalID < terminals.size()) {
 						terminalConnection = terminals.get(terminalID);
 
 						terminalConnection.terminate();
 
-						terminals.add(terminalID, new TerminalConnection(terminalID, terminalSocket));
-						if (debug) System.out.println("TerminalConnection created at " + terminalID + " " + terminalIDs.get(terminalID));
+						terminals.set(
+							terminalID,
+							new TerminalConnection(terminalID, terminalSocket, voteSender, registry)
+						);
+
+						if (debug)
+							System.out.println(
+								"TerminalConnection created at " + terminalID + " "
+								+ terminalIDs.get(terminalID)
+							);
 					} else {
-						terminals.add(terminalID, new TerminalConnection(terminalID, terminalSocket));
-						if (debug) System.out.println("TerminalConnection created at " + terminalID + " " + terminalIDs.get(terminalID));
+						terminals.add(
+							terminalID,
+							new TerminalConnection(terminalID, terminalSocket, voteSender, registry)
+							);
+
+						if (debug)
+							System.out.println(
+								"TerminalConnection created at " + terminalID + " "
+								+ terminalIDs.get(terminalID)
+							);
 					}
 				}
 			}
+		}
+	}
+
+	public static void getVotingTables() {
+		ArrayList<Faculty> faculties = listFaculties();
+		ArrayList<Department> departments;
+		ArrayList<String> list = new ArrayList<String>();
+		int opcao;
+		Faculty faculty;
+		Department department;
+
+		for (Faculty auxFaculty : faculties) {
+			list.add(auxFaculty.name);
+		}
+
+		opcao = selector(list, "Selecione a faculdade onde se situa");
+
+		faculty = faculties.get(opcao);
+
+		departments = listDepartments(faculty);
+
+		list.clear();
+
+		for (Department auxDepartment : departments) {
+			list.add(auxDepartment.name);
+		}
+
+		opcao = selector(list, "Selecione o departmento onde se situa");
+
+		department = departments.get(opcao);
+
+		votingTables = listVotingTables(department);
+	}
+
+	public static ArrayList<VotingTable> listVotingTables(Department department) {
+		return registry.listVotingTables(department);
+	}
+
+	public static ArrayList<Department> listDepartments(Faculty faculty) {
+		return registry.listDepartments(faculty);
+	}
+
+	public static ArrayList<Faculty> listFaculties() {
+		return registry.listFaculties();
+	}
+
+	public static int selector(ArrayList<String> list, String title) {
+		int i = 0;
+		int opcao;
+		Scanner scanner = new Scanner(System.in);
+		String line;
+
+		System.out.println("--------------------");
+		System.out.println(title);
+		System.out.println("--------------------");
+
+		for (String item : list) {
+			System.out.println("[" + i + "] " + item);
+			++i;
+		}
+
+		System.out.print("Opcao: ");
+		line = scanner.nextLine();
+
+		try {
+			opcao = Integer.parseInt(line);
+		} catch (Exception e) {
+			System.out.println("Opcao invalida");
+			return selector(list, title);
+		}
+
+		if (opcao >= i && opcao < 0) {
+			System.out.println("Opcao invalida");
+			return selector(list, title);
 		}
 	}
 
@@ -148,6 +249,7 @@ class VotingTableAutentication extends Thread {
 	ArrayList<TerminalConnection> terminals;
 	DataServerInterface registry;
 	boolean debug = true;
+	ArrayList<VotingTable> votingTables;
 
 	public void run() {
 		Scanner scanner = new Scanner(System.in);
@@ -155,6 +257,7 @@ class VotingTableAutentication extends Thread {
 		int cc = -1;
 		boolean pass = false;
 		Credential credentials;
+		VotingTable votingTable;
 
 		while (true) {
 			synchronized (this.lock) {
@@ -162,6 +265,8 @@ class VotingTableAutentication extends Thread {
 					break;
 				}
 			}
+
+			// NOTE Choose voting table (The election) to vote on
 
 			do {
 				System.out.print("Cartao Cidadao: ");
@@ -187,6 +292,7 @@ class VotingTableAutentication extends Thread {
 						if (debug) System.out.println("ID: " + terminal.terminalID + " STATE: " + terminal.getState());
 						if (terminal.getState() == Thread.State.WAITING) {
 							terminal.credentials = credentials;
+							terminal.votingTable = votingTable;
 							synchronized (terminal.terminalLock) {
 								terminal.terminalLock.notify();
 							}
@@ -217,11 +323,13 @@ class VotingTableAutentication extends Thread {
 	public VotingTableAutentication(
 		ArrayList<String> terminalIDs,
 		ArrayList<TerminalConnection> terminals,
-		DataServerInterface registry
+		DataServerInterface registry,
+		ArrayList<VotingTable> votingTables
 	) {
 			this.terminalIDs = terminalIDs;
 			this.terminals = terminals;
 			this.registry = registry;
+			this.votingTables = votingTables;
 
 			this.start();
 		}
@@ -239,9 +347,17 @@ class TerminalConnection extends Thread {
 	boolean locked = true;
 	boolean debug = true;
 	boolean authorized = false;
+	VotingTable votingTable;
+	Election election;
+	VoteSender voteSender;
+	DataServerInterface registry;
 
 	public void run() {
 		HashMap<String, String> response;
+		ArrayList<List> lists;
+		String query;
+		List list;
+		Vote vote;
 
 		while (true) {
 			synchronized (this.lock) {
@@ -251,7 +367,7 @@ class TerminalConnection extends Thread {
 				}
 			}
 
-			if (!this.authorized) this.reset();
+			if (!this.authorized) this.logout();
 
 			if (this.inAvailable()) {
 				response = this.parseResponse(this.readSocket());
@@ -261,15 +377,41 @@ class TerminalConnection extends Thread {
 													&& response.get("password").equals(credentials.password);
 
 						if (this.authorized) {
-							this.writeSocket("type|status;login|sucessful;msg|Podes votar :D");
+							this.writeSocket("type|status;login|sucessful");
 						} else {
 							this.writeSocket("type|status;login|failed");
 						}
 					} else if (this.authorized && response.get("type").equals("vote")) {
+						vote = new Vote(this.votingTable, this.terminalID, response.get("list"));
+						synchronized (this.voteSender.votes) {
+							this.voteSender.votes.addFirst(vote);
+						}
+						this.logout();
+					} else if (this.authorized && response.get("type").equals("request")) {
+						if (response.get("datatype").equals("list")) {
+							lists = this.listLists();
+							query = "type|item_list;datatype|list;item_count|" + lists.size();
+							for (int i = 0; i<lists.size(); ++i) {
+								list = lists.get(i);
+								query = new String(query + ";item_" + i + "|" + list.name);
+							}
 
+							this.writeSocket(query);
+						}
 					}
 				}
 			}
+		}
+	}
+
+	public ArrayList<List> listLists() {
+		try {
+			synchronized (this.votingTable) {
+				return this.registry.listLists(this.votingTable.election);
+			}
+		} catch (RemoteException re) {
+			this.nap();
+			return this.listLists();
 		}
 	}
 
@@ -376,9 +518,14 @@ class TerminalConnection extends Thread {
 		}
 	}
 
-	public TerminalConnection(int terminalID, Socket terminalSocket) {
+	public TerminalConnection(
+		int terminalID, Socket terminalSocket, VoteSender voteSender,
+		DataServerInterface registry
+	) {
 		this.terminalID = terminalID;
 		this.terminalSocket = terminalSocket;
+		this.voteSender = voteSender;
+
 		try {
 			this.in = new DataInputStream(terminalSocket.getInputStream());
 			this.out = new DataOutputStream(terminalSocket.getOutputStream());
@@ -386,6 +533,73 @@ class TerminalConnection extends Thread {
 			return;
 		}
 
+		this.start();
+	}
+}
+
+class VoteSender extends Thread {
+	boolean end = false;
+	Object lock = new Object();
+	ArrayList<String> terminals;
+	ArrayList<Integer> voteNumbers;
+	LinkedList<Vote> votes = new LinkedList<Vote>();
+	int id;
+	DataServerInterface registry;
+
+	public void run() {
+		Vote vote;
+		int delta;
+
+		while (true) {
+			synchronized (this.terminals) {
+				delta = this.terminals.size() - this.voteNumbers.size();
+				if (delta > 0) {
+					for (int i=0; i<delta; ++i) {
+						this.voteNumbers.add(this.voteNumbers.size()+i, 0);
+					}
+				}
+			}
+
+			synchronized (lock) {
+				if (this.end) {
+					synchronized (this.votes) {
+						if (this.votes.size() > 0) {
+							System.out.println("Ainda existem votos por enviar");
+						} else return;
+					}
+				}
+			}
+
+			synchronized (this.votes) {
+				if (this.votes.size() > 0) {
+					vote = this.votes.removeLast();
+					id = vote.terminalID;
+
+					this.voteNumbers.set(id, this.voteNumbers.get(id) + 1);
+					vote.voteNumber = this.voteNumbers.get(id);
+					try {
+						this.registry.sendVote(vote);
+					} catch (RemoteException re) {
+						vote.voteNumber = -1;
+						this.voteNumbers.set(id, this.voteNumbers.get(id) - 1);
+						this.votes.addLast(vote);
+					}
+				}
+			}
+		}
+	}
+
+	public void terminate() {
+		synchronized (lock) {
+			this.end = true;
+		}
+	}
+
+	public VoteSender(ArrayList<String> terminals, DataServerInterface registry) {
+		this.terminals = terminals;
+		this.registry = registry;
+
+		this.setDaemon(true);
 		this.start();
 	}
 }

@@ -3,25 +3,26 @@ import java.rmi.*;
 
 class ConsoleWorker extends Thread {
   LinkedList<Job> jobs;
-  Job job;
   Object lock = new Object();
   boolean end = false;
   DataServerConsoleInterface registry;
 
   public void run() {
+		Job job;
+
     while (true) {
       synchronized (lock) {
         if (!end) {
-          synchronized (jobs) {
-            if (jobs.size() == 0) {
+          synchronized (this.jobs) {
+            if (this.jobs.size() == 0) {
               try {
-                jobs.wait();
+                this.jobs.wait();
               } catch(InterruptedException e1) {
                 System.out.println(e1);
                 return;
               }
             } else {
-              job = jobs.removeLast();
+              job = this.jobs.removeLast();
 
               try {
                 System.out.println("WORKING ON " + job.instruction);
@@ -85,30 +86,13 @@ class ConsoleWorker extends Thread {
                 }
               } catch (RemoteException e) {
                 System.out.println("WORKER FAILED " + e);
-                synchronized (jobs) {
-                  jobs.addLast(job);
-                }
-
-                synchronized (lock) {
-                  if (end) {
-                    System.out.println("WORK DONE BOSS");
-                    return;
-                  }
-
-                  try {
-                    Thread.sleep(1000);
-                    System.out.println("WORKER RETRYING...");
-                  } catch (InterruptedException e2) {
-                    System.out.println(e2);
-                    return;
-                  }
+                synchronized (this.jobs) {
+                  this.jobs.addLast(job);
                 }
               }
             }
           }
-        } else {
-          return;
-        }
+        } else return;
       }
     }
   }

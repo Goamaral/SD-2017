@@ -16,6 +16,10 @@ public class Terminal {
 		boolean loginRequired;
 		boolean loginSucessful;
 		boolean loginFailed;
+		boolean listListRecieved;
+		int size;
+		ArrayList<String> list;
+		int opcao;
 
     getOptions(args);
 
@@ -37,13 +41,27 @@ public class Terminal {
 					loginFailed = response.get("type").equals("status")
 														&& response.get("login").equals("failed");
 
+					listListRecieved = response.get("type").equals("item_list")
+																&& response.get("datatype").equals("list");
+
 					if (loginRequired) {
 						auth();
 					} else if (loginSucessful) {
-						System.out.println(response.get("msg"));
+						writeSocket("type|request;datatype|list");
 					} else if (loginFailed) {
 						System.out.println("Credenciais invalidas");
 						auth();
+					} else if (listListRecieved) {
+						list.clear();
+						size = Integer.parseInt(response.get("item_count"));
+
+						for (int i = 0; i<size; ++i) {
+							list.add(i, response.get("item_" + i));
+						}
+
+						opcao = selector(list, "Vote numa lista");
+
+						writeSocket("type|vote;list|" + list.get(opcao));
 					}
 				} else {
 					System.out.printf("NULL RESPONSE");
@@ -51,6 +69,37 @@ public class Terminal {
 			}
 		}
   }
+
+	public static int selector(ArrayList<String> list, String title) {
+		int i = 0;
+		int opcao;
+		Scanner scanner = new Scanner(System.in);
+		String line;
+
+		System.out.println("--------------------");
+		System.out.println(title);
+		System.out.println("--------------------");
+
+		for (String item : list) {
+			System.out.println("[" + i + "] " + item);
+			++i;
+		}
+
+		System.out.print("Opcao: ");
+		line = scanner.nextLine();
+
+		try {
+			opcao = Integer.parseInt(line);
+		} catch (Exception e) {
+			System.out.println("Opcao invalida");
+			return selector(list, title);
+		}
+
+		if (opcao >= i && opcao < 0) {
+			System.out.println("Opcao invalida");
+			return selector(list, title);
+		}
+	}
 
 	public static boolean newInput() {
 		try {

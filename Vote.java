@@ -1,13 +1,13 @@
 class Vote {
-	Election election;
 	VotingTable votingTable;
 	int terminalID;
-	int numberVote;
+	int voteNumber;
+	String list;
 
-	public Vote(Election election, VotingTable votingTable, int terminalID, int numberVote) {
-		this.election = election;
+	public Vote(VotingTable votingTable, int terminalID, String list) {
 		this.votingTable = votingTable;
 		this.terminalID = terminalID;
-		this.numberVote = numberVote;
+		this.list = list;
+		this.voteNumber = -1;
 	}
 }

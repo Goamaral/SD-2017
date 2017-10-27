@@ -30,4 +30,8 @@ public interface DataServerInterface extends Remote {
   public void createVotingTable(VotingTable votingTable) throws RemoteException;
   public void removeVotingTable(VotingTable votingTable) throws RemoteException;
   public ArrayList<VotingTable> listVotingTables(Election election) throws RemoteException;
+	public ArrayList<VotingTable> listVotingTables(Department department) throws RemoteException;
+
+	// Votes
+	public void sendVote(Vote vote) throws RemoteException;
 }
