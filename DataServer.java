@@ -157,24 +157,21 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
   	public void updateZone(Zone zone, Zone newZone) throws RemoteException {
 		// check if zone already exists
 		String message;
-		if(zone instanceof Faculty) {
-			message = "SELECT  FROM faculty WHERE facName = '" + zone.name + "'";
+		if(zone instanceof Faculty && newZone instanceof Faculty) {
+			message = "UPDATE faculty SET facName = '" + newZone.name + 
+			"' WHERE facName = '" + zone.name + "'";
 		}
-		else if (zone instanceof Department) {
-			message = "DELETE FROM department WHERE depName = '" + zone.name + "'";
+		else if (zone instanceof Department && newZone instanceof Department) {
+			Department department = (Department)newZone;
+			message = "UPDATE department SET depName = '" + department.name + 
+			"' , faculty = '" + department.faculty.name +
+			"' WHERE depName = '" + department.name + "'";
 		}
 		else {
 			System.out.println("Error in updateZone("+ zone +"): Not Department or Faculty");
 			return;
 		}
-		ResultSet resultSet = fetchData(message);
-		try {
-			while(resultSet.next()){
-
-			}
-		} catch (Exception e) {
-			System.out.println("Error in updateZone("+ zone +", "+ newZone +"): " + e);
-		}
+		changeData(message);
 	}
 
   	public void removeZone(Zone zone) throws RemoteException {
