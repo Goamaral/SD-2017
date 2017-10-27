@@ -15,7 +15,7 @@ CREATE TABLE election
  electionName         VARCHAR(255)        NOT NULL,
  electionDescription  VARCHAR(255),
  electionType         VARCHAR(255)        NOT NULL,
- electionsubType      VARCHAR(255),
+ electionSubType      VARCHAR(255),
  electionStart        DATE                NOT NULL,
  electionEnd          DATE                NOT NULL  
 );

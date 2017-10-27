@@ -572,7 +572,7 @@ public class Console {
 
 		department = pickDepartment(faculty);
 
-		return new Election(name, department, start, end, type, subtype);
+		return new Election(name, start, end, type, subtype);
 	}
 
 	public static Department editDepartment(Department department) {
