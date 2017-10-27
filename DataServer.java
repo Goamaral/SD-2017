@@ -134,8 +134,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 			"', "  + person.phone + 
 			", '"  + person.address + 
 			"', "  + person.cc +
-			", '"  + dateFormat.format(person.ccExpire) +
-			"', "  + getListID(person.list) +
+			", "   + person.ccExpire +
 			")";
 		changeData(message);
 	}
@@ -175,7 +174,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	}
 
   	public void removeZone(Zone zone) throws RemoteException {
-		// Identificas se é faculdade ou departamento e removes
 		String message;
 		if(zone instanceof Faculty) {
 			message = "DELETE FROM faculty WHERE facName = '" + zone.name + "'";
@@ -233,24 +231,39 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		return departments;
 	}
 
-  public void createElection(Election election) throws RemoteException {
-		return;
+  	public void createElection(Election election) throws RemoteException {
+  		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+  		String message = "INSERT INTO election VALUES (" + createElectionID(election) +
+  			", '" + election.name +
+  			"', '" + election.description +
+  			"', '" + election.type +
+  			"', '" + election.subtype +
+  			"', " + election.start +
+  			", " + election.end +
+  			")";
+		changeData(message);
 	}
 
-  public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
+  	public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
+
 		return null;
 	}
 
-  public void createList(List list) throws RemoteException {
-		return;
+  	public void createList(List list) throws RemoteException {
+		String message = "INSERT INTO votingList VALUES (" + createListID(list) +
+  			", '" + list.name +
+  			"', " + getElectionID(list.election) +
+  			")";
+		changeData(message);
 	}
 
   public ArrayList<List> listLists(Election type) throws RemoteException {
-		return null;
+		return null;  
 	}
 
   public void removeList(List list) throws RemoteException {
-		return;
+		String message = "DELETE FROM votingList WHERE listID = " + getListID(list) + ")";
+		changeData(message);
 	}
 
   public ArrayList<Person> listCandidates(List list) throws RemoteException {
@@ -262,15 +275,24 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 	}
 
   public void removeCandidate(List list, Person person) throws RemoteException {
-		return;
+		String message = "DELETE FROM votingListMembers WHERE listID = " + getListID(list) + 
+		" AND personCC = " + person.cc +
+		")";
+		changeData(message);
 	}
 
   public void createVotingTable(VotingTable votingTable) throws RemoteException {
-		return;
+  	String message = "INSERT INTO votingTable VALUES (" + getElectionID(votingTable.election) +
+  			", '" + votingTable.department.name +
+  			"')";
+		changeData(message);
 	}
 
   public void removeVotingTable(VotingTable votingTable) throws RemoteException {
-		return;
+		String message = "DELETE FROM votingTable WHERE electionID = " + getElectionID(votingTable.election) + 
+		"AND depName = '" + votingTable.department.name +
+		"')";
+		changeData(message);
 	}
 
 	public ArrayList<VotingTable> listVotingTables(Election election) throws RemoteException {
