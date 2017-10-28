@@ -417,6 +417,16 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 	}
 
 	public Credential getCredentials(int cc) throws RemoteException{
+		String message = "SELECT personID, password FROM Person WHERE cc = " + cc ;
+		ResultSet resultSet = fetchData(message);
+		try{
+			while (resultSet.next()){
+				return new Credential(resultSet.getString("personID"),
+									  resultSet.getString("password"));
+			}
+		}  catch(Exception e){
+			System.out.println("Error on getCredentials("+ cc +"): " + e);
+		}
 		return null;
 	}
 
