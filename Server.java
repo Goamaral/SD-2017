@@ -9,7 +9,8 @@ class Server {
 	static DataServerInterface registry;
 	static ServerSocket listenSocket;
 	static int portRMI = 7000;
-	static String referenceRMI = "iVotasServer";
+	static String ipRMI = "localhost";
+	static String referenceRMI = "iVotas";
 	static int portTCP = 7001;
 	static boolean debug = true;
 	static ArrayList<String> terminalIDs = new ArrayList<String>();
@@ -29,6 +30,7 @@ class Server {
 
 		setSecurityPolicies();
 		getOptions(args);
+		if (rmiNapper == null) rmiNapper = new RmiNapper();
 		lookupRegistry(portRMI, referenceRMI);
 		createServerSocket();
 		location = getLocation();
@@ -42,8 +44,6 @@ class Server {
 		for (TerminalConnection terminal : terminals) {
 			terminal.terminate();
 		}
-
-		if (rmiNapper == null) rmiNapper = new RmiNapper();
 
 		if (voteSender != null) {
 			synchronized (voteSender.votes) {
@@ -203,6 +203,8 @@ class Server {
 			System.out.println("Opcao invalida");
 			return selector(list, title);
 		}
+
+		return opcao;
 	}
 
 	public static Socket waitForRequest() {
@@ -232,6 +234,14 @@ class Server {
 						System.out.println("No RMI port provided, using default: 7000");
 					}
 					break;
+				case "-ri":
+				case "--rmiip":
+					try {
+						ipRMI = args[i+1];
+					} catch (Exception e) {
+						System.out.println("No RMI ip provided, using default: localhost");
+					}
+					break;
 				case "-rr":
 				case "--rmireference":
 					try {
@@ -250,7 +260,7 @@ class Server {
 					break;
 				case "-h":
 				case "--help":
-					System.out.println("java Server -rp 7000 -rr iVotas -tp 7001");
+					System.out.println("java Server -rp 7000 -ri localhost -rr iVotas -tp 7001");
 					System.exit(0);
 					break;
 			}
@@ -263,6 +273,9 @@ class Server {
 			rmiNapper.awake();
 			return;
 		} catch (RemoteException re) {
+			nap();
+			lookupRegistry(port, reference);
+		} catch (NotBoundException nbe) {
 			nap();
 			lookupRegistry(port, reference);
 		}
@@ -293,7 +306,7 @@ class VotingTableAutentication extends Thread {
 		Credential credentials;
 		Election election;
 		int opcao;
-		ArrayList<String> list;
+		ArrayList<String> list =  new ArrayList<String>();
 
 		while (true) {
 			synchronized (this.lock) {
@@ -392,6 +405,8 @@ class VotingTableAutentication extends Thread {
 			System.out.println("Opcao invalida");
 			return selector(list, title);
 		}
+
+		return opcao;
 	}
 
 	public ArrayList<Election> getElections(int cc) {
@@ -532,7 +547,7 @@ class TerminalConnection extends Thread {
 	}
 
 	public boolean waitForRequest() {
-		boolean ret;
+		boolean ret = false;
 		this.terminalWatcher.start();
 		try {
 			ret = this.in.available() != 0;
@@ -543,11 +558,12 @@ class TerminalConnection extends Thread {
 					return false;
 				}
 			}
-			return ret;
 		} catch (IOException ioe) {
 			System.out.println("Falha na utilizacao da socket");
 			this.terminate();
 		}
+
+		return ret;
 	}
 
 	public void closeSocket() {
@@ -662,7 +678,11 @@ class TerminalWatcher extends Thread {
 					this.watcherTimedout = false;
 				}
 			}
-			this.wait(1000);
+			try {
+				this.wait(1000);
+			} catch (InterruptedException e) {
+				System.exit(0);
+			}
 			synchronized (this.timeoutLock) {
 				this.timeout = this.timeout - 1;
 				if (this.timeout == 0) {

@@ -18,7 +18,7 @@ public class Terminal {
 		boolean loginFailed;
 		boolean listListRecieved;
 		int size;
-		ArrayList<String> list;
+		ArrayList<String> list = new ArrayList<String>();
 		int opcao;
 
     getOptions(args);
@@ -99,6 +99,8 @@ public class Terminal {
 			System.out.println("Opcao invalida");
 			return selector(list, title);
 		}
+
+		return opcao;
 	}
 
 	public static boolean newInput() {
@@ -174,6 +176,8 @@ public class Terminal {
 	public static HashMap<String, String> parseResponse(String response) {
 		HashMap<String, String> out = new HashMap<String, String>();
 
+		System.out.println(response);
+
 		String[] pairs = response.split(";");
 		String[] pairParts;
 
@@ -206,7 +210,7 @@ public class Terminal {
 					break;
 				case "-h":
 				case "--help":
-					System.out.println("java -lp 3000 -sp 7001");
+					System.out.println("java -lp 3000 -sa localhost -sp 7001");
 					System.exit(0);
 					break;
 			}
