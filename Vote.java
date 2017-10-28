@@ -1,11 +1,11 @@
 class Vote {
-	VotingTable votingTable;
+	Election election;
 	int terminalID;
 	int voteNumber;
 	String list;
 
-	public Vote(VotingTable votingTable, int terminalID, String list) {
-		this.votingTable = votingTable;
+	public Vote(Election election, int terminalID, String list) {
+		this.election = election;
 		this.terminalID = terminalID;
 		this.list = list;
 		this.voteNumber = -1;

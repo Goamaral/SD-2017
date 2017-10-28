@@ -15,8 +15,8 @@ class Server {
 	static ArrayList<String> terminalIDs = new ArrayList<String>();
 	static ArrayList<TerminalConnection> terminals = new ArrayList<TerminalConnection>();
 	static VotingTableAutentication auth = null;
-	static ArrayList<VotingTable> votingTables = new ArrayList<VotingTable>();
 	static VoteSender voteSender = null;
+	static Department location;
 
 	public static void main(String args[]) {
 		TerminalConnection terminalConnection;
@@ -28,7 +28,7 @@ class Server {
 		getOptions(args);
 		lookupRegistry(portRMI, referenceRMI);
 		createServerSocket();
-		getVotingTables();
+		location = getLocation();
 
 		System.out.println("Mesa de voto");
 		if (debug) {
@@ -47,8 +47,8 @@ class Server {
 
 		if (auth != null) {
 			auth.terminate();
-			auth = new VotingTableAutentication(terminalIDs, terminals, registry, votingTables);
-		} else auth = new VotingTableAutentication(terminalIDs, terminals, registry, votingTables);
+			auth = new VotingTableAutentication(terminalIDs, terminals, registry, location);
+		} else auth = new VotingTableAutentication(terminalIDs, terminals, registry, location);
 
 		while(true) {
 			terminalSocket = waitForRequest();
@@ -95,8 +95,7 @@ class Server {
 			}
 		}
 	}
-
-	public static void getVotingTables() {
+	public static Department getLocation() {
 		ArrayList<Faculty> faculties = listFaculties();
 		ArrayList<Department> departments;
 		ArrayList<String> list = new ArrayList<String>();
@@ -122,13 +121,8 @@ class Server {
 
 		opcao = selector(list, "Selecione o departmento onde se situa");
 
-		department = departments.get(opcao);
+		return departments.get(opcao);
 
-		votingTables = listVotingTables(department);
-	}
-
-	public static ArrayList<VotingTable> listVotingTables(Department department) {
-		return registry.listVotingTables(department);
 	}
 
 	public static ArrayList<Department> listDepartments(Faculty faculty) {
@@ -249,7 +243,8 @@ class VotingTableAutentication extends Thread {
 	ArrayList<TerminalConnection> terminals;
 	DataServerInterface registry;
 	boolean debug = true;
-	ArrayList<VotingTable> votingTables;
+	ArrayList<Election> elections;
+	Department location;
 
 	public void run() {
 		Scanner scanner = new Scanner(System.in);
@@ -257,7 +252,7 @@ class VotingTableAutentication extends Thread {
 		int cc = -1;
 		boolean pass = false;
 		Credential credentials;
-		VotingTable votingTable;
+		Election election;
 
 		while (true) {
 			synchronized (this.lock) {
@@ -265,8 +260,6 @@ class VotingTableAutentication extends Thread {
 					break;
 				}
 			}
-
-			// NOTE Choose voting table (The election) to vote on
 
 			do {
 				System.out.print("Cartao Cidadao: ");
@@ -283,16 +276,19 @@ class VotingTableAutentication extends Thread {
 				}
 			} while (!pass);
 
-
 			credentials = this.getCredentials(cc);
 
 			if (credentials != null) {
+				elections = this.getElections(cc);
+
+				// NOTE selector election
+
 				synchronized (this.terminals) {
 					for (TerminalConnection terminal : this.terminals) {
-						if (debug) System.out.println("ID: " + terminal.terminalID + " STATE: " + terminal.getState());
 						if (terminal.getState() == Thread.State.WAITING) {
+							System.out.println("Terminal " + terminal.terminalID + " desbloqueado");
 							terminal.credentials = credentials;
-							terminal.votingTable = votingTable;
+							terminal.election = election;
 							synchronized (terminal.terminalLock) {
 								terminal.terminalLock.notify();
 							}
@@ -305,10 +301,13 @@ class VotingTableAutentication extends Thread {
 		}
 	}
 
+	public ArrayList<Election> getElections(int cc) {
+		// NOTE based on cc and location
+	}
+
 	public Credential getCredentials(int cc) {
 		try {
-			return new Credential("goa","root"); // NOTE
-			//return this.registry.getCredentials(cc);
+			return this.registry.getCredentials(cc);
 		} catch (Exception e) {
 			return this.getCredentials(cc);
 		}
@@ -324,12 +323,12 @@ class VotingTableAutentication extends Thread {
 		ArrayList<String> terminalIDs,
 		ArrayList<TerminalConnection> terminals,
 		DataServerInterface registry,
-		ArrayList<VotingTable> votingTables
+		Department location
 	) {
 			this.terminalIDs = terminalIDs;
 			this.terminals = terminals;
 			this.registry = registry;
-			this.votingTables = votingTables;
+			this.location = location;
 
 			this.start();
 		}
@@ -347,7 +346,6 @@ class TerminalConnection extends Thread {
 	boolean locked = true;
 	boolean debug = true;
 	boolean authorized = false;
-	VotingTable votingTable;
 	Election election;
 	VoteSender voteSender;
 	DataServerInterface registry;
@@ -382,7 +380,7 @@ class TerminalConnection extends Thread {
 							this.writeSocket("type|status;login|failed");
 						}
 					} else if (this.authorized && response.get("type").equals("vote")) {
-						vote = new Vote(this.votingTable, this.terminalID, response.get("list"));
+						vote = new Vote(this.election, this.terminalID, response.get("list"));
 						synchronized (this.voteSender.votes) {
 							this.voteSender.votes.addFirst(vote);
 						}
@@ -404,10 +402,11 @@ class TerminalConnection extends Thread {
 		}
 	}
 
+	// NOTE code timeouts
 	public ArrayList<List> listLists() {
 		try {
-			synchronized (this.votingTable) {
-				return this.registry.listLists(this.votingTable.election);
+			synchronized (this.election) {
+				return this.registry.listLists(this.election);
 			}
 		} catch (RemoteException re) {
 			this.nap();
