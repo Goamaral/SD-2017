@@ -34,6 +34,8 @@ public interface DataServerInterface extends Remote {
 	// Votes
 	public void sendVote(Vote vote) throws RemoteException;
 	public void sendLog(Log log) throws RemoteException;
+	// String é o nome da lista/Branco/Nulo e Integer é o numero de votos
+	public Hashtable<String, Integer> getResults(Election election) throws RemoteException;
 
 	// Authentication
 	public Credential getCredentials(int cc) throws RemoteException;

@@ -4,11 +4,9 @@ import java.util.*;
 import java.lang.Thread.State;
 import java.text.*;
 
-// NOTE Dados estatisticos
-
 public class Console {
 	static boolean debug = true;
-	static DataServerConsoleInterface registry;
+	static DataServerInterface registry;
 	static LinkedList<Job> jobs = new LinkedList<Job>();
 	static ConsoleWorker worker = null;
 	static Hashtable<String, Menu> menus = new Hashtable<String, Menu>();
@@ -36,8 +34,8 @@ public class Console {
 		String[] menuElectionTypes = { "General", "Nucleus" };
 		menus.put("Election", new Menu(menuElection, menuElectionTypes));
 
-		String[] menuNucleus = { "Criar", "Listas", "Mesas de Voto" };
-		String[] menuNucleusTypes = { "Add", "List", "VotingTable" };
+		String[] menuNucleus = { "Criar", "Listas", "Mesas de Voto", "Resultados" };
+		String[] menuNucleusTypes = { "Add", "List", "VotingTable", "Results" };
 		menus.put("Nucleus", new Menu(menuNucleus, menuNucleusTypes));
 
 		String[] menuGeneral = { "Estudante", "Docente", "Funcionario" };
@@ -111,7 +109,7 @@ public class Console {
 
 	public static void lookupRegistry(int port, String reference) {
 		try {
-			registry = (DataServerConsoleInterface)LocateRegistry.getRegistry(port).lookup(reference);
+			registry = (DataServerInterface)LocateRegistry.getRegistry(port).lookup(reference);
 		} catch (Exception e1) {
 			System.out.println("Remote failure. Trying to reconnect...");
 			try {
@@ -138,7 +136,7 @@ public class Console {
 		String line;
 		String[] endings = {
 			"Student", "Teacher", "Employee", "Add", "Edit", "Remove", "Create",
-			"Log"
+			"Log", "Results"
 		};
 
 		System.out.println("----------");
@@ -249,7 +247,18 @@ public class Console {
 					subtype = actions[2].split("-")[0];
 				}
 				list = pickList(pickElection(actions[1], subtype));
-				candidates = listCandidates(list);
+				listCandidates(list);
+				return;
+
+			case "Election General Student-Election Results":
+			case "Election General Teacher-Election Results":
+			case "Election General Employee-Election Results":
+			case "Election Nucleus Results":
+				if (actions.length == 4) {
+					subtype = actions[2].split("-")[0];
+				}
+				election = pickElection(actions[1], subtype);
+				listResults(election);
 				return;
 
 			case "Election General Student-Election VotingTable Add":
@@ -284,6 +293,26 @@ public class Console {
 					jobs.notify();
 				}
 			}
+		}
+	}
+
+	public static void listResults(Election election) {
+		Hashtable<String, Integer> result = null;
+
+		try {
+			result = registry.getResults(election);
+			for (String key : result.keySet()) {
+				System.out.println(key + ": " + result.get(key));
+			}
+		} catch (RemoteException re) {
+			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				System.exit(0);
+			}
+			listResults(election);
+			return;
 		}
 	}
 
@@ -528,9 +557,9 @@ public class Console {
 
 	public static Election buildElection(String type, String subtype) {
 		String name;
-	  String description;
-	  Date start = null;
-	  Date end = null;
+		String description;
+		Date start = null;
+		Date end = null;
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
 		boolean pass;

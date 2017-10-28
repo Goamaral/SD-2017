@@ -5,7 +5,7 @@ class ConsoleWorker extends Thread {
   LinkedList<Job> jobs;
   Object lock = new Object();
   boolean end = false;
-  DataServerConsoleInterface registry;
+  DataServerInterface registry;
 
   public void run() {
 		Job job;
@@ -103,7 +103,7 @@ class ConsoleWorker extends Thread {
     }
   }
 
-  public ConsoleWorker(LinkedList<Job> jobs, DataServerConsoleInterface registry) {
+  public ConsoleWorker(LinkedList<Job> jobs, DataServerInterface registry) {
     this.jobs = jobs;
     this.registry = registry;
 
