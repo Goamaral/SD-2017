@@ -34,6 +34,7 @@ public interface DataServerInterface extends Remote {
 
 	// Votes
 	public void sendVote(Vote vote) throws RemoteException;
+	public void sendLog(Log log) throws RemoteException;
 
 	// Authentication
 	public Credential getCredentials(int cc) throws RemoteException;

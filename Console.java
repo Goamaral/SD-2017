@@ -541,8 +541,12 @@ public class Console {
 		System.out.println("Criar eleicao ");
 		System.out.println("--------------------");
 
-		System.out.print("Nome: ");
-		name = scanner.nextLine();
+		String[] menuElection = { "Eleicao Geral", "Eleicao Nucleo de Estudantes" };
+		String[] menuElectionTypes = { "General", "Nucleus" };
+
+		int index = Arrays.binarySearch(menuElectionTypes, type);
+
+		name = new String(menuElection[index]);
 
 		System.out.print("Descricao: ");
 		description = scanner.nextLine();

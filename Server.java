@@ -5,6 +5,8 @@ import java.util.*;
 import java.lang.Thread.State;
 import java.io.*;
 
+// NOTE Nap thread for timeouts
+
 class Server {
 	static DataServerInterface registry;
 	static ServerSocket listenSocket;
@@ -18,8 +20,6 @@ class Server {
 	static VoteSender voteSender = null;
 	static Department location;
 
-	// NOTE send who already voted on what
-	// NOTE terminate election
 	public static void main(String args[]) {
 		TerminalConnection terminalConnection;
 		int terminalID;
@@ -255,6 +255,8 @@ class VotingTableAutentication extends Thread {
 		boolean pass = false;
 		Credential credentials;
 		Election election;
+		int opcao;
+		ArrayList<String> list;
 
 		while (true) {
 			synchronized (this.lock) {
@@ -281,9 +283,15 @@ class VotingTableAutentication extends Thread {
 			credentials = this.getCredentials(cc);
 
 			if (credentials != null) {
-				elections = this.getElections(cc);
+				this.elections = this.getElections(cc);
+				list.clear();
 
-				// NOTE selector election
+				for (Election electionAux : this.elections) {
+					list.add(electionAux.name);
+				}
+
+				opcao = selector(list, "Escolha uma eleicao");
+				election = this.elections.get(opcao);
 
 				synchronized (this.terminals) {
 					for (TerminalConnection terminal : this.terminals) {
@@ -291,6 +299,7 @@ class VotingTableAutentication extends Thread {
 							System.out.println("Terminal " + terminal.terminalID + " desbloqueado");
 							terminal.credentials = credentials;
 							terminal.election = election;
+							terminal.log = new Log(location, election, cc);
 							synchronized (terminal.terminalLock) {
 								terminal.terminalLock.notify();
 							}
@@ -303,8 +312,52 @@ class VotingTableAutentication extends Thread {
 		}
 	}
 
+	public static int selector(ArrayList<String> list, String title) {
+		int i = 0;
+		int opcao;
+		Scanner scanner = new Scanner(System.in);
+		String line;
+
+		System.out.println("--------------------");
+		System.out.println(title);
+		System.out.println("--------------------");
+
+		for (String item : list) {
+			System.out.println("[" + i + "] " + item);
+			++i;
+		}
+
+		System.out.print("Opcao: ");
+		line = scanner.nextLine();
+
+		try {
+			opcao = Integer.parseInt(line);
+		} catch (Exception e) {
+			System.out.println("Opcao invalida");
+			return selector(list, title);
+		}
+
+		if (opcao >= i && opcao < 0) {
+			System.out.println("Opcao invalida");
+			return selector(list, title);
+		}
+	}
+
 	public ArrayList<Election> getElections(int cc) {
-		// NOTE based on cc and location
+		try {
+			return registry.listElections(location, cc);
+		} catch (RemoteException re) {
+			this.nap();
+			return getElections(cc);
+		}
+	}
+
+	public void nap() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException ie) {
+			this.end = true;
+		}
 	}
 
 	public Credential getCredentials(int cc) {
@@ -322,11 +375,8 @@ class VotingTableAutentication extends Thread {
 	}
 
 	public VotingTableAutentication(
-		ArrayList<String> terminalIDs,
-		ArrayList<TerminalConnection> terminals,
-		DataServerInterface registry,
-		Department location
-	) {
+		ArrayList<String> terminalIDs, ArrayList<TerminalConnection> terminals,
+		DataServerInterface registry, Department location) {
 			this.terminalIDs = terminalIDs;
 			this.terminals = terminals;
 			this.registry = registry;
@@ -351,6 +401,7 @@ class TerminalConnection extends Thread {
 	Election election;
 	VoteSender voteSender;
 	DataServerInterface registry;
+	Log log;
 
 	public void run() {
 		HashMap<String, String> response;
@@ -358,6 +409,7 @@ class TerminalConnection extends Thread {
 		String query;
 		List list;
 		Vote vote;
+		Date date;
 
 		while (true) {
 			synchronized (this.lock) {
@@ -382,9 +434,12 @@ class TerminalConnection extends Thread {
 							this.writeSocket("type|status;login|failed");
 						}
 					} else if (this.authorized && response.get("type").equals("vote")) {
-						vote = new Vote(this.election, this.terminalID, response.get("list"));
+						date = new Date();
+						vote = new Vote(this.election, this.terminalID, response.get("list"), date);
+						this.log.date = date;
 						synchronized (this.voteSender.votes) {
 							this.voteSender.votes.addFirst(vote);
+							this.voteSender.logs.addFirst(this.log);
 						}
 						this.logout();
 					} else if (this.authorized && response.get("type").equals("request")) {
@@ -404,7 +459,6 @@ class TerminalConnection extends Thread {
 		}
 	}
 
-	// NOTE code timeouts
 	public ArrayList<List> listLists() {
 		try {
 			synchronized (this.election) {
@@ -544,12 +598,14 @@ class VoteSender extends Thread {
 	ArrayList<String> terminals;
 	ArrayList<Integer> voteNumbers;
 	LinkedList<Vote> votes = new LinkedList<Vote>();
+	LinkedList<Log> logs = new LinkedList<Log>();
 	int id;
 	DataServerInterface registry;
 
 	public void run() {
 		Vote vote;
 		int delta;
+		Log log;
 
 		while (true) {
 			synchronized (this.terminals) {
@@ -564,9 +620,11 @@ class VoteSender extends Thread {
 			synchronized (lock) {
 				if (this.end) {
 					synchronized (this.votes) {
-						if (this.votes.size() > 0) {
-							System.out.println("Ainda existem votos por enviar");
-						} else return;
+						synchronized (this.logs) {
+							if (this.votes.size() > 0 || this.logs.size() > 0) {
+								System.out.println("Ainda existem votos por enviar");
+							} else return;
+						}
 					}
 				}
 			}
@@ -578,12 +636,28 @@ class VoteSender extends Thread {
 
 					this.voteNumbers.set(id, this.voteNumbers.get(id) + 1);
 					vote.voteNumber = this.voteNumbers.get(id);
-					try {
-						this.registry.sendVote(vote);
-					} catch (RemoteException re) {
-						vote.voteNumber = -1;
-						this.voteNumbers.set(id, this.voteNumbers.get(id) - 1);
-						this.votes.addLast(vote);
+					if (vote.date.after(vote.election.start) && vote.date.before(vote.election.end)) {
+						try {
+							this.registry.sendVote(vote);
+						} catch (RemoteException re) {
+							vote.voteNumber = -1;
+							this.voteNumbers.set(id, this.voteNumbers.get(id) - 1);
+							this.votes.addLast(vote);
+						}
+					}
+				}
+			}
+
+			synchronized (this.logs) {
+				if (this.logs.size() > 0) {
+					log = this.logs.removeLast();
+
+					if (log.date.after(log.election.start) && log.date.before(log.election.end)) {
+						try {
+							this.registry.sendLog(log);
+						} catch (RemoteException re) {
+							this.logs.addLast(log);
+						}
 					}
 				}
 			}
