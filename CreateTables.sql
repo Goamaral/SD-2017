@@ -17,7 +17,7 @@ CREATE TABLE election
  electionName         VARCHAR(255)        NOT NULL,
  electionDescription  VARCHAR(255),
  electionType         VARCHAR(255)        NOT NULL,
- electionSubType      VARCHAR(255),
+ electionSubType      VARCHAR(255)        NOT NULL,
  electionStart        VARCHAR(255)        NOT NULL,
  electionEnd          VARCHAR(255)        NOT NULL  
 );
@@ -68,10 +68,10 @@ Password is encrypted
 Each "person" line represents one person (voter)
 */
 CREATE TABLE person
-(type           VARCHAR(255)         NOT NULL,
+(type           VARCHAR(255)        NOT NULL,
  name           VARCHAR(255)        NOT NULL,
  personID       int                 NOT NULL,
- password       VARCHAR(255)         NOT NULL,
+ password       VARCHAR(255)        NOT NULL,
  depName        VARCHAR(255)        NOT NULL, 
                                     FOREIGN KEY (depName) 
                                         REFERENCES department(depName),
@@ -103,7 +103,6 @@ CREATE TABLE vote
  voteDate       VARCHAR(255)        NOT NULL
 );
 
-
 CREATE TABLE log
 (depName        VARCHAR(255)        NOT NULL,
                                     FOREIGN KEY (depName)
@@ -111,7 +110,7 @@ CREATE TABLE log
 electionID      int                 NOT NULL,
                                     FOREIGN KEY (electionID)
                                         REFERENCES election (electionID),
-logDate         VARCHAR(255)        NOT NULL,
+logDate         VARCHAR(255),    
 personCC        int                 NOT NULL,
                                     FOREIGN KEY (personCC)
                                         REFERENCES person(cc)
