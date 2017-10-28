@@ -3,15 +3,15 @@ import java.io.*;
 import java.util.*;
 
 public class Terminal {
-  static int portServer = 7001;
+	static int portServer = 7001;
 	static String addressServer = "localhost";
-  static Socket socket;
-  static DataInputStream in;
-  static DataOutputStream out;
+	static Socket socket;
+	static DataInputStream in;
+	static DataOutputStream out;
 	static String username;
 	static String password;
 
-  public static void main(String args[]) {
+	public static void main(String args[]) {
 		HashMap<String, String> response;
 		boolean loginRequired;
 		boolean loginSucessful;
@@ -21,9 +21,8 @@ public class Terminal {
 		ArrayList<String> list = new ArrayList<String>();
 		int opcao;
 
-    getOptions(args);
-
-    connectSocket();
+		getOptions(args);
+		connectSocket();
 		createStreams();
 
 		System.out.println("Terminal de voto ativo");
@@ -58,6 +57,9 @@ public class Terminal {
 						for (int i = 0; i<size; ++i) {
 							list.add(i, response.get("item_" + i));
 						}
+
+						list.add("Nulo");
+						list.add("Branco");
 
 						opcao = selector(list, "Vote numa lista");
 
@@ -189,10 +191,10 @@ public class Terminal {
 		return out;
 	}
 
-  public static void getOptions(String[] args) {
+	public static void getOptions(String[] args) {
 		for (int i=0; i<args.length; ++i) {
 			switch (args[i]) {
-        case "-sp":
+				case "-sp":
 				case "--serverport":
 					try {
 						portServer = Integer.parseInt(args[i+1]);
