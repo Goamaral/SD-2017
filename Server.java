@@ -5,8 +5,6 @@ import java.util.*;
 import java.lang.Thread.State;
 import java.io.*;
 
-// NOTE Nap thread for timeouts
-
 class Server {
 	static DataServerInterface registry;
 	static ServerSocket listenSocket;
@@ -276,8 +274,6 @@ class Server {
 	}
 }
 
-// NOTE lock terminal after timeout
-
 class VotingTableAutentication extends Thread {
 	boolean end = false;
 	Object lock = new Object();
@@ -413,7 +409,7 @@ class VotingTableAutentication extends Thread {
 
 	public void nap() {
 		try {
-			Thread.sleep(1000);
+			this.wait(1000);
 			this.rmiNapper.nap();
 		} catch (InterruptedException ie) {
 			this.end = true;
@@ -468,6 +464,9 @@ class TerminalConnection extends Thread {
 	VoteSender voteSender;
 	DataServerInterface registry;
 	Log log;
+	TerminalWatcher terminalWatcher;
+	boolean watcherTimedout = false;
+	Object watcherLock = new Object();
 
 	public void run() {
 		HashMap<String, String> response;
@@ -486,7 +485,7 @@ class TerminalConnection extends Thread {
 
 			if (!this.authorized) this.logout();
 
-			if (this.inAvailable()) {
+			if (this.waitForRequest()) {
 				response = this.parseResponse(this.readSocket());
 				if (response != null) {
 					if (response.get("type").equals("login")) {
@@ -532,15 +531,22 @@ class TerminalConnection extends Thread {
 		this.writeSocket("type|status;login|required");
 	}
 
-	public boolean inAvailable() {
+	public boolean waitForRequest() {
+		boolean ret;
+		this.terminalWatcher.start();
 		try {
-			return this.in.available() != 0;
+			ret = this.in.available() != 0;
+			this.terminalWatcher.awake();
+			synchronized (this.watcherLock) {
+				if (this.watcherTimedout) {
+					this.logout();
+					return false;
+				}
+			}
+			return ret;
 		} catch (IOException ioe) {
 			System.out.println("Falha na utilizacao da socket");
-			synchronized (this.lock) {
-				this.end = true;
-				return false;
-			}
+			this.terminate();
 		}
 	}
 
@@ -633,6 +639,54 @@ class TerminalConnection extends Thread {
 			return;
 		}
 
+		this.terminalWatcher = new TerminalWatcher(this.watcherTimedout, this.watcherLock);
+
+		this.start();
+	}
+}
+
+class TerminalWatcher extends Thread {
+	int timeout = 120;
+	Object timeoutLock = new Object();
+	boolean watcherTimedout;
+	Object watcherLock;
+
+	public void run() {
+		while (true);
+	}
+
+	public void start() {
+		while (true) {
+			synchronized (this.watcherLock) {
+				if (this.watcherTimedout) {
+					this.watcherTimedout = false;
+				}
+			}
+			this.wait(1000);
+			synchronized (this.timeoutLock) {
+				this.timeout = this.timeout - 1;
+				if (this.timeout == 0) {
+					synchronized (this.watcherLock) {
+						this.watcherTimedout = true;
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	public void awake() {
+		synchronized (this.watcherLock) {
+			this.watcherTimedout = false;
+		}
+		synchronized (this.timeoutLock) {
+			this.timeout = 120;
+		}
+	}
+
+	public TerminalWatcher(boolean watcherTimedout, Object watcherLock) {
+		this.watcherTimedout = watcherTimedout;
+		this.watcherLock = watcherLock;
 		this.start();
 	}
 }
@@ -721,7 +775,7 @@ class VoteSender extends Thread {
 
 	public void nap() {
 		try {
-			Thread.sleep(1000);
+			this.wait(1000);
 			this.rmiNapper.nap();
 		} catch (InterruptedException ie) {
 			System.exit(0);
@@ -780,5 +834,6 @@ class RmiNapper extends Thread {
 	}
 
 	public RmiNapper() {
+		this.start();
 	}
 }
