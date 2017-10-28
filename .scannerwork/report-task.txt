@@ -1,7 +1,0 @@
-organization=goamaral-github
-projectKey=SD-2017
-serverUrl=https://sonarcloud.io
-serverVersion=6.6.0.30458
-dashboardUrl=https://sonarcloud.io/dashboard/index/SD-2017
-ceTaskId=AV9clHDBfwWpOfyf_tqm
-ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AV9clHDBfwWpOfyf_tqm

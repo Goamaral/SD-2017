@@ -53,25 +53,25 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 			System.out.println("Server ready Port: " + port + " Reference: " + reference);
 
 			while(true){
-	            try{
-	            	byte[] buf = new byte[256];
-	            	DatagramPacket packet = new DatagramPacket(buf, buf.length);
-	            	DatagramSocket socket = new DatagramSocket(socketPort);
+				try{
+					byte[] buf = new byte[256];
+					DatagramPacket packet = new DatagramPacket(buf, buf.length);
+					DatagramSocket socket = new DatagramSocket(socketPort);
 					System.out.println("Listenting on port: " + socketPort);
-	            	socket.receive(packet);
-	            	InetAddress returnAddress = packet.getAddress();
-	            	int returnPort = packet.getPort();
-		            String received = new String(packet.getData(), 0, packet.getLength());
-		            System.out.println("Recieved: " + received);
-		            String returnMessage = "pong";
-		            buf = returnMessage.getBytes();
-		            packet = new DatagramPacket(buf, buf.length, returnAddress, returnPort);
-		            System.out.println("Sending: " + returnMessage);
-		            socket.send(packet);
-			   		socket.close();
-	            }catch(Exception e) {
-	            	System.out.println(e);
-	            }
+					socket.receive(packet);
+					InetAddress returnAddress = packet.getAddress();
+					int returnPort = packet.getPort();
+					String received = new String(packet.getData(), 0, packet.getLength());
+					System.out.println("Recieved: " + received);
+					String returnMessage = "pong";
+					buf = returnMessage.getBytes();
+					packet = new DatagramPacket(buf, buf.length, returnAddress, returnPort);
+					System.out.println("Sending: " + returnMessage);
+					socket.send(packet);
+					socket.close();
+				} catch(Exception e) {
+						System.out.println(e);
+				}
 			}
 		} catch (RemoteException e) {
 			System.out.println("Remote failure:\n" + e );
@@ -95,24 +95,24 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 				try{
 					byte[] buf = new byte[256];
 					String msg = "ping";
-        			buf = msg.getBytes();
+					buf = msg.getBytes();
 					InetAddress sendAddress = InetAddress.getByName("localhost");
 					DatagramPacket packet = new DatagramPacket(buf, buf.length, sendAddress, socketPort);
 					System.out.println("Sending: " + msg);
-		        	socket.send(packet);
-		        	socket.setSoTimeout(1000);
-		        	socket.receive(packet);
-	            	InetAddress returnAddress = packet.getAddress();
-	            	int returnPort = packet.getPort();
-		            String received = new String(packet.getData(), 0, packet.getLength());
-		            System.out.println("Recieved: " + received);
-		        	tries = 5;
-				}catch (SocketTimeoutException e) {
-	                // timeout exception.
-	                System.out.println("Timeout reached!!! " + tries);
-	                tries--;
-	            }catch (Exception e){}
-	            socket.close();
+					socket.send(packet);
+					socket.setSoTimeout(1000);
+					socket.receive(packet);
+					InetAddress returnAddress = packet.getAddress();
+					int returnPort = packet.getPort();
+					String received = new String(packet.getData(), 0, packet.getLength());
+					System.out.println("Recieved: " + received);
+					tries = 5;
+				} catch (SocketTimeoutException e) {
+					// timeout exception.
+					System.out.println("Timeout reached!!! " + tries);
+					tries--;
+			} catch (Exception e){}
+				socket.close();
 			}
 			runServer(0);
 
@@ -153,16 +153,16 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		changeData(message);
 	}
 
-  	public void updateZone(Zone zone, Zone newZone) throws RemoteException {
+	public void updateZone(Zone zone, Zone newZone) throws RemoteException {
 		// check if zone already exists
 		String message;
 		if(zone instanceof Faculty && newZone instanceof Faculty) {
-			message = "UPDATE faculty SET facName = '" + newZone.name + 
+			message = "UPDATE faculty SET facName = '" + newZone.name +
 			"' WHERE facName = '" + zone.name + "'";
 		}
 		else if (zone instanceof Department && newZone instanceof Department) {
 			Department department = (Department)newZone;
-			message = "UPDATE department SET depName = '" + department.name + 
+			message = "UPDATE department SET depName = '" + department.name +
 			"' , faculty = '" + department.faculty.name +
 			"' WHERE depName = '" + department.name + "'";
 		}
@@ -173,7 +173,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		changeData(message);
 	}
 
-  	public void removeZone(Zone zone) throws RemoteException {
+	public void removeZone(Zone zone) throws RemoteException {
 		String message;
 		if(zone instanceof Faculty) {
 			message = "DELETE FROM faculty WHERE facName = '" + zone.name + "'";
@@ -194,11 +194,11 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		changeData(message);
 	}
 
-  	public ArrayList<Faculty> listFaculties() throws RemoteException {
-  		ArrayList<Faculty> faculties = new ArrayList<Faculty>();
-  		String message = "SELECT facName FROM faculty";
-  		ResultSet resultSet = fetchData(message);
-  		try{
+	public ArrayList<Faculty> listFaculties() throws RemoteException {
+		ArrayList<Faculty> faculties = new ArrayList<Faculty>();
+		String message = "SELECT facName FROM faculty";
+		ResultSet resultSet = fetchData(message);
+		try{
 			while(resultSet.next()){
 				faculties.add(new Faculty(
 					resultSet.getString("facName")
@@ -213,10 +213,10 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 	}
 
 	public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException {
-  		ArrayList<Department> departments = new ArrayList<Department>();
+		ArrayList<Department> departments = new ArrayList<Department>();
 		String message = "SELECT faculty, depName FROM department WHERE facName = '" + faculty.name + "'";
-  		ResultSet resultSet = fetchData(message);
-  		try{
+		ResultSet resultSet = fetchData(message);
+		try{
 			while(resultSet.next()){
 				departments.add(new Department(
 					new Faculty(resultSet.getString("faculty")),
@@ -231,34 +231,34 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		return departments;
 	}
 
-  	public void createElection(Election election) throws RemoteException {
-  		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
-  		String message = "INSERT INTO election VALUES (" + createElectionID(election) +
-  			", '" + election.name +
-  			"', '" + election.description +
-  			"', '" + election.type +
-  			"', '" + election.subtype +
-  			"', '" + dateFormat.format(election.start) +
-  			"', '" + dateFormat.format(election.end) +
-  			"')";
+	public void createElection(Election election) throws RemoteException {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+		String message = "INSERT INTO election VALUES (" + createElectionID(election) +
+			", '" + election.name +
+			"', '" + election.description +
+			"', '" + election.type +
+			"', '" + election.subtype +
+			"', '" + dateFormat.format(election.start) +
+			"', '" + dateFormat.format(election.end) +
+			"')";
 		changeData(message);
 	}
 
-  	public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
-  		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
-  		java.util.Date dateNow = new java.util.Date();
-  		ArrayList<Election> elections = new ArrayList<Election>();
-		String message = "SELECT electionName, electionStart, electionEnd FROM department WHERE electionType = '" + type 
+	public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+		java.util.Date dateNow = new java.util.Date();
+		ArrayList<Election> elections = new ArrayList<Election>();
+		String message = "SELECT electionName, electionStart, electionEnd FROM department WHERE electionType = '" + type
 						+ "' AND electionSubType = '" + subtype + "'";
-  		ResultSet resultSet = fetchData(message);
-  		try{
+		ResultSet resultSet = fetchData(message);
+		try {
 			while(resultSet.next()){
 				java.util.Date eventEndDate = dateFormat.parse(resultSet.getString("electionEnd"));
 				if(eventEndDate.compareTo(dateNow) >= 0) // if still running
-					elections.add(new Election( resultSet.getString("electionName"), 
-											dateFormat.parse(resultSet.getString("electionStart")), 
-											dateFormat.parse(resultSet.getString("electionEnd")), 
-											type, 
+					elections.add(new Election( resultSet.getString("electionName"),
+											dateFormat.parse(resultSet.getString("electionStart")),
+											dateFormat.parse(resultSet.getString("electionEnd")),
+											type,
 											subtype
 				));
 			}
@@ -347,25 +347,25 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		return elections;
 	}
 
-  	public void createList(List list) throws RemoteException {
+	public void createList(List list) throws RemoteException {
 		String message = "INSERT INTO votingList VALUES (" + createListID(list) +
-  			", '" + list.name +
-  			"', " + getElectionID(list.election) +
-  			")";
+			", '" + list.name +
+			"', " + getElectionID(list.election) +
+			")";
 		changeData(message);
 	}
 
   public ArrayList<List> listLists(Election election) throws RemoteException {
-	  	ArrayList<List> lists = new ArrayList<List>();
+		ArrayList<List> lists = new ArrayList<List>();
 		String message = "SELECT listName FROM votingList WHERE electionID = " + getElectionID(election) ;
-  		ResultSet resultSet = fetchData(message);
-  		try{
+		ResultSet resultSet = fetchData(message);
+		try {
 			while(resultSet.next()){
-				lists.add(new List( election, 
+				lists.add(new List( election,
 									resultSet.getString(1)
 				));
 			}
-		}catch(Exception e) {
+		} catch(Exception e) {
 			System.out.println("Error on listLists(): " + e);
 			return null;
 		}
@@ -373,69 +373,69 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		return lists;
 	}
 
-  	public void removeList(List list) throws RemoteException {
+	public void removeList(List list) throws RemoteException {
 		String message = "DELETE FROM votingList WHERE listID = " + getListID(list) + ")";
 		changeData(message);
 	}
 
-  	public ArrayList<Person> listCandidates(List list) throws RemoteException {
-  		ArrayList<Person> candidates = new ArrayList<Person>();
-  		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-  		// get the cc column from listMembers
-  		int listID = getListID(list);
+	public ArrayList<Person> listCandidates(List list) throws RemoteException {
+		ArrayList<Person> candidates = new ArrayList<Person>();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		// get the cc column from listMembers
+		int listID = getListID(list);
 
-  		String message = "SELECT personCC FROM votingListMembers WHERE listID = " + listID;
-  		ResultSet resultSet1 = fetchData(message);
+		String message = "SELECT personCC FROM votingListMembers WHERE listID = " + listID;
+		ResultSet resultSet1 = fetchData(message);
 
-  		try{
-  			while(resultSet1.next()){
-  				message = "SELECT type, name, personID, password, depName, phone, address, cc, ccExpire " +
-  						  "FROM person WHERE cc = " + resultSet1.getInt(1);
-  				ResultSet resultSet2 = fetchData(message);
-  				while(resultSet2.next()){
-  					message = "SELECT faculty, depName FROM department WHERE depName = '" + resultSet2.getString(5) + "'";
-  					ResultSet resultSet3 = fetchData(message);
-  					candidates.add(new Person(resultSet2.getString(1),
-  											  resultSet2.getString(2),
-  											  resultSet2.getInt(3),
-  											  resultSet2.getString(4),
-  											  new Department(new Faculty(resultSet3.getString(1)), resultSet3.getString(2)),
-  											  resultSet2.getInt(6),
-  											  resultSet2.getString(7),
-  											  resultSet2.getInt(8),
-  											  dateFormat.parse(resultSet2.getString(9))
-  					));
-  				}
-  			}
-  		} catch (Exception e){
-  			System.out.println("Error on listCandidates(): " + e );
-  			return null;
-  		}
-		
+		try{
+			while(resultSet1.next()){
+				message = "SELECT type, name, personID, password, depName, phone, address, cc, ccExpire " +
+						  "FROM person WHERE cc = " + resultSet1.getInt(1);
+				ResultSet resultSet2 = fetchData(message);
+				while(resultSet2.next()){
+					message = "SELECT faculty, depName FROM department WHERE depName = '" + resultSet2.getString(5) + "'";
+					ResultSet resultSet3 = fetchData(message);
+					candidates.add(new Person(resultSet2.getString(1),
+											  resultSet2.getString(2),
+											  resultSet2.getInt(3),
+											  resultSet2.getString(4),
+											  new Department(new Faculty(resultSet3.getString(1)), resultSet3.getString(2)),
+											  resultSet2.getInt(6),
+											  resultSet2.getString(7),
+											  resultSet2.getInt(8),
+											  dateFormat.parse(resultSet2.getString(9))
+					));
+				}
+			}
+		} catch (Exception e){
+			System.out.println("Error on listCandidates(): " + e );
+			return null;
+		}
+
 		return candidates;
 	}
 
-  	public void addCandidate(List list, Person person) throws RemoteException {
-  		String message = "INSERT INTO votingListMembers VALUES (" + getListID(list) + ", " + person.cc + ")";
+	public void addCandidate(List list, Person person) throws RemoteException {
+		String message = "INSERT INTO votingListMembers VALUES (" + getListID(list) + ", " + person.cc + ")";
 		changeData(message);
 	}
 
-  	public void removeCandidate(List list, Person person) throws RemoteException {
-		String message = "DELETE FROM votingListMembers WHERE listID = " + getListID(list) + 
+	public void removeCandidate(List list, Person person) throws RemoteException {
+		String message = "DELETE FROM votingListMembers WHERE listID = " + getListID(list) +
 		" AND personCC = " + person.cc +
 		")";
 		changeData(message);
 	}
 
-  	public void createVotingTable(VotingTable votingTable) throws RemoteException {
-  	String message = "INSERT INTO votingTable VALUES (" + getElectionID(votingTable.election) +
-  			", '" + votingTable.department.name +
-  			"')";
+	public void createVotingTable(VotingTable votingTable) throws RemoteException {
+		String message = "INSERT INTO votingTable VALUES (" + getElectionID(votingTable.election) +
+				", '" + votingTable.department.name +
+				"')";
 		changeData(message);
 	}
 
-  	public void removeVotingTable(VotingTable votingTable) throws RemoteException {
-		String message = "DELETE FROM votingTable WHERE electionID = " + getElectionID(votingTable.election) + 
+	public void removeVotingTable(VotingTable votingTable) throws RemoteException {
+		String message = "DELETE FROM votingTable WHERE electionID = " + getElectionID(votingTable.election) +
 		"AND depName = '" + votingTable.department.name +
 		"')";
 		changeData(message);
@@ -474,7 +474,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 						", '" + vote.list +
 						"', '" + dateFormat.format(vote.date) +
 						"')";
-		changeData(message);	
+		changeData(message);
 		return;
 	}
 
@@ -532,12 +532,12 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		+ "' AND electionID = " + getElectionID(list.election);
 		ResultSet resultSet = fetchData(message);
 		int listID = -1; // if an error occurs, return an invalid ID
-  		try{
+		try {
 			while(resultSet.next()){
 				listID = resultSet.getInt("listID");
 			}
 			return listID;
-		}catch(SQLException e) {
+		} catch(SQLException e) {
 			System.out.println("Error on getListID("+ list +"): " + e);
 			return -1;
 		}
@@ -571,12 +571,12 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		+ "' AND electionType = '" + election.type + "'";
 		ResultSet resultSet = fetchData(message);
 		int electionID = -1; // if an error occurs, return an invalid ID
-  		try{
+		try {
 			while(resultSet.next()){
 				electionID = resultSet.getInt("electionID");
 			}
 			return electionID;
-		}catch(SQLException e) {
+		} catch(SQLException e) {
 			System.out.println("Error on getElectionID("+ election +"): " + e);
 			return -1;
 		}
@@ -616,8 +616,8 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 
 	public ResultSet fetchData(String message) {
 		try{
-	  		ResultSet resultQuery = database.query(message);
-	  		System.out.println(message);
+			ResultSet resultQuery = database.query(message);
+			System.out.println(message);
 			return resultQuery;
 		} catch(Exception e){
 			System.out.println("Error in fetchData(" + message + "): " + e);
