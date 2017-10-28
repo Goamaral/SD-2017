@@ -413,6 +413,25 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 	}
 
 	public Hashtable<String, Integer> getResults(Election election) throws RemoteException{
+		Hashtable<String, Integer> elections = new Hashtable<String, Integer>();
+		// get all lists of an election
+		int electionID = getElectionID(election);
+		String message = "SELECT listID, listName FROM votingList WHERE electionID = " + electionID;
+		ResultSet resultSet1 = fetchData(message);
+		try{
+			while(resultSet1.next()){
+				message = "SELECT COUNT(*) FROM vote WHERE electionID = " + electionID +
+												   " AND votingListID = " + resultSet1.getInt("listID");
+				ResultSet resultSet2 = fetchData(message);
+				while(resultSet2.next()){
+					elections.put(resultSet1.getString("listName"),
+								  resultSet2.getInt(1));
+				}
+			}
+			return elections;
+		}catch(Exception e){
+			System.out.println("Error in getResults("+ election +"): " + e );
+		}
 		return null;
 	}
 

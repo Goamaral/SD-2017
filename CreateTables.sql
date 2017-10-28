@@ -103,6 +103,7 @@ CREATE TABLE vote
  voteDate       VARCHAR(255)        NOT NULL
 );
 
+
 CREATE TABLE log
 (depName        VARCHAR(255)        NOT NULL,
                                     FOREIGN KEY (depName)
