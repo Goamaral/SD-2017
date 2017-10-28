@@ -402,7 +402,18 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 
 
 	public void sendLog(Log log) throws RemoteException{
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+		String message = "INSERT INTO log VALUES ('" + log.department.name +
+							"', " + getElectionID(log.election) +
+							", '" + dateFormat.format(log.date) +
+							"', " + log.cc +
+							")";
+		changeData(message);
 		return;
+	}
+
+	public Hashtable<String, Integer> getResults(Election election) throws RemoteException{
+		return null;
 	}
 
 	public Credential getCredentials(int cc) throws RemoteException{
