@@ -361,9 +361,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		changeData(message);
 	}
 
-	public ArrayList<VotingTable> listVotingTables(Election election) throws RemoteException {
-		return null;
-	}
+	
 
 	private int getListID(List list) {
 		String message = "SELECT listID FROM votingList WHERE listName = '" + list.name
