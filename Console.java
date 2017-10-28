@@ -4,6 +4,8 @@ import java.util.*;
 import java.lang.Thread.State;
 import java.text.*;
 
+// NOTE Dados estatisticos
+
 public class Console {
 	static boolean debug = true;
 	static DataServerConsoleInterface registry;
@@ -529,8 +531,6 @@ public class Console {
 	  String description;
 	  Date start = null;
 	  Date end = null;
-	  Department department;
-		Faculty faculty;
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
 		boolean pass;
@@ -541,8 +541,12 @@ public class Console {
 		System.out.println("Criar eleicao ");
 		System.out.println("--------------------");
 
-		System.out.print("Nome: ");
-		name = scanner.nextLine();
+		String[] menuElection = { "Eleicao Geral", "Eleicao Nucleo de Estudantes" };
+		String[] menuElectionTypes = { "General", "Nucleus" };
+
+		int index = Arrays.binarySearch(menuElectionTypes, type);
+
+		name = new String(menuElection[index]);
 
 		System.out.print("Descricao: ");
 		description = scanner.nextLine();
@@ -574,11 +578,7 @@ public class Console {
 			}
 		} while (!pass);
 
-		faculty = pickFaculty();
-
-		department = pickDepartment(faculty);
-
-		return new Election(name, department, start, end, type, subtype);
+		return new Election(name, start, end, type, subtype);
 	}
 
 	public static Department editDepartment(Department department) {
