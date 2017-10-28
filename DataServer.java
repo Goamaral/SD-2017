@@ -272,13 +272,12 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 
 
 	public ArrayList<Election> listElections(Department department, int cc) throws RemoteException{
-		/*
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
 		ArrayList<Election> elections = new ArrayList<Election>();
 
 		// get all election IDs from department
 		String message = "SELECT electionID FROM votingTable WHERE depName = '" + department.name + "'";
-		ResultSet resultSet_electionID = getData(message);
+		ResultSet resultSet_electionID = fetchData(message);
 
 		// get person type and department (if applicable)
 		message = "SELECT type, depName FROM person WHERE cc = " + cc;
@@ -299,13 +298,42 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 
 				switch(personType){
 					case "Student":
- 						
+						if (electionType.equals("General") && electionSubType.equals("Student-Election")){
+							elections.add(new Election( resultSet_election.getString("electionName"), 
+											dateFormat.parse(resultSet_election.getString("electionStart")), 
+											dateFormat.parse(resultSet_election.getString("electionEnd")), 
+											electionType, 
+											electionSubType
+							));
+						}
+ 						if(electionType.equals("Nucleus") && personDepartment.equals(electionSubType)){
+ 							elections.add(new Election( resultSet_election.getString("electionName"), 
+											dateFormat.parse(resultSet_election.getString("electionStart")), 
+											dateFormat.parse(resultSet_election.getString("electionEnd")), 
+											electionType, 
+											electionSubType
+							));
+ 						}
 					break;
 					case "Teacher":
-
+						if(electionType.equals("General") && electionSubType.equals("Teacher-Election")){
+							elections.add(new Election( resultSet_election.getString("electionName"), 
+											dateFormat.parse(resultSet_election.getString("electionStart")), 
+											dateFormat.parse(resultSet_election.getString("electionEnd")), 
+											electionType, 
+											electionSubType
+							));
+						}
 					break;
 					case "Employee":
-
+						if(electionType.equals("General") && electionSubType.equals("Employee-Election")){
+							elections.add(new Election( resultSet_election.getString("electionName"), 
+											dateFormat.parse(resultSet_election.getString("electionStart")), 
+											dateFormat.parse(resultSet_election.getString("electionEnd")), 
+											electionType, 
+											electionSubType
+							));
+						}
 					break;
 					default: 
 						System.out.println("Error on listElections(): Employee type unrecognized");
@@ -317,7 +345,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 			return null;
 		}
 		return elections;
-*/return null;
 	}
 
   	public void createList(List list) throws RemoteException {
