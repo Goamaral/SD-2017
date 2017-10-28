@@ -134,8 +134,8 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 			"', "  + person.phone +
 			", '"  + person.address +
 			"', "  + person.cc +
-			", "   + person.ccExpire +
-			")";
+			", '"  + dateFormat.format(person.ccExpire) +
+			"')";
 		changeData(message);
 	}
 
@@ -224,7 +224,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 					));
 			}
 		}catch(SQLException e) {
-			System.out.println("Error on listFaculties(): " + e);
+			System.out.println("Error on listDepartments(): " + e);
 			return null;
 		}
 
@@ -238,23 +238,26 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   			"', '" + election.description +
   			"', '" + election.type +
   			"', '" + election.subtype +
-  			"', " + election.start +
-  			", " + election.end +
-  			")";
+  			"', '" + dateFormat.format(election.start) +
+  			"', '" + dateFormat.format(election.end) +
+  			"')";
 		changeData(message);
 	}
 
   	public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
   		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+  		java.util.Date dateNow = new java.util.Date();
   		ArrayList<Election> elections = new ArrayList<Election>();
 		String message = "SELECT electionName, electionStart, electionEnd FROM department WHERE electionType = '" + type 
 						+ "' AND electionSubType = '" + subtype + "'";
   		ResultSet resultSet = fetchData(message);
   		try{
 			while(resultSet.next()){
-				elections.add(new Election( resultSet.getString(1), 
-											dateFormat.parse(resultSet.getString(2)), 
-											dateFormat.parse(resultSet.getString(3)), 
+				java.util.Date eventEndDate = dateFormat.parse(resultSet.getString("electionEnd"));
+				if(eventEndDate.compareTo(dateNow) >= 0) // if still running
+					elections.add(new Election( resultSet.getString("electionName"), 
+											dateFormat.parse(resultSet.getString("electionStart")), 
+											dateFormat.parse(resultSet.getString("electionEnd")), 
 											type, 
 											subtype
 				));
@@ -265,6 +268,30 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		}
 
 		return elections;
+	}
+
+
+	public ArrayList<Election> listElections(Department department, int cc) throws RemoteException{
+/*
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+		String message = "SELECT type, depName FROM person WHERE cc = " + cc;
+		ResultSet resultSet = getData(message);
+		try{
+			while(resultSet,next()){
+				String type = resultSet.getString("type");
+				String depName = resultSet.getString("depName");
+				switch(type){
+					case "student":
+
+
+				}
+			}
+		}catch (Exception e){
+			System.out.println("Error on listElections(): " + e);
+			return null;
+		}
+		return elections;
+*/return null;
 	}
 
   	public void createList(List list) throws RemoteException {
@@ -361,7 +388,26 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		changeData(message);
 	}
 
-	
+	public void sendVote(Vote vote) throws RemoteException{
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+		String message = "INSERT INTO vote VALUES ("+ getElectionID(vote.election) +
+						", " + vote.terminalID +
+						", " + vote.voteNumber +
+						", '" + vote.list +
+						"', '" + dateFormat.format(vote.date) +
+						"')";
+		changeData(message);	
+		return;
+	}
+
+
+	public void sendLog(Log log) throws RemoteException{
+		return;
+	}
+
+	public Credential getCredentials(int cc) throws RemoteException{
+		return null;
+	}
 
 	private int getListID(List list) {
 		String message = "SELECT listID FROM votingList WHERE listName = '" + list.name

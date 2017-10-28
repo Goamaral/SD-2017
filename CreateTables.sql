@@ -1,3 +1,4 @@
+drop table vote;
 drop table votingListMembers;
 drop table person;
 drop table votingTable;
@@ -16,8 +17,8 @@ CREATE TABLE election
  electionDescription  VARCHAR(255),
  electionType         VARCHAR(255)        NOT NULL,
  electionSubType      VARCHAR(255),
- electionStart        DATE                NOT NULL,
- electionEnd          DATE                NOT NULL  
+ electionStart        VARCHAR(255)        NOT NULL,
+ electionEnd          VARCHAR(255)        NOT NULL  
 );
 
 /*
@@ -57,7 +58,7 @@ CREATE TABLE votingTable
                                     FOREIGN KEY (depName) 
                                         REFERENCES department(depName)
                                     CONSTRAINT PK_votingTable PRIMARY KEY (electionID, depName)
-)
+);
 
 
 /* 
@@ -76,7 +77,7 @@ CREATE TABLE person
  phone          int,
  address        VARCHAR(255),
  cc             int                 PRIMARY KEY,
- ccExpire       DATE
+ ccExpire       VARCHAR(255)
 );
  
 CREATE TABLE votingListMembers
@@ -88,7 +89,17 @@ CREATE TABLE votingListMembers
                                         REFERENCES person(cc),
                                     CONSTRAINT PK_votingListMemebers PRIMARY KEY (listID, personCC)
 
-)
+);
 
+CREATE TABLE vote
+(electionID     int                 NOT NULL,
+                                    FOREIGN KEY (electionID)
+                                        REFERENCES election(electionID)
+ terminalID     int                 NOT NULL,
+ votingListID   int                 NOT NULL,
+                                    FOREIGN KEY (votingListID)
+                                        REFERENCES votingList(votingListID),
+ voteDate       VARCHAR(255)        NOT NULL
+);
 
 COMMIT;
