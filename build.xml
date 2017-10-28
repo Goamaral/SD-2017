@@ -1,6 +1,0 @@
-<?xml version = "1.0"?>
-<project name = "SD-2017" default = "test">
-   <target name = "test">
-      <javac srcdir="." destdir="."/>
-   </target>
-</project>
