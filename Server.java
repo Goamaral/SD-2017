@@ -18,6 +18,8 @@ class Server {
 	static VoteSender voteSender = null;
 	static Department location;
 
+	// NOTE send who already voted on what
+	// NOTE terminate election
 	public static void main(String args[]) {
 		TerminalConnection terminalConnection;
 		int terminalID;
