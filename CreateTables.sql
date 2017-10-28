@@ -1,3 +1,5 @@
+drop table log;
+drop table vote;
 drop table votingListMembers;
 drop table person;
 drop table votingTable;
@@ -16,8 +18,8 @@ CREATE TABLE election
  electionDescription  VARCHAR(255),
  electionType         VARCHAR(255)        NOT NULL,
  electionSubType      VARCHAR(255),
- electionStart        DATE                NOT NULL,
- electionEnd          DATE                NOT NULL  
+ electionStart        VARCHAR(255)        NOT NULL,
+ electionEnd          VARCHAR(255)        NOT NULL  
 );
 
 /*
@@ -45,7 +47,7 @@ Each "votingList" line represents a group of people who want to get elected
 */
 CREATE TABLE votingList
 (listID         int                 NOT NULL        PRIMARY KEY,
- listName       VARCHAR(30)         NOT NULL,
+ listName       VARCHAR(255)         NOT NULL,
  electionID           int, 
                                     FOREIGN KEY (electionID) 
                                         REFERENCES election(electionId)
@@ -57,7 +59,7 @@ CREATE TABLE votingTable
                                     FOREIGN KEY (depName) 
                                         REFERENCES department(depName)
                                     CONSTRAINT PK_votingTable PRIMARY KEY (electionID, depName)
-)
+);
 
 
 /* 
@@ -66,17 +68,17 @@ Password is encrypted
 Each "person" line represents one person (voter)
 */
 CREATE TABLE person
-(type           VARCHAR(15)         NOT NULL,
+(type           VARCHAR(255)         NOT NULL,
  name           VARCHAR(255)        NOT NULL,
  personID       int                 NOT NULL,
- password       VARCHAR(30)         NOT NULL,
- depName        VARCHAR(100)        NOT NULL, 
+ password       VARCHAR(255)         NOT NULL,
+ depName        VARCHAR(255)        NOT NULL, 
                                     FOREIGN KEY (depName) 
                                         REFERENCES department(depName),
  phone          int,
  address        VARCHAR(255),
  cc             int                 PRIMARY KEY,
- ccExpire       DATE
+ ccExpire       VARCHAR(255)
 );
  
 CREATE TABLE votingListMembers
@@ -88,7 +90,31 @@ CREATE TABLE votingListMembers
                                         REFERENCES person(cc),
                                     CONSTRAINT PK_votingListMemebers PRIMARY KEY (listID, personCC)
 
-)
+);
 
+CREATE TABLE vote
+(electionID     int                 NOT NULL,
+                                    FOREIGN KEY (electionID)
+                                        REFERENCES election(electionID)
+ terminalID     int                 NOT NULL,
+ votingListID   int                 NOT NULL,
+                                    FOREIGN KEY (votingListID)
+                                        REFERENCES votingList(votingListID),
+ voteDate       VARCHAR(255)        NOT NULL
+);
+
+
+CREATE TABLE log
+(depName        VARCHAR(255)        NOT NULL,
+                                    FOREIGN KEY (depName)
+                                        REFERENCES department(depName),
+electionID      int                 NOT NULL,
+                                    FOREIGN KEY (electionID)
+                                        REFERENCES election (electionID),
+logDate         VARCHAR(255)        NOT NULL,
+personCC        int                 NOT NULL,
+                                    FOREIGN KEY (personCC)
+                                        REFERENCES person(cc)
+);
 
 COMMIT;
