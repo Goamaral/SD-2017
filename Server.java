@@ -19,12 +19,15 @@ class Server {
 	static VotingTableAutentication auth = null;
 	static VoteSender voteSender = null;
 	static Department location;
+	static RmiNapper rmiNapper;
 
 	public static void main(String args[]) {
 		TerminalConnection terminalConnection;
 		int terminalID;
 		Socket terminalSocket;
 		String terminalReference;
+		LinkedList<Vote> votes;
+		LinkedList<Log> logs;
 
 		setSecurityPolicies();
 		getOptions(args);
@@ -42,9 +45,21 @@ class Server {
 			terminal.terminate();
 		}
 
+		if (rmiNapper == null) rmiNapper = new RmiNapper();
+
 		if (voteSender != null) {
+			synchronized (voteSender.votes) {
+				votes = voteSender.votes;
+			}
+
+			synchronized (voteSender.logs) {
+				logs = voteSender.logs;
+			}
+
 			voteSender.terminate();
 			voteSender = new VoteSender(terminalIDs, registry);
+			voteSender.votes = votes;
+			voteSender.logs = logs;
 		} else voteSender = new VoteSender(terminalIDs, registry);
 
 		if (auth != null) {
@@ -97,6 +112,16 @@ class Server {
 			}
 		}
 	}
+
+	public static void nap() {
+		try {
+			Thread.sleep(1000);
+			rmiNapper.nap();
+		} catch (InterruptedException ie) {
+			System.exit(0);
+		}
+	}
+
 	public static Department getLocation() {
 		ArrayList<Faculty> faculties = listFaculties();
 		ArrayList<Department> departments;
@@ -128,11 +153,27 @@ class Server {
 	}
 
 	public static ArrayList<Department> listDepartments(Faculty faculty) {
-		return registry.listDepartments(faculty);
+		ArrayList<Department> ret;
+		try {
+			ret = registry.listDepartments(faculty);
+			rmiNapper.awake();
+			return ret;
+		} catch (RemoteException re) {
+			nap();
+			return listDepartments(faculty);
+		}
 	}
 
 	public static ArrayList<Faculty> listFaculties() {
-		return registry.listFaculties();
+		ArrayList<Faculty> ret;
+		try {
+			ret = registry.listFaculties();
+			rmiNapper.awake();
+			return ret;
+		} catch (RemoteException re) {
+			nap();
+			return listFaculties();
+		}
 	}
 
 	public static int selector(ArrayList<String> list, String title) {
@@ -221,13 +262,10 @@ class Server {
 	public static void lookupRegistry(int port, String reference) {
 		try {
 			registry = (DataServerInterface)LocateRegistry.getRegistry(port).lookup(reference);
-		} catch (Exception e1) {
-			System.out.println("Remote failure. Trying to reconnect...");
-			try {
-				Thread.sleep(1000);
-			} catch (Exception e2) {
-				System.exit(0);
-			}
+			rmiNapper.awake();
+			return;
+		} catch (RemoteException re) {
+			nap();
 			lookupRegistry(port, reference);
 		}
 	}
@@ -238,6 +276,8 @@ class Server {
 	}
 }
 
+// NOTE lock terminal after timeout
+
 class VotingTableAutentication extends Thread {
 	boolean end = false;
 	Object lock = new Object();
@@ -247,6 +287,7 @@ class VotingTableAutentication extends Thread {
 	boolean debug = true;
 	ArrayList<Election> elections;
 	Department location;
+	RmiNapper rmiNapper;
 
 	public void run() {
 		Scanner scanner = new Scanner(System.in);
@@ -290,7 +331,7 @@ class VotingTableAutentication extends Thread {
 					list.add(electionAux.name);
 				}
 
-				opcao = selector(list, "Escolha uma eleicao");
+				opcao = this.selector(list, "Escolha uma eleicao");
 				election = this.elections.get(opcao);
 
 				synchronized (this.terminals) {
@@ -299,6 +340,7 @@ class VotingTableAutentication extends Thread {
 							System.out.println("Terminal " + terminal.terminalID + " desbloqueado");
 							terminal.credentials = credentials;
 							terminal.election = election;
+							terminal.lists = listLists(election);
 							terminal.log = new Log(location, election, cc);
 							synchronized (terminal.terminalLock) {
 								terminal.terminalLock.notify();
@@ -312,7 +354,20 @@ class VotingTableAutentication extends Thread {
 		}
 	}
 
-	public static int selector(ArrayList<String> list, String title) {
+	public ArrayList<List> listLists(Election election) {
+		ArrayList<List> ret;
+
+		try {
+			ret = this.registry.listLists(election);
+			this.rmiNapper.awake();
+			return ret;
+		} catch (RemoteException re) {
+			this.nap();
+			return this.listLists(election);
+		}
+	}
+
+	public int selector(ArrayList<String> list, String title) {
 		int i = 0;
 		int opcao;
 		Scanner scanner = new Scanner(System.in);
@@ -344,8 +399,12 @@ class VotingTableAutentication extends Thread {
 	}
 
 	public ArrayList<Election> getElections(int cc) {
+		ArrayList<Election> ret;
+
 		try {
-			return registry.listElections(location, cc);
+			ret = registry.listElections(location, cc);
+			this.rmiNapper.awake();
+			return ret;
 		} catch (RemoteException re) {
 			this.nap();
 			return getElections(cc);
@@ -355,15 +414,21 @@ class VotingTableAutentication extends Thread {
 	public void nap() {
 		try {
 			Thread.sleep(1000);
+			this.rmiNapper.nap();
 		} catch (InterruptedException ie) {
 			this.end = true;
 		}
 	}
 
 	public Credential getCredentials(int cc) {
+		Credential ret;
+
 		try {
-			return this.registry.getCredentials(cc);
+			ret = this.registry.getCredentials(cc);
+			this.rmiNapper.awake();
+			return ret;
 		} catch (Exception e) {
+			this.nap();
 			return this.getCredentials(cc);
 		}
 	}
@@ -399,13 +464,13 @@ class TerminalConnection extends Thread {
 	boolean debug = true;
 	boolean authorized = false;
 	Election election;
+	ArrayList<List> lists;
 	VoteSender voteSender;
 	DataServerInterface registry;
 	Log log;
 
 	public void run() {
 		HashMap<String, String> response;
-		ArrayList<List> lists;
 		String query;
 		List list;
 		Vote vote;
@@ -444,10 +509,9 @@ class TerminalConnection extends Thread {
 						this.logout();
 					} else if (this.authorized && response.get("type").equals("request")) {
 						if (response.get("datatype").equals("list")) {
-							lists = this.listLists();
-							query = "type|item_list;datatype|list;item_count|" + lists.size();
-							for (int i = 0; i<lists.size(); ++i) {
-								list = lists.get(i);
+							query = "type|item_list;datatype|list;item_count|" + this.lists.size();
+							for (int i = 0; i<this.lists.size(); ++i) {
+								list = this.lists.get(i);
 								query = new String(query + ";item_" + i + "|" + list.name);
 							}
 
@@ -456,17 +520,6 @@ class TerminalConnection extends Thread {
 					}
 				}
 			}
-		}
-	}
-
-	public ArrayList<List> listLists() {
-		try {
-			synchronized (this.election) {
-				return this.registry.listLists(this.election);
-			}
-		} catch (RemoteException re) {
-			this.nap();
-			return this.listLists();
 		}
 	}
 
@@ -534,14 +587,6 @@ class TerminalConnection extends Thread {
 		}
 	}
 
-	public void nap() {
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException ie) {
-			this.end = true;
-		}
-	}
-
 	public String readSocket() {
 		try {
 			return this.in.readUTF();
@@ -601,6 +646,8 @@ class VoteSender extends Thread {
 	LinkedList<Log> logs = new LinkedList<Log>();
 	int id;
 	DataServerInterface registry;
+	RmiNapper rmiNapper;
+	boolean terminator = false;
 
 	public void run() {
 		Vote vote;
@@ -618,6 +665,10 @@ class VoteSender extends Thread {
 			}
 
 			synchronized (lock) {
+				if (this.terminator) {
+					return;
+				}
+
 				if (this.end) {
 					synchronized (this.votes) {
 						synchronized (this.logs) {
@@ -639,10 +690,12 @@ class VoteSender extends Thread {
 					if (vote.date.after(vote.election.start) && vote.date.before(vote.election.end)) {
 						try {
 							this.registry.sendVote(vote);
+							this.rmiNapper.awake();
 						} catch (RemoteException re) {
 							vote.voteNumber = -1;
 							this.voteNumbers.set(id, this.voteNumbers.get(id) - 1);
 							this.votes.addLast(vote);
+							this.nap();
 						}
 					}
 				}
@@ -655,8 +708,10 @@ class VoteSender extends Thread {
 					if (log.date.after(log.election.start) && log.date.before(log.election.end)) {
 						try {
 							this.registry.sendLog(log);
+							this.rmiNapper.awake();
 						} catch (RemoteException re) {
 							this.logs.addLast(log);
+							this.nap();
 						}
 					}
 				}
@@ -664,9 +719,19 @@ class VoteSender extends Thread {
 		}
 	}
 
+	public void nap() {
+		try {
+			Thread.sleep(1000);
+			this.rmiNapper.nap();
+		} catch (InterruptedException ie) {
+			System.exit(0);
+		}
+	}
+
 	public void terminate() {
 		synchronized (lock) {
 			this.end = true;
+			this.terminator = true;
 		}
 	}
 
@@ -675,6 +740,45 @@ class VoteSender extends Thread {
 		this.registry = registry;
 
 		this.setDaemon(true);
+		this.rmiNapper = new RmiNapper();
 		this.start();
+	}
+}
+
+class RmiNapper extends Thread {
+	int timeout = 30;
+	int tries;
+	boolean end = false;
+	Object lock = new Object();
+
+	public void run() {
+		while(true) {
+			synchronized (this.lock) {
+				if (this.end) {
+					return;
+				}
+			}
+		}
+	}
+
+	public void nap() {
+		this.tries = this.tries + 1;
+		if (this.tries == this.timeout) {
+			System.out.println("Ligacao com o servidor principal nao pode ser estabelecida");
+			System.exit(0);
+		}
+	}
+
+	public void awake() {
+		this.tries = 0;
+	}
+
+	public void terminate() {
+		synchronized (this.lock) {
+			this.end = true;
+		}
+	}
+
+	public RmiNapper() {
 	}
 }
