@@ -221,6 +221,8 @@ public class Console {
 			case "Election Nucleus Add":
 				if (actions.length == 4) {
 					subtype = actions[2].split("-")[0];
+				} else {
+					subtype = pickDepartment(pickFaculty());
 				}
 				data1 = buildElection(actions[1], subtype);
 				break;
