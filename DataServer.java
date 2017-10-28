@@ -272,18 +272,44 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 
 
 	public ArrayList<Election> listElections(Department department, int cc) throws RemoteException{
-/*
+		/*
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
-		String message = "SELECT type, depName FROM person WHERE cc = " + cc;
-		ResultSet resultSet = getData(message);
+		ArrayList<Election> elections = new ArrayList<Election>();
+
+		// get all election IDs from department
+		String message = "SELECT electionID FROM votingTable WHERE depName = '" + department.name + "'";
+		ResultSet resultSet_electionID = getData(message);
+
+		// get person type and department (if applicable)
+		message = "SELECT type, depName FROM person WHERE cc = " + cc;
+		ResultSet resultSet_person = fetchData(message);
+
 		try{
-			while(resultSet,next()){
-				String type = resultSet.getString("type");
-				String depName = resultSet.getString("depName");
-				switch(type){
-					case "student":
+			String personType = resultSet_person.getString("type");
+			String personDepartment = resultSet_person.getString("depName");
 
+			while(resultSet_electionID.next()){
 
+				// get election info
+				message = "Select * FROM election WHERE electionID = " + resultSet_electionID.getInt("electionID");
+				ResultSet resultSet_election = fetchData(message);
+
+				String electionType = resultSet_election.getString("electionType");
+				String electionSubType = resultSet_election.getString("electionSubType");
+
+				switch(personType){
+					case "Student":
+ 						
+					break;
+					case "Teacher":
+
+					break;
+					case "Employee":
+
+					break;
+					default: 
+						System.out.println("Error on listElections(): Employee type unrecognized");
+					return null;
 				}
 			}
 		}catch (Exception e){
@@ -386,6 +412,31 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		"AND depName = '" + votingTable.department.name +
 		"')";
 		changeData(message);
+	}
+
+	public ArrayList<VotingTable> listVotingTables(Election election) throws RemoteException{
+		ArrayList<VotingTable> votingTables = new ArrayList<VotingTable>();
+		String message = "SELECT depName FROM votingTable WHERE electionID = " + getElectionID(election) ;
+  		ResultSet resultSet_depName = fetchData(message);
+  		try{
+			while(resultSet_depName.next()){
+				String depName = resultSet_depName.getString("depName");
+				message = "SELECT faculty FROM department WHERE depName = '" + depName + "'";
+				ResultSet resultSet_faculty = fetchData(message);
+
+				votingTables.add(new VotingTable(
+									election, 
+									new Department(new Faculty(resultSet_faculty.getString("facName")),
+										depName)
+				));
+			}
+		}catch(Exception e) {
+			System.out.println("Error on listLists(): " + e);
+			return null;
+		}
+
+		return votingTables;
+
 	}
 
 	public void sendVote(Vote vote) throws RemoteException{
