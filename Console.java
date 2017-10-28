@@ -607,6 +607,10 @@ public class Console {
 			}
 		} while (!pass);
 
+		faculty = pickFaculty();
+
+		department = pickDepartment(faculty);
+
 		return new Election(name, start, end, type, subtype);
 	}
 
