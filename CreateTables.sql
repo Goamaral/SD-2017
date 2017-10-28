@@ -1,4 +1,6 @@
+drop table votingListMembers;
 drop table person;
+drop table votingTable;
 drop table votingList;
 drop table department;
 drop table faculty;
@@ -9,10 +11,11 @@ Creates table "election", which has a unique id for referencing.
 Each "election" line represents an election of a list (from a pool of lists).
 */
 CREATE TABLE election
-(electionId           int                 PRIMARY KEY,
+(electionID           int                 PRIMARY KEY,
  electionName         VARCHAR(255)        NOT NULL,
- electionDesc         VARCHAR(255),
+ electionDescription  VARCHAR(255),
  electionType         VARCHAR(255)        NOT NULL,
+ electionSubType      VARCHAR(255),
  electionStart        DATE                NOT NULL,
  electionEnd          DATE                NOT NULL  
 );
@@ -41,12 +44,20 @@ Creates table "votingList", which has a unique id for referencing.
 Each "votingList" line represents a group of people who want to get elected
 */
 CREATE TABLE votingList
-(listId         int                 NOT NULL        PRIMARY KEY,
+(listID         int                 NOT NULL        PRIMARY KEY,
  listName       VARCHAR(30)         NOT NULL,
  electionID           int, 
                                     FOREIGN KEY (electionID) 
                                         REFERENCES election(electionId)
 );
+
+CREATE TABLE votingTable
+(electionID,    int                 NOT NULL,
+ depName,       VARCHAR(255)        NOT NULL,
+                                    FOREIGN KEY (depName) 
+                                        REFERENCES department(depName)
+                                    CONSTRAINT PK_votingTable PRIMARY KEY (electionID, depName)
+)
 
 
 /* 
@@ -57,19 +68,27 @@ Each "person" line represents one person (voter)
 CREATE TABLE person
 (type           VARCHAR(15)         NOT NULL,
  name           VARCHAR(255)        NOT NULL,
- personId       int                 NOT NULL,
+ personID       int                 NOT NULL,
  password       VARCHAR(30)         NOT NULL,
- depName        VARCHAR(100)           NOT NULL, 
+ depName        VARCHAR(100)        NOT NULL, 
                                     FOREIGN KEY (depName) 
                                         REFERENCES department(depName),
  phone          int,
  address        VARCHAR(255),
  cc             int                 PRIMARY KEY,
- ccExpire       DATE,
- listId         int,
-                                    FOREIGN KEY (listId)
-                                        REFERENCES votingList(listId)
+ ccExpire       DATE
 );
  
+CREATE TABLE votingListMembers
+(listID         int                 NOT NULL,
+                                    FOREIGN KEY (listID)
+                                        REFERENCES votingList(listID),
+ personCC       int                 NOT NULL,
+                                    FOREIGN KEY (personCC)
+                                        REFERENCES person(cc),
+                                    CONSTRAINT PK_votingListMemebers PRIMARY KEY (listID, personCC)
+
+)
+
 
 COMMIT;

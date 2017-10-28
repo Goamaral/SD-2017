@@ -134,8 +134,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 			"', "  + person.phone +
 			", '"  + person.address +
 			"', "  + person.cc +
-			", '"  + dateFormat.format(person.ccExpire) +
-			"', "  + getListID(person.list) +
+			", "   + person.ccExpire +
 			")";
 		changeData(message);
 	}
@@ -175,7 +174,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 	}
 
   	public void removeZone(Zone zone) throws RemoteException {
-		// Identificas se é faculdade ou departamento e removes
 		String message;
 		if(zone instanceof Faculty) {
 			message = "DELETE FROM faculty WHERE facName = '" + zone.name + "'";
@@ -233,49 +231,137 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		return departments;
 	}
 
-  public void createElection(Election election) throws RemoteException {
-		return;
+  	public void createElection(Election election) throws RemoteException {
+  		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+  		String message = "INSERT INTO election VALUES (" + createElectionID(election) +
+  			", '" + election.name +
+  			"', '" + election.description +
+  			"', '" + election.type +
+  			"', '" + election.subtype +
+  			"', " + election.start +
+  			", " + election.end +
+  			")";
+		changeData(message);
 	}
 
-  public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
-		return null;
+  	public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
+  		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
+  		ArrayList<Election> elections = new ArrayList<Election>();
+		String message = "SELECT electionName, electionStart, electionEnd FROM department WHERE electionType = '" + type 
+						+ "' AND electionSubType = '" + subtype + "'";
+  		ResultSet resultSet = fetchData(message);
+  		try{
+			while(resultSet.next()){
+				elections.add(new Election( resultSet.getString(1), 
+											dateFormat.parse(resultSet.getString(2)), 
+											dateFormat.parse(resultSet.getString(3)), 
+											type, 
+											subtype
+				));
+			}
+		}catch(Exception e) {
+			System.out.println("Error on listElections(): " + e);
+			return null;
+		}
+
+		return elections;
 	}
 
-  public void createList(List list) throws RemoteException {
-		return;
+  	public void createList(List list) throws RemoteException {
+		String message = "INSERT INTO votingList VALUES (" + createListID(list) +
+  			", '" + list.name +
+  			"', " + getElectionID(list.election) +
+  			")";
+		changeData(message);
 	}
 
-  public ArrayList<List> listLists(Election type) throws RemoteException {
-		return null;
+  public ArrayList<List> listLists(Election election) throws RemoteException {
+	  	ArrayList<List> lists = new ArrayList<List>();
+		String message = "SELECT listName FROM votingList WHERE electionID = " + getElectionID(election) ;
+  		ResultSet resultSet = fetchData(message);
+  		try{
+			while(resultSet.next()){
+				lists.add(new List( election, 
+									resultSet.getString(1)
+				));
+			}
+		}catch(Exception e) {
+			System.out.println("Error on listLists(): " + e);
+			return null;
+		}
+
+		return lists;
 	}
 
-  public void removeList(List list) throws RemoteException {
-		return;
+  	public void removeList(List list) throws RemoteException {
+		String message = "DELETE FROM votingList WHERE listID = " + getListID(list) + ")";
+		changeData(message);
 	}
 
-  public ArrayList<Person> listCandidates(List list) throws RemoteException {
-		return null;
+  	public ArrayList<Person> listCandidates(List list) throws RemoteException {
+  		ArrayList<Person> candidates = new ArrayList<Person>();
+  		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+  		// get the cc column from listMembers
+  		int listID = getListID(list);
+
+  		String message = "SELECT personCC FROM votingListMembers WHERE listID = " + listID;
+  		ResultSet resultSet1 = fetchData(message);
+
+  		try{
+  			while(resultSet1.next()){
+  				message = "SELECT type, name, personID, password, depName, phone, address, cc, ccExpire " +
+  						  "FROM person WHERE cc = " + resultSet1.getInt(1);
+  				ResultSet resultSet2 = fetchData(message);
+  				while(resultSet2.next()){
+  					message = "SELECT faculty, depName FROM department WHERE depName = '" + resultSet2.getString(5) + "'";
+  					ResultSet resultSet3 = fetchData(message);
+  					candidates.add(new Person(resultSet2.getString(1),
+  											  resultSet2.getString(2),
+  											  resultSet2.getInt(3),
+  											  resultSet2.getString(4),
+  											  new Department(new Faculty(resultSet3.getString(1)), resultSet3.getString(2)),
+  											  resultSet2.getInt(6),
+  											  resultSet2.getString(7),
+  											  resultSet2.getInt(8),
+  											  dateFormat.parse(resultSet2.getString(9))
+  					));
+  				}
+  			}
+  		} catch (Exception e){
+  			System.out.println("Error on listCandidates(): " + e );
+  			return null;
+  		}
+		
+		return candidates;
 	}
 
-  public void addCandidate(List list, Person person) throws RemoteException {
-		return;
+  	public void addCandidate(List list, Person person) throws RemoteException {
+  		String message = "INSERT INTO votingListMembers VALUES (" + getListID(list) + ", " + person.cc + ")";
+		changeData(message);
 	}
 
-  public void removeCandidate(List list, Person person) throws RemoteException {
-		return;
+  	public void removeCandidate(List list, Person person) throws RemoteException {
+		String message = "DELETE FROM votingListMembers WHERE listID = " + getListID(list) + 
+		" AND personCC = " + person.cc +
+		")";
+		changeData(message);
 	}
 
-  public void createVotingTable(VotingTable votingTable) throws RemoteException {
-		return;
+  	public void createVotingTable(VotingTable votingTable) throws RemoteException {
+  	String message = "INSERT INTO votingTable VALUES (" + getElectionID(votingTable.election) +
+  			", '" + votingTable.department.name +
+  			"')";
+		changeData(message);
 	}
 
-  public void removeVotingTable(VotingTable votingTable) throws RemoteException {
-		return;
+  	public void removeVotingTable(VotingTable votingTable) throws RemoteException {
+		String message = "DELETE FROM votingTable WHERE electionID = " + getElectionID(votingTable.election) + 
+		"AND depName = '" + votingTable.department.name +
+		"')";
+		changeData(message);
 	}
 
-	public ArrayList<VotingTable> listVotingTables(Election election) throws RemoteException {
-		return null;
-	}
+	
 
 	private int getListID(List list) {
 		String message = "SELECT listID FROM votingList WHERE listName = '" + list.name
