@@ -6,15 +6,15 @@ import java.sql.*;
 import java.util.*;
 import java.text.*;
 
-public class DataServer extends UnicastRemoteObject implements DataServerConsoleInterface {
-	static DataServerConsoleInterface backupRegistry;
+public class DataServer extends UnicastRemoteObject implements DataServerInterface
+{
+	static DataServerInterface backupRegistry;
 	static Registry serverRegistry;
 	static DataServer server;
 	static String reference;
 	static int port;
 	static int socketPort = 7002;
 	static OracleCon database;
-
 
 	public static void main(String args[]) {
 		// create RMI Server
@@ -49,7 +49,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		}
 
 		try {
-			serverRegistry = (Registry) createAndBindRegistry();
+			serverRegistry = createAndBindRegistry();
 			System.out.println("Server ready Port: " + port + " Reference: " + reference);
 
 			while(true){
@@ -81,7 +81,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 
 	public static void runBackupServer(int delay){
 		try {
-			backupRegistry = (DataServerConsoleInterface) lookupRegistry(port, reference);
+			backupRegistry = (DataServerInterface) lookupRegistry(port, reference);
 			System.out.println("Backup server ready Port: " + port + " Reference: " + reference);
 			int tries = 5;
 			while(tries > 0){
@@ -128,11 +128,11 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		String message = "INSERT INTO person VALUES (" +
 			"'"    + person.type +
 			"', '" + person.name +
-			"', "  + person.number + 
-			", '"  + person.password + 
+			"', "  + person.number +
+			", '"  + person.password +
 			"', '" + person.department.name +
-			"', "  + person.phone + 
-			", '"  + person.address + 
+			"', "  + person.phone +
+			", '"  + person.address +
 			"', "  + person.cc +
 			", "   + person.ccExpire +
 			")";
@@ -144,7 +144,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 		if(zone instanceof Faculty){
 			message = "INSERT INTO faculty VALUES ('" + zone.name + "')";
 		} else if(zone instanceof Department) {
-			Department department = (Department) zone; 
+			Department department = (Department) zone;
 			message = "INSERT INTO department VALUES ('" + department.name + "', " + department.faculty.name+ ")";
 		} else {
 			System.out.println("Error in createZone("+ zone +"): Not Department or Faculty");
@@ -219,8 +219,8 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
   		try{
 			while(resultSet.next()){
 				departments.add(new Department(
-					new Faculty(resultSet.getString("faculty")),	
-					resultSet.getString("depName")	
+					new Faculty(resultSet.getString("faculty")),
+					resultSet.getString("depName")
 					));
 			}
 		}catch(SQLException e) {
@@ -417,7 +417,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerConsole
 			return -1;
 		}
 	}
-	
+
 	private int createElectionID(Election election) {
 
 		// check if election already exists

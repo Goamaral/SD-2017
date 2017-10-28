@@ -10,6 +10,8 @@ class Election implements Serializable {
   Date start;
   Date end;
 
+	public static final long serialVersionUID = 2848095557101780926L;
+
   public Election(String name, Date start, Date end, String type, String subtype) {
     this.name = name;
     this.description = description;

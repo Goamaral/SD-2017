@@ -13,6 +13,8 @@ class Person implements Serializable {
   int cc;
   Date ccExpire;
 
+	public static final long serialVersionUID = -7092225612111117624L;
+
   public Person(
     String type, String name, int number, String password, Department department,
     int phone, String address, int cc, Date ccExpire
