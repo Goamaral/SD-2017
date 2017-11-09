@@ -1,4 +1,4 @@
-class Menu {
+public class Menu {
   String[] menu;
   String[] types;
 

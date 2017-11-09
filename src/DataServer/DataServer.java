@@ -1,5 +1,6 @@
 import java.rmi.*;
 import java.rmi.server.*;
+import java.io.IOException;
 import java.net.*;
 import java.rmi.registry.*;
 import java.sql.*;
@@ -7,6 +8,7 @@ import java.util.*;
 import java.text.*;
 
 public class DataServer extends UnicastRemoteObject implements DataServerInterface {
+	private static final long serialVersionUID = -977374215791991679L;
 	static DataServerInterface backupRegistry;
 	static Registry serverRegistry;
 	static DataServer server;
@@ -101,22 +103,26 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 					socket.send(packet);
 					socket.setSoTimeout(1000);
 					socket.receive(packet);
-					InetAddress returnAddress = packet.getAddress();
-					int returnPort = packet.getPort();
 					String received = new String(packet.getData(), 0, packet.getLength());
 					System.out.println("Recieved: " + received);
 					tries = 5;
-				} catch (SocketTimeoutException e) {
+				} catch (SocketTimeoutException ste) {
 					// timeout exception.
 					System.out.println("Timeout reached!!! " + tries);
 					tries--;
-			} catch (Exception e){}
-				socket.close();
+				} catch (IOException ioe) {
+					socket.close();
+				}
+				runServer(0);
 			}
-			runServer(0);
-
-		} catch (Exception e) {
-			System.out.println("Remote failure: " + e + "\nTrying to reconnect...");
+		} catch (SocketException se) {
+			System.out.println("Socket failure\nTrying to reconnect...");
+			runBackupServer(1500);
+		} catch (RemoteException re) {
+			System.out.println("Remote failure\nTrying to reconnect...");
+			runBackupServer(1500);
+		} catch (NotBoundException nbe) {
+			System.out.println("Not bound\nTrying to reconnect...");
 			runBackupServer(1500);
 		}
 	}
@@ -253,16 +259,24 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		try {
 			while(resultSet.next()){
 				java.util.Date eventEndDate = dateFormat.parse(resultSet.getString("electionEnd"));
-				if(eventEndDate.compareTo(dateNow) >= 0) // if still running
-					elections.add(new Election( resultSet.getString("electionName"),
-											dateFormat.parse(resultSet.getString("electionStart")),
-											dateFormat.parse(resultSet.getString("electionEnd")),
-											type,
-											subtype
-				));
+				if(eventEndDate.compareTo(dateNow) >= 0) { // if still running
+					elections.add(
+						new Election(
+							resultSet.getString("electionName"),
+							resultSet.getString("electionDescription"),
+							dateFormat.parse(resultSet.getString("electionStart")),
+							dateFormat.parse(resultSet.getString("electionEnd")),
+							type,
+							subtype
+						)
+					);
+				}
 			}
-		}catch(Exception e) {
-			System.out.println("Error on listElections(): " + e);
+		} catch (SQLException sqlException) {
+			System.out.println("SQL failure on listElections()");
+			return null;
+		} catch (ParseException parseException) {
+			System.out.println("Error parsing date on listElections()");
 			return null;
 		}
 
@@ -295,54 +309,72 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 				String electionType = resultSet_election.getString("electionType");
 				String electionSubType = resultSet_election.getString("electionSubType");
 
-				switch(personType){
-					case "Student":
-						if (electionType.equals("General") && electionSubType.equals("Student-Election")){
-							elections.add(new Election( resultSet_election.getString("electionName"),
-											dateFormat.parse(resultSet_election.getString("electionStart")),
-											dateFormat.parse(resultSet_election.getString("electionEnd")),
-											electionType,
-											electionSubType
-							));
-						}
- 						if(electionType.equals("Nucleus") && personDepartment.equals(electionSubType)){
- 							elections.add(new Election( resultSet_election.getString("electionName"),
-											dateFormat.parse(resultSet_election.getString("electionStart")),
-											dateFormat.parse(resultSet_election.getString("electionEnd")),
-											electionType,
-											electionSubType
-							));
- 						}
-					break;
-					case "Teacher":
-						if(electionType.equals("General") && electionSubType.equals("Teacher-Election")){
-							elections.add(new Election( resultSet_election.getString("electionName"),
-											dateFormat.parse(resultSet_election.getString("electionStart")),
-											dateFormat.parse(resultSet_election.getString("electionEnd")),
-											electionType,
-											electionSubType
-							));
-						}
-					break;
-					case "Employee":
-						if(electionType.equals("General") && electionSubType.equals("Employee-Election")){
-							elections.add(new Election( resultSet_election.getString("electionName"),
-											dateFormat.parse(resultSet_election.getString("electionStart")),
-											dateFormat.parse(resultSet_election.getString("electionEnd")),
-											electionType,
-											electionSubType
-							));
-						}
-					break;
-					default:
-						System.out.println("Error on listElections(): Employee type unrecognized");
+				if (personType.equals("Student")){
+					if (electionType.equals("General") && electionSubType.equals("Student-Election")){
+						elections.add(
+							new Election(
+								resultSet_election.getString("electionName"),
+								resultSet_election.getString("electionDescription"),
+								dateFormat.parse(resultSet_election.getString("electionStart")),
+								dateFormat.parse(resultSet_election.getString("electionEnd")),
+								electionType,
+								electionSubType
+							)
+						);
+					}
+					if(electionType.equals("Nucleus") && personDepartment.equals(electionSubType)){
+						elections.add(
+							new Election(
+								resultSet_election.getString("electionName"),
+								resultSet_election.getString("electionDescription"),
+								dateFormat.parse(resultSet_election.getString("electionStart")),
+								dateFormat.parse(resultSet_election.getString("electionEnd")),
+								electionType,
+								electionSubType
+							)
+						);
+					}
+				} else if (personType.equals("Teacher")) {
+					if(electionType.equals("General") && electionSubType.equals("Teacher-Election")){
+						elections.add(
+							new Election(
+								resultSet_election.getString("electionName"),
+								resultSet_election.getString("electionDescription"),
+								dateFormat.parse(resultSet_election.getString("electionStart")),
+								dateFormat.parse(resultSet_election.getString("electionEnd")),
+								electionType,
+								electionSubType
+							)
+						);
+					}
+				}
+				else if (personType.equals("Employee")) {
+					if(electionType.equals("General") && electionSubType.equals("Employee-Election")){
+						elections.add(
+							new Election(
+								resultSet_election.getString("electionName"),
+								resultSet_election.getString("electionDescription"),
+								dateFormat.parse(resultSet_election.getString("electionStart")),
+								dateFormat.parse(resultSet_election.getString("electionEnd")),
+								electionType,
+								electionSubType
+							)
+						);
+					}
+				}
+				else {
+					System.out.println("Error on listElections(): Employee type unrecognized");
 					return null;
 				}
 			}
-		}catch (Exception e){
-			System.out.println("Error on listElections(): " + e);
+		} catch (ParseException pe) {
+			System.out.println("Date parsing error on listElections()");
+			return null;
+		} catch (SQLException sqle) {
+			System.out.println("SQL error on listElections()");
 			return null;
 		}
+		
 		return elections;
 	}
 

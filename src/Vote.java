@@ -1,11 +1,13 @@
+
+
 import java.util.*;
 
-class Vote {
-	Election election;
-	int terminalID;
-	int voteNumber;
-	String list;
-	Date date;
+public class Vote {
+	public Election election;
+	public int terminalID;
+	public int voteNumber;
+	public String list;
+	public Date date;
 
 	public Vote(Election election, int terminalID, String list, Date date) {
 		this.election = election;

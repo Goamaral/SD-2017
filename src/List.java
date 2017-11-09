@@ -1,8 +1,10 @@
+
+
 import java.io.Serializable;
 
-class List implements Serializable {
-  String name;
-  Election election;
+public class List implements Serializable {
+  public String name;
+  public Election election;
 
 	public static final long serialVersionUID = 780428918543205496L;
 

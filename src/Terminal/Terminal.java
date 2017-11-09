@@ -90,6 +90,8 @@ public class Terminal {
 		System.out.print("Opcao: ");
 		line = scanner.nextLine();
 
+		scanner.close();
+		
 		try {
 			opcao = Integer.parseInt(line);
 		} catch (Exception e) {
@@ -154,6 +156,8 @@ public class Terminal {
 
 		System.out.print("Password: ");
 		password = scanner.nextLine();
+		
+		scanner.close();
 
 		writeSocket("type|login;username|" + username + ";password|" + password);
 	}
@@ -193,28 +197,29 @@ public class Terminal {
 
 	public static void getOptions(String[] args) {
 		for (int i=0; i<args.length; ++i) {
-			switch (args[i]) {
-				case "-sp":
-				case "--serverport":
-					try {
-						portServer = Integer.parseInt(args[i+1]);
-					} catch (Exception e) {
-						System.out.println("No valid server port provided, using default: 7001");
-					}
-					break;
-				case "-sa":
-				case "--serveraddress":
-					try {
-						addressServer = args[i+1];
-					} catch (Exception e) {
-						System.out.println("No valid server address provided, using default: localhost");
-					}
-					break;
-				case "-h":
-				case "--help":
-					System.out.println("java -lp 3000 -sa localhost -sp 7001");
-					System.exit(0);
-					break;
+			if (args[i].equals("-sp")
+				|| args[i].equals("--serverport")
+			) {
+				try {
+					portServer = Integer.parseInt(args[i+1]);
+				} catch (Exception e) {
+					System.out.println("No valid server port provided, using default: 7001");
+				}	
+			}
+			else if (args[i].equals("-sa")
+				|| args[i].equals("--serveraddress")
+			) {
+				try {
+					addressServer = args[i+1];
+				} catch (Exception e) {
+					System.out.println("No valid server address provided, using default: localhost");
+				}
+			}
+			else if (args[i].equals("-h")
+				|| args[i].equals("--help")
+			) {
+				System.out.println("java Terminal -lp 3000 -sa localhost -sp 7001");
+				System.exit(0);
 			}
 		}
 	}

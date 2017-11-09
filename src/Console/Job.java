@@ -1,4 +1,4 @@
-class Job {
+public class Job {
   String instruction;
   Object data1 = null;
   Object data2 = null;

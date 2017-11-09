@@ -1,10 +1,13 @@
+
+
 import java.util.*;
 
+
 public class Log {
-	Department department;
-	Election election;
-	Date date;
-	int cc;
+	public Department department;
+	public Election election;
+	public Date date;
+	public int cc;
 
 	public Log(Department department, Election election, int cc) {
 		this.department = department;

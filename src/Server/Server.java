@@ -2,7 +2,6 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.net.*;
 import java.util.*;
-import java.lang.Thread.State;
 import java.io.*;
 
 class Server {
@@ -126,7 +125,12 @@ class Server {
 		ArrayList<String> list = new ArrayList<String>();
 		int opcao;
 		Faculty faculty;
-		Department department;
+		
+		if (faculties == null) {
+			System.out.println("Nao exitem faculdades registadas para"
+				+ " indicar a localizacao da mesa de voto");
+			System.exit(0);
+		}
 
 		for (Faculty auxFaculty : faculties) {
 			list.add(auxFaculty.name);
@@ -171,6 +175,8 @@ class Server {
 		} catch (RemoteException re) {
 			nap();
 			return listFaculties();
+		} catch (NullPointerException nullPointerException) {
+			return null;
 		}
 	}
 
@@ -192,6 +198,8 @@ class Server {
 		System.out.print("Opcao: ");
 		line = scanner.nextLine();
 
+		scanner.close();
+		
 		try {
 			opcao = Integer.parseInt(line);
 		} catch (Exception e) {
@@ -225,44 +233,47 @@ class Server {
 
 	public static void getOptions(String[] args) {
 		for (int i=0; i<args.length; ++i) {
-			switch (args[i]) {
-				case "-rp":
-				case "--rmiport":
-					try {
-						portRMI = Integer.parseInt(args[i+1]);
-					} catch (Exception e) {
-						System.out.println("No RMI port provided, using default: 7000");
-					}
-					break;
-				case "-ri":
-				case "--rmiip":
-					try {
-						ipRMI = args[i+1];
-					} catch (Exception e) {
-						System.out.println("No RMI ip provided, using default: localhost");
-					}
-					break;
-				case "-rr":
-				case "--rmireference":
-					try {
-						referenceRMI = args[i+1];
-					} catch (Exception e1) {
-						System.out.println("No valid RMI reference provided, using default: iVotas");
-					}
-					break;
-				case "-tp":
-				case "--tcpport":
-					try {
-						portTCP = Integer.parseInt(args[i+1]);
-					} catch (Exception e2) {
-						System.out.println("No valid TCP port provided, using default: 7001");
-					}
-					break;
-				case "-h":
-				case "--help":
-					System.out.println("java Server -rp 7000 -ri localhost -rr iVotas -tp 7001");
-					System.exit(0);
-					break;
+			if (args[i].equals("-rp")
+				|| args[i].equals("--rmiport")
+			) {
+				try {
+					portRMI = Integer.parseInt(args[i+1]);
+				} catch (Exception e) {
+					System.out.println("No RMI port provided, using default: 7000");
+				}
+			}
+			else if (args[i].equals("-ri")
+				|| args[i].equals("-rmiip")
+			) {
+				try {
+					ipRMI = args[i+1];
+				} catch (Exception e) {
+					System.out.println("No RMI ip provided, using default: localhost");
+				}
+			}
+			else if (args[i].equals("-rr")
+				|| args[i].equals("--rmireference")
+			) {
+				try {
+					referenceRMI = args[i+1];
+				} catch (Exception e1) {
+					System.out.println("No valid RMI reference provided, using default: iVotas");
+				}
+			}
+			else if (args[i].equals("-tp")
+				|| args[i].equals("-tcpport")
+			) {
+				try {
+					portTCP = Integer.parseInt(args[i+1]);
+				} catch (Exception e2) {
+					System.out.println("No valid TCP port provided, using default: 7001");
+				}
+			}
+			else if (args[i].equals("-h")
+				|| args[i].equals("--help")
+			) {
+				System.out.println("java Server -rp 7000 -ri localhost -rr iVotas -tp 7001");
+				System.exit(0);
 			}
 		}
 	}
@@ -361,6 +372,8 @@ class VotingTableAutentication extends Thread {
 				System.out.println("Membro nao resgistado");
 			}
 		}
+		
+		scanner.close();
 	}
 
 	public ArrayList<List> listLists(Election election) {
@@ -394,6 +407,8 @@ class VotingTableAutentication extends Thread {
 		System.out.print("Opcao: ");
 		line = scanner.nextLine();
 
+		scanner.close();
+		
 		try {
 			opcao = Integer.parseInt(line);
 		} catch (Exception e) {
@@ -623,8 +638,6 @@ class TerminalConnection extends Thread {
 		HashMap<String, String> out = new HashMap<String, String>();
 		String[] pairs = response.split(";");
 		String[] pairParts;
-
-		if (response == null) return null;
 
 		for (String pair : pairs) {
 			pairParts = pair.split("\\|");
