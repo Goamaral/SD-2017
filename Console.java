@@ -81,6 +81,7 @@ public class Console {
 
 			while(true) {
 				action = menu("Start", "");
+        System.out.println("Pre-action: " + action);
 				executeAction(action);
 			}
 		} catch (Exception e) {
@@ -103,7 +104,7 @@ public class Console {
 		try {
 			return args[2].toString();
 		} catch (ArrayIndexOutOfBoundsException e) {
-			return "iVotasConsole";
+			return "iVotas";
 		}
 	}
 
@@ -111,7 +112,7 @@ public class Console {
 		try {
 			registry = (DataServerInterface)LocateRegistry.getRegistry(port).lookup(reference);
 		} catch (Exception e1) {
-			System.out.println("Remote failure. Trying to reconnect...");
+			System.out.println("Remote failure. Trying to reconnect... " + reference + ":" + port);
 			try {
 				Thread.sleep(1000);
 			} catch (Exception e2) {
@@ -143,9 +144,8 @@ public class Console {
 		if (debug) System.out.println("TYPE: " + type);
 
 		if (Arrays.asList(endings).contains(type)) {
-			flow = new String(flow + type);
 			if (debug) System.out.println("FLOW: " + flow);
-			return flow;
+			return flow.substring(0, flow.length()-1);
 		}
 
 		menu = menus.get(type);
@@ -182,7 +182,7 @@ public class Console {
 		Election election;
 		ArrayList<Person> candidates;
 
-		if (debug) System.out.println(action);
+		if (debug) System.out.println("ACTION " + action);
 
 		switch (action) {
 			case "Person Register Student":
@@ -203,7 +203,7 @@ public class Console {
 				data1 = pickFaculty();
 				break;
 
-			case "Zone Department Add":
+			case "Zone Department Add Add":
 				data1 = buildDepartment(pickFaculty());
 				break;
 			case "Zone Department Edit":

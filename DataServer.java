@@ -6,8 +6,7 @@ import java.sql.*;
 import java.util.*;
 import java.text.*;
 
-public class DataServer extends UnicastRemoteObject implements DataServerInterface
-{
+public class DataServer extends UnicastRemoteObject implements DataServerInterface {
 	static DataServerInterface backupRegistry;
 	static Registry serverRegistry;
 	static DataServer server;
@@ -299,43 +298,43 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 				switch(personType){
 					case "Student":
 						if (electionType.equals("General") && electionSubType.equals("Student-Election")){
-							elections.add(new Election( resultSet_election.getString("electionName"), 
-											dateFormat.parse(resultSet_election.getString("electionStart")), 
-											dateFormat.parse(resultSet_election.getString("electionEnd")), 
-											electionType, 
+							elections.add(new Election( resultSet_election.getString("electionName"),
+											dateFormat.parse(resultSet_election.getString("electionStart")),
+											dateFormat.parse(resultSet_election.getString("electionEnd")),
+											electionType,
 											electionSubType
 							));
 						}
  						if(electionType.equals("Nucleus") && personDepartment.equals(electionSubType)){
- 							elections.add(new Election( resultSet_election.getString("electionName"), 
-											dateFormat.parse(resultSet_election.getString("electionStart")), 
-											dateFormat.parse(resultSet_election.getString("electionEnd")), 
-											electionType, 
+ 							elections.add(new Election( resultSet_election.getString("electionName"),
+											dateFormat.parse(resultSet_election.getString("electionStart")),
+											dateFormat.parse(resultSet_election.getString("electionEnd")),
+											electionType,
 											electionSubType
 							));
  						}
 					break;
 					case "Teacher":
 						if(electionType.equals("General") && electionSubType.equals("Teacher-Election")){
-							elections.add(new Election( resultSet_election.getString("electionName"), 
-											dateFormat.parse(resultSet_election.getString("electionStart")), 
-											dateFormat.parse(resultSet_election.getString("electionEnd")), 
-											electionType, 
+							elections.add(new Election( resultSet_election.getString("electionName"),
+											dateFormat.parse(resultSet_election.getString("electionStart")),
+											dateFormat.parse(resultSet_election.getString("electionEnd")),
+											electionType,
 											electionSubType
 							));
 						}
 					break;
 					case "Employee":
 						if(electionType.equals("General") && electionSubType.equals("Employee-Election")){
-							elections.add(new Election( resultSet_election.getString("electionName"), 
-											dateFormat.parse(resultSet_election.getString("electionStart")), 
-											dateFormat.parse(resultSet_election.getString("electionEnd")), 
-											electionType, 
+							elections.add(new Election( resultSet_election.getString("electionName"),
+											dateFormat.parse(resultSet_election.getString("electionStart")),
+											dateFormat.parse(resultSet_election.getString("electionEnd")),
+											electionType,
 											electionSubType
 							));
 						}
 					break;
-					default: 
+					default:
 						System.out.println("Error on listElections(): Employee type unrecognized");
 					return null;
 				}
@@ -452,7 +451,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 				ResultSet resultSet_faculty = fetchData(message);
 
 				votingTables.add(new VotingTable(
-									election, 
+									election,
 									new Department(new Faculty(resultSet_faculty.getString("facName")),
 										depName)
 				));

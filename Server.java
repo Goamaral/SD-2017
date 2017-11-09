@@ -824,6 +824,7 @@ class RmiNapper extends Thread {
 	int tries;
 	boolean end = false;
 	Object lock = new Object();
+	boolean debug = true;
 
 	public void run() {
 		while(true) {
@@ -837,6 +838,7 @@ class RmiNapper extends Thread {
 
 	public void nap() {
 		this.tries = this.tries + 1;
+		if (this.debug) System.out.println("Trying to connect to RMI server, " + this.tries);
 		if (this.tries == this.timeout) {
 			System.out.println("Ligacao com o servidor principal nao pode ser estabelecida");
 			System.exit(0);
