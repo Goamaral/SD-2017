@@ -1,35 +1,30 @@
-
-
-
 import java.io.Serializable;
-import java.util.Date;
-
 
 public class Person implements Serializable {
+	public int cc;
 	public String type;
 	public String name;
-	public int number;
 	public String password;
-	public Department department;
-	public int phone;
 	public String address;
-	public int cc;
-	public Date ccExpire;
+	public int number;
+	public int phone;
+	public String ccExpire;
+	public String departmentName;
 
 	public static final long serialVersionUID = -7092225612111117624L;
 
 	public Person(
-			String type, String name, int number, String password, Department department,
-			int phone, String address, int cc, Date ccExpire
+	  int cc, String type, String name, String password, String address,
+	  int number, int phone, String ccExpire, String departmentName
 	) {
-		this.type = type;
-		this.name = name;
-		this.number = number;
-		this.password = password;
-	this.department = department;
-	this.phone = phone;
-	this.address = address;
-	this.cc = cc;
-	this.ccExpire = ccExpire;
+	  this.cc = cc;
+	  this.type = type;
+	  this.name = name;
+	  this.password = password;
+	  this.address = address;
+	  this.number = number;
+	  this.phone = phone;
+	  this.ccExpire = ccExpire;
+	  this.departmentName = departmentName;
 	}
 }

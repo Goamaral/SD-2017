@@ -5,696 +5,628 @@ import java.net.*;
 import java.rmi.registry.*;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.text.*;
 
+import com.sun.org.apache.regexp.internal.REUtil;
+
 public class DataServer extends UnicastRemoteObject implements DataServerInterface {
-	private static final long serialVersionUID = -977374215791991679L;
-	static DataServerInterface backupRegistry;
-	static Registry serverRegistry;
-	static DataServer server;
-	static String reference;
-	static int port;
-	static int socketPort = 7002;
-	static OracleCon database;
+  private static final long serialVersionUID = -977374215791991679L;
+  static DataServerInterface backupRegistry;
+  static Registry serverRegistry;
+  static DataServer server;
+  static String reference;
+  static int port;
+  static int socketPort = 7002;
+  static OracleCon database;
+  static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+  static SimpleDateFormat electionDateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
 
-	public static void main(String args[]) {
-		// create RMI Server
-		try {
-			server = new DataServer();
-		} catch (RemoteException e) {
-			System.out.println(e);
-			System.exit(-1);
-		}
-		// set security policies
-		setSecurityPolicies();
+  public static void main(String args[]) {
+    // create RMI Server
+    try {
+      server = new DataServer();
+    } catch (RemoteException e) {
+      System.out.println(e);
+      System.exit(-1);
+    }
+    // set security policies
+    setSecurityPolicies();
 
-		// set port and reference for RMI Server
-		port = getPort(args);
-		reference = getReference(args);
+    // set port and reference for RMI Server
+    port = getPort(args);
+    reference = getReference(args);
 
-		// connect to oracle database
-		database = new OracleCon("bd","bd", true);
+    // connect to oracle database
+    database = new OracleCon("bd", "bd", true);
 
-		// run RMI Server
-		runServer(0);
+    // run RMI Server
+    runServer(0);
 
-		return;
+    return;
+  }
+
+  public static void runServer(int delay) {
+    try {
+      Thread.sleep(delay);
+    } catch (InterruptedException e) {
+      System.exit(0);
+    }
+
+    try {
+      serverRegistry = createAndBindRegistry();
+      System.out.println("Server ready Port: " + port + " Reference: " + reference);
+
+      while (true) {
+        try {
+          byte[] buf = new byte[256];
+          DatagramPacket packet = new DatagramPacket(buf, buf.length);
+          DatagramSocket socket = new DatagramSocket(socketPort);
+          System.out.println("Listenting on port: " + socketPort);
+          socket.receive(packet);
+          InetAddress returnAddress = packet.getAddress();
+          int returnPort = packet.getPort();
+          String received = new String(packet.getData(), 0, packet.getLength());
+          System.out.println("Recieved: " + received);
+          String returnMessage = "pong";
+          buf = returnMessage.getBytes();
+          packet = new DatagramPacket(buf, buf.length, returnAddress, returnPort);
+          System.out.println("Sending: " + returnMessage);
+          socket.send(packet);
+          socket.close();
+        } catch (Exception e) {
+          System.out.println(e);
+        }
+      }
+    } catch (RemoteException e) {
+      System.out.println("Remote failure:\n" + e);
+      runBackupServer(0);
+    }
+  }
+
+  public static void runBackupServer(int delay) {
+    try {
+      backupRegistry = (DataServerInterface) lookupRegistry(port, reference);
+      System.out.println("Backup server ready Port: " + port + " Reference: " + reference);
+      int tries = 5;
+      while (tries > 0) {
+        try {
+          Thread.sleep(3000);
+        } catch (InterruptedException e) {
+          System.exit(0);
+        }
+
+        DatagramSocket socket = new DatagramSocket(socketPort + 1);
+        try {
+          byte[] buf = new byte[256];
+          String msg = "ping";
+          buf = msg.getBytes();
+          InetAddress sendAddress = InetAddress.getByName("localhost");
+          DatagramPacket packet = new DatagramPacket(buf, buf.length, sendAddress, socketPort);
+          System.out.println("Sending: " + msg);
+          socket.send(packet);
+          socket.setSoTimeout(1000);
+          socket.receive(packet);
+          String received = new String(packet.getData(), 0, packet.getLength());
+          System.out.println("Recieved: " + received);
+          tries = 5;
+        } catch (SocketTimeoutException ste) {
+          // timeout exception.
+          System.out.println("Timeout reached!!! " + tries);
+          tries--;
+        } catch (IOException ioe) {
+          socket.close();
+        }
+        runServer(0);
+      }
+    } catch (SocketException se) {
+      System.out.println("Socket failure\nTrying to reconnect...");
+      runBackupServer(1500);
+    } catch (RemoteException re) {
+      System.out.println("Remote failure\nTrying to reconnect...");
+      runBackupServer(1500);
+    } catch (NotBoundException nbe) {
+      System.out.println("Not bound\nTrying to reconnect...");
+      runBackupServer(1500);
+    }
+  }
+
+  // DataServer Console Interface Methods
+  public Election getElection(int id) throws RemoteException {
+    ResultSet resultSet = this.query("SELECT name, description, type, subtype, start, end"
+      + " FROM Election WHERE id = " + id
+    );
+    
+    try {
+	   return new Election(
+	      id,
+	      resultSet.getString("name"),
+	      resultSet.getString("description"),
+	      resultSet.getString("type"),
+	      resultSet.getString("subtype"),
+	      resultSet.getString("start"),
+	      resultSet.getString("end")
+	    );
+    } catch(SQLException sqlException) {
+    	System.out.println("Error getting election:\n" + sqlException);
+    }
+  }
+  
+  public int createPerson(Person person) throws RemoteException {	  
+    this.query("INSERT INTO Person VALUES ("
+      + person.cc
+      + ", '" + person.type + "'"
+      + ", '" + person.name + "'"
+      + ", '" + person.password + "'"
+      + ", '" + person.address + "'" 
+      + ", " + person.number
+      + ", " + person.phone
+      + ", '" + person.ccExpire + "'"
+      + ", '" + person.departmentName + "'"
+      + ")"
+    );
+    
+    return person.cc;
+  }
+
+  public String createFaculty(Faculty faculty) throws RemoteException {
+    this.query("INSERT INTO Faculty VALUES ("
+      + "'" + faculty.name + "'"
+      + ")"
+    );
+    
+    return faculty.name;
+  }
+  
+  public String createDepartment(Department department) throws RemoteException {
+    this.query("INSERT INTO Department VALUES ("
+      + "'" + department.name + "'"
+      + ", '" + department.facultyName + "'"
+      + ")"
+    );
+    
+    return department.name;
+  }
+
+  public void updateFaculty(Faculty faculty, Faculty newFaculty) throws RemoteException {
+    this.query("UPDATE Faculty"
+  	  + " SET name = '" + newFaculty.name + "'"
+      + " WHERE name = '" + faculty.name + "'"
+    );
+  }
+  
+  public void updateDepartment(Department department, Department newDepartment) {
+    this.query("UPDATE Department SET"
+      + " name = '" + newDepartment.name + "'"
+      + ", facultyName = '" + newDepartment.facultyName + "'"
+      + " WHERE name = '" + department.name + "'"
+    );
+  }
+
+  public void removeFaculty(String name) throws RemoteException {  
+    this.query("DELETE FROM Faculty WHERE name = '" + name + "'");
+  }
+  
+  public void removeDepartment(String name) throws RemoteException {
+    this.query("DELETE FROM Department WHERE name = '" + name + "'");
+  }
+
+  public ArrayList < Faculty > listFaculties() throws RemoteException {
+    ArrayList < Faculty > faculties = new ArrayList < Faculty > ();
+    ResultSet resultSet = this.query("SELECT name FROM Faculty");
+    
+    try {
+      while (resultSet.next()) {
+        faculties.add(
+          new Faculty(resultSet.getString("name"))
+        );
+      }
+    } catch (SQLException e) {
+      System.out.println("Error on listFaculties(): " + e);
+      return new ArrayList<Faculty>();
+    }
+
+    return faculties;
+  }
+
+  public ArrayList < Department > listDepartments(Faculty faculty) throws RemoteException {
+    ArrayList < Department > departments = new ArrayList < Department > ();    
+    
+    ResultSet resultSet = this.query(
+	  "SELECT name, facultyName"
+	  + " FROM Department "
+	  + " WHERE faculty = '" + faculty.name + "'"
+    );
+    
+    try {
+      while (resultSet.next()) {
+        departments.add(
+          new Department(
+            resultSet.getString("name"),
+            resultSet.getString("facultyName")
+          )
+        );
+      }
+    } catch (SQLException e) {
+      System.out.println("Error on listDepartments(): " + e);
+      return new ArrayList<Department>();
+    }
+
+    return departments;
+  }
+
+  public int createElection(Election election) throws RemoteException {
+    ResultSet resultSet = this.query("INSERT INTO Election VALUES ("
+      + " (SELECT MAX(id)+1 as newID from Election)"
+      + ", '" + election.name + "'"
+      + ", '" + election.description + "'"
+      + ", '" + election.type + "'"
+      + ", '" + election.subtype + "'"
+      + ", '" + electionDateFormat.format(election.start) + "'"
+      + ", '" + electionDateFormat.format(election.end) + "'"
+      + ", 0" // blank votes
+      + ", 0" // null votes
+      + "') RETURNING newID"
+     );
+    
+    try {
+    	return resultSet.getInt("newID");
+    } catch(SQLException sqlException) {
+    	System.out.println("Failed to return electionID");
+    	return -1;
+    }
+  }
+
+  public ArrayList < Election > listElections(String type, String subtype) throws RemoteException {
+    ArrayList < Election > elections = new ArrayList < Election > ();
+    
+    ResultSet resultSet = this.query(
+      "SELECT id, name, description, start, end"
+      + " FROM Election"
+      + " WHERE electionType = '" + type + "'"
+      + " AND electionSubType = '" + subtype + "'"
+    );
+    
+    try {
+      while (resultSet.next()) {
+        //Date eventEndDate = dateFormat.parse(resultSet.getString("electionEnd"));
+        //if (eventEndDate.compareTo(new Date()) >= 0) { // if still running
+          elections.add(
+            new Election(
+              resultSet.getInt("id"),
+              resultSet.getString("name"),
+              resultSet.getString("description"),
+              type,
+              subtype,
+              electionDateFormat.parse(resultSet.getString("start")),
+              electionDateFormat.parse(resultSet.getString("end"))
+            )
+          );
+        }
+      //}
+    } catch (SQLException sqlException) {
+      System.out.println("SQL failure on listElections()");
+      return new ArrayList<Election>();
+    } catch (ParseException parseException) {
+      System.out.println("Error parsing date on listElections()");
+      return new ArrayList<Election>();
+    }
+
+    return elections;
+  }
+
+  public ArrayList < Election > listElections(String departmentName, int cc) throws RemoteException {
+    
+  }
+
+  public int createVotingList(VotingList votingList) throws RemoteException {
+    ResultSet resultSet = this.query("INSERT INTO VotingList VALUES ("
+      + " (SELECT MAX(id)+1 as newID from VotingList)"
+      + ", '" + votingList.name + "'"
+      + ", " + votingList.electionID
+      + ") RETURNING newID"
+    );
+    
+    try {
+    	return resultSet.getInt("newID");
+    } catch(SQLException sqlException) {
+    	System.out.println("Failed to return votingListID");
+    	return -1;
+    }
+  }
+
+  public ArrayList < VotingList > listVotingLists(int electionID) throws RemoteException {
+    ArrayList < VotingList > votingLists = new ArrayList < VotingList > ();
+        
+    ResultSet resultSet = this.query("SELECT id, name FROM VotingList"
+      + " WHERE electionID = " + electionID
+    );
+    
+    try {
+      while (resultSet.next()) {
+    	  votingLists.add(
+    	    new VotingList(
+    	      resultSet.getInt("id"),
+    	      electionID,
+              resultSet.getString("name")
+            )
+    	  );
+      }
+    } catch (Exception e) {
+      System.out.println("Error on listLists(): " + e);
+      return null;
+    }
+
+    return votingLists;
+  }
+
+  public void removeVotingList(int id) throws RemoteException {	
+	  this.query("DELETE FROM VotingList WHERE listID = " + id + ")");
+  }
+
+  public ArrayList < Person > listCandidates(int votingListID) throws RemoteException {
+    ArrayList < Person > candidates = new ArrayList < Person > ();
+
+    ResultSet resultSet = this.query(
+      "SELECT cc, type, name, password, address, number, phone, ccExpire, departmentName FROM Person"
+      + " WHERE cc in ( SELECT personCC FROM VotingListMember"
+        + " WHERE votingListID = " + votingListID + " )"
+    );
+
+    try {
+      while (resultSet.next()) {
+        candidates.add(
+          new Person(
+        	resultSet.getInt("cc"),
+        	resultSet.getString("type"),
+        	resultSet.getString("name"),
+        	resultSet.getString("password"),
+        	resultSet.getString("address"),
+            resultSet.getInt("number"),
+            resultSet.getInt("phone"),
+            resultSet.getString("ccExpire"),
+            resultSet.getString("departmentName")  
+          )
+        );
+      }
+    } catch (Exception e) {
+      System.out.println("Error on listCandidates(): " + e);
+    }
+
+    return candidates;
+  }
+
+  public void addCandidate(int votingListID, int personCC) throws RemoteException {
+    this.query("INSERT INTO VotingListMembers VALUES (" + personCC + ", " + votingListID + ")");
+  }
+
+  public void removeCandidate(int votingListID, int personCC) throws RemoteException {
+	this.query("DELETE FROM VotingListMembers"
+      + " WHERE listID = " + votingListID
+      + " AND personCC = " + personCC
+      + ")"
+    );
+  }
+
+  public int createVotingTable(VotingTable votingTable) throws RemoteException {
+    ResultSet resultSet = this.query("INSERT INTO votingTable VALUES ("
+      + " ( SELECT MAX(id)+1 as newID FROM VotingTable )"
+      + ", " + votingTable.electionID
+      + ", '" + votingTable.departmentName + "'"
+      + ") RETURNING newID"
+    );
+    
+    try {
+    	return resultSet.getInt("newID");
+    } catch(SQLException sqlException) {
+    	System.out.println("Failed to return votingTableID");
+    	return -1;
+    }
+  }
+
+  public void removeVotingTable(int id) throws RemoteException {	  
+    this.query("DELETE FROM VotingTable"
+      + " WHERE id = " + id
+      + ")"
+    );
+  }
+
+  public ArrayList < VotingTable > listVotingTables(int electionID) throws RemoteException {
+    ArrayList < VotingTable > votingTables = new ArrayList < VotingTable > ();
+    
+    ResultSet resultSet = this.query("SELECT id, departmentName FROM VotingTable"
+      + " WHERE electionID = " + electionID
+    );
+    
+    try {
+      while (resultSet.next()) {
+    	votingTables.add(
+    	  new VotingTable(
+    	    resultSet.getInt("id"), 
+    		electionID,
+    		resultSet.getString("departmentName")
+    	  )
+    	);
+      }
+    } catch (Exception e) {
+      System.out.println("Error on listLists(): " + e);
+      new ArrayList < VotingTable > ();
+    }
+
+    return votingTables;
+
+  }
+
+  public void sendVote(int electionID, String votingList) throws RemoteException {
+	boolean success = false;
+	int type = -1;
+	boolean isNull = votingList.equals("Nulo");
+	boolean isBlank = votingList.equals("Branco");
+	
+    if (!isNull && !isBlank) {
+    	type = 2;
+    	success = this.voteVotingList(electionID, votingList);
+    } else if (isNull) {
+    	type = 1;
+    	success = true;
+	} else if (isBlank) {
+		type = 0;
+		success = true;
+	} else {
+		success = false;
 	}
-
-
-	public static void runServer(int delay) {
-		try {
-			Thread.sleep(delay);
-		} catch (InterruptedException e) {
-			System.exit(0);
-		}
-
-		try {
-			serverRegistry = createAndBindRegistry();
-			System.out.println("Server ready Port: " + port + " Reference: " + reference);
-
-			while(true){
-				try{
-					byte[] buf = new byte[256];
-					DatagramPacket packet = new DatagramPacket(buf, buf.length);
-					DatagramSocket socket = new DatagramSocket(socketPort);
-					System.out.println("Listenting on port: " + socketPort);
-					socket.receive(packet);
-					InetAddress returnAddress = packet.getAddress();
-					int returnPort = packet.getPort();
-					String received = new String(packet.getData(), 0, packet.getLength());
-					System.out.println("Recieved: " + received);
-					String returnMessage = "pong";
-					buf = returnMessage.getBytes();
-					packet = new DatagramPacket(buf, buf.length, returnAddress, returnPort);
-					System.out.println("Sending: " + returnMessage);
-					socket.send(packet);
-					socket.close();
-				} catch(Exception e) {
-						System.out.println(e);
-				}
-			}
-		} catch (RemoteException e) {
-			System.out.println("Remote failure:\n" + e );
-			runBackupServer(0);
-		}
+    
+    if (success) this.voteElection(electionID, type);
+    
+    return;
+  }
+  
+  public void voteElection(int electionID, int type) {
+	if (type == 0) {
+		this.query("UPDATE Election"
+		  + " SET blankVotes = ( SELECT blankVotes FROM Election"
+		    + " WHERE id = " + electionID + " ) + 1"
+		  + " WHERE id = " + electionID
+		);
+	} else if (type == 1) {
+		this.query("UPDATE Election"
+		  + " SET nullVotes = ( SELECT nullVotes FROM Election"
+		    + " WHERE id = " + electionID + " ) + 1"
+		  + " WHERE id = " + electionID
+		);
+	} else if (type == 2) {
+		this.query("UDPATE Election"
+		  + "SET votes = ( SELECT votes FROM Election"
+		   + " WHERE id = " + electionID + " ) + 1"
+		  + " WHERE id = " + electionID
+		);
 	}
-
-	public static void runBackupServer(int delay){
-		try {
-			backupRegistry = (DataServerInterface) lookupRegistry(port, reference);
-			System.out.println("Backup server ready Port: " + port + " Reference: " + reference);
-			int tries = 5;
-			while(tries > 0){
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					System.exit(0);
-				}
-
-				DatagramSocket socket = new DatagramSocket(socketPort+1);
-				try{
-					byte[] buf = new byte[256];
-					String msg = "ping";
-					buf = msg.getBytes();
-					InetAddress sendAddress = InetAddress.getByName("localhost");
-					DatagramPacket packet = new DatagramPacket(buf, buf.length, sendAddress, socketPort);
-					System.out.println("Sending: " + msg);
-					socket.send(packet);
-					socket.setSoTimeout(1000);
-					socket.receive(packet);
-					String received = new String(packet.getData(), 0, packet.getLength());
-					System.out.println("Recieved: " + received);
-					tries = 5;
-				} catch (SocketTimeoutException ste) {
-					// timeout exception.
-					System.out.println("Timeout reached!!! " + tries);
-					tries--;
-				} catch (IOException ioe) {
-					socket.close();
-				}
-				runServer(0);
-			}
-		} catch (SocketException se) {
-			System.out.println("Socket failure\nTrying to reconnect...");
-			runBackupServer(1500);
-		} catch (RemoteException re) {
-			System.out.println("Remote failure\nTrying to reconnect...");
-			runBackupServer(1500);
-		} catch (NotBoundException nbe) {
-			System.out.println("Not bound\nTrying to reconnect...");
-			runBackupServer(1500);
-		}
-	}
-
-	// DataServer Console Interface Methods
-	public void createPerson(Person person) throws RemoteException {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-		String message = "INSERT INTO person VALUES (" +
-			"'"    + person.type +
-			"', '" + person.name +
-			"', "  + person.number +
-			", '"  + person.password +
-			"', '" + person.department.name +
-			"', "  + person.phone +
-			", '"  + person.address +
-			"', "  + person.cc +
-			", '"  + dateFormat.format(person.ccExpire) +
-			"')";
-		changeData(message);
-	}
-
-  public void createZone(Zone zone) throws RemoteException {
-  	String message;
-		if(zone instanceof Faculty){
-			message = "INSERT INTO faculty VALUES ('" + zone.name + "')";
-		} else if(zone instanceof Department) {
-			Department department = (Department) zone;
-			message = "INSERT INTO department VALUES ('" + department.name + "', " + department.faculty.name+ ")";
-		} else {
-			System.out.println("Error in createZone("+ zone +"): Not Department or Faculty");
-			return;
-		}
-		changeData(message);
-	}
-
-	public void updateZone(Zone zone, Zone newZone) throws RemoteException {
-		// check if zone already exists
-		String message;
-		if(zone instanceof Faculty && newZone instanceof Faculty) {
-			message = "UPDATE faculty SET facName = '" + newZone.name +
-			"' WHERE facName = '" + zone.name + "'";
-		}
-		else if (zone instanceof Department && newZone instanceof Department) {
-			Department department = (Department)newZone;
-			message = "UPDATE department SET depName = '" + department.name +
-			"' , faculty = '" + department.faculty.name +
-			"' WHERE depName = '" + department.name + "'";
-		}
-		else {
-			System.out.println("Error in updateZone("+ zone +"): Not Department or Faculty");
-			return;
-		}
-		changeData(message);
-	}
-
-	public void removeZone(Zone zone) throws RemoteException {
-		String message;
-		if(zone instanceof Faculty) {
-			message = "DELETE FROM faculty WHERE facName = '" + zone.name + "'";
-		}
-		else if (zone instanceof Department) {
-			message = "DELETE FROM department WHERE depName = '" + zone.name + "'";
-		}
-		else {
-			System.out.println("Error in removeZone("+ zone +"): Not Department or Faculty");
-			return;
-		}
-		changeData(message);
-	}
-
-
-	public void createFaculty(Faculty faculty) throws RemoteException{
-		String message = "INSERT INTO faculty VALUES ('" + faculty.name + "')";
-		changeData(message);
-	}
-
-	public ArrayList<Faculty> listFaculties() throws RemoteException {
-		ArrayList<Faculty> faculties = new ArrayList<Faculty>();
-		String message = "SELECT facName FROM faculty";
-		ResultSet resultSet = fetchData(message);
-		try{
-			while(resultSet.next()){
-				faculties.add(new Faculty(
-					resultSet.getString("facName")
-					));
-			}
-		}catch(SQLException e) {
-			System.out.println("Error on listFaculties(): " + e);
-			return null;
-		}
-
-		return faculties;
-	}
-
-	public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException {
-		ArrayList<Department> departments = new ArrayList<Department>();
-		String message = "SELECT faculty, depName FROM department WHERE facName = '" + faculty.name + "'";
-		ResultSet resultSet = fetchData(message);
-		try{
-			while(resultSet.next()){
-				departments.add(new Department(
-					new Faculty(resultSet.getString("faculty")),
-					resultSet.getString("depName")
-					));
-			}
-		}catch(SQLException e) {
-			System.out.println("Error on listDepartments(): " + e);
-			return null;
-		}
-
-		return departments;
-	}
-
-	public void createElection(Election election) throws RemoteException {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
-		String message = "INSERT INTO election VALUES (" + createElectionID(election) +
-			", '" + election.name +
-			"', '" + election.description +
-			"', '" + election.type +
-			"', '" + election.subtype +
-			"', '" + dateFormat.format(election.start) +
-			"', '" + dateFormat.format(election.end) +
-			"')";
-		changeData(message);
-	}
-
-	public ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
-		java.util.Date dateNow = new java.util.Date();
-		ArrayList<Election> elections = new ArrayList<Election>();
-		String message = "SELECT electionName, electionStart, electionEnd FROM department WHERE electionType = '" + type
-						+ "' AND electionSubType = '" + subtype + "'";
-		ResultSet resultSet = fetchData(message);
-		try {
-			while(resultSet.next()){
-				java.util.Date eventEndDate = dateFormat.parse(resultSet.getString("electionEnd"));
-				if(eventEndDate.compareTo(dateNow) >= 0) { // if still running
-					elections.add(
-						new Election(
-							resultSet.getString("electionName"),
-							resultSet.getString("electionDescription"),
-							dateFormat.parse(resultSet.getString("electionStart")),
-							dateFormat.parse(resultSet.getString("electionEnd")),
-							type,
-							subtype
-						)
-					);
-				}
-			}
-		} catch (SQLException sqlException) {
-			System.out.println("SQL failure on listElections()");
-			return null;
-		} catch (ParseException parseException) {
-			System.out.println("Error parsing date on listElections()");
-			return null;
-		}
-
-		return elections;
-	}
-
-
-	public ArrayList<Election> listElections(Department department, int cc) throws RemoteException{
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
-		ArrayList<Election> elections = new ArrayList<Election>();
-
-		// get all election IDs from department
-		String message = "SELECT electionID FROM votingTable WHERE depName = '" + department.name + "'";
-		ResultSet resultSet_electionID = fetchData(message);
-
-		// get person type and department (if applicable)
-		message = "SELECT type, depName FROM person WHERE cc = " + cc;
-		ResultSet resultSet_person = fetchData(message);
-
-		try{
-			String personType = resultSet_person.getString("type");
-			String personDepartment = resultSet_person.getString("depName");
-
-			while(resultSet_electionID.next()){
-
-				// get election info
-				message = "Select * FROM election WHERE electionID = " + resultSet_electionID.getInt("electionID");
-				ResultSet resultSet_election = fetchData(message);
-
-				String electionType = resultSet_election.getString("electionType");
-				String electionSubType = resultSet_election.getString("electionSubType");
-
-				if (personType.equals("Student")){
-					if (electionType.equals("General") && electionSubType.equals("Student-Election")){
-						elections.add(
-							new Election(
-								resultSet_election.getString("electionName"),
-								resultSet_election.getString("electionDescription"),
-								dateFormat.parse(resultSet_election.getString("electionStart")),
-								dateFormat.parse(resultSet_election.getString("electionEnd")),
-								electionType,
-								electionSubType
-							)
-						);
-					}
-					if(electionType.equals("Nucleus") && personDepartment.equals(electionSubType)){
-						elections.add(
-							new Election(
-								resultSet_election.getString("electionName"),
-								resultSet_election.getString("electionDescription"),
-								dateFormat.parse(resultSet_election.getString("electionStart")),
-								dateFormat.parse(resultSet_election.getString("electionEnd")),
-								electionType,
-								electionSubType
-							)
-						);
-					}
-				} else if (personType.equals("Teacher")) {
-					if(electionType.equals("General") && electionSubType.equals("Teacher-Election")){
-						elections.add(
-							new Election(
-								resultSet_election.getString("electionName"),
-								resultSet_election.getString("electionDescription"),
-								dateFormat.parse(resultSet_election.getString("electionStart")),
-								dateFormat.parse(resultSet_election.getString("electionEnd")),
-								electionType,
-								electionSubType
-							)
-						);
-					}
-				}
-				else if (personType.equals("Employee")) {
-					if(electionType.equals("General") && electionSubType.equals("Employee-Election")){
-						elections.add(
-							new Election(
-								resultSet_election.getString("electionName"),
-								resultSet_election.getString("electionDescription"),
-								dateFormat.parse(resultSet_election.getString("electionStart")),
-								dateFormat.parse(resultSet_election.getString("electionEnd")),
-								electionType,
-								electionSubType
-							)
-						);
-					}
-				}
-				else {
-					System.out.println("Error on listElections(): Employee type unrecognized");
-					return null;
-				}
-			}
-		} catch (ParseException pe) {
-			System.out.println("Date parsing error on listElections()");
-			return null;
-		} catch (SQLException sqle) {
-			System.out.println("SQL error on listElections()");
-			return null;
-		}
-		
-		return elections;
-	}
-
-	public void createList(List list) throws RemoteException {
-		String message = "INSERT INTO votingList VALUES (" + createListID(list) +
-			", '" + list.name +
-			"', " + getElectionID(list.election) +
-			")";
-		changeData(message);
-	}
-
-  public ArrayList<List> listLists(Election election) throws RemoteException {
-		ArrayList<List> lists = new ArrayList<List>();
-		String message = "SELECT listName FROM votingList WHERE electionID = " + getElectionID(election) ;
-		ResultSet resultSet = fetchData(message);
-		try {
-			while(resultSet.next()){
-				lists.add(new List( election,
-									resultSet.getString(1)
-				));
-			}
-		} catch(Exception e) {
-			System.out.println("Error on listLists(): " + e);
-			return null;
-		}
-
-		return lists;
-	}
-
-	public void removeList(List list) throws RemoteException {
-		String message = "DELETE FROM votingList WHERE listID = " + getListID(list) + ")";
-		changeData(message);
-	}
-
-	public ArrayList<Person> listCandidates(List list) throws RemoteException {
-		ArrayList<Person> candidates = new ArrayList<Person>();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-		// get the cc column from listMembers
-		int listID = getListID(list);
-
-		String message = "SELECT personCC FROM votingListMembers WHERE listID = " + listID;
-		ResultSet resultSet1 = fetchData(message);
-
-		try{
-			while(resultSet1.next()){
-				message = "SELECT type, name, personID, password, depName, phone, address, cc, ccExpire " +
-						  "FROM person WHERE cc = " + resultSet1.getInt(1);
-				ResultSet resultSet2 = fetchData(message);
-				while(resultSet2.next()){
-					message = "SELECT faculty, depName FROM department WHERE depName = '" + resultSet2.getString(5) + "'";
-					ResultSet resultSet3 = fetchData(message);
-					candidates.add(new Person(resultSet2.getString(1),
-											  resultSet2.getString(2),
-											  resultSet2.getInt(3),
-											  resultSet2.getString(4),
-											  new Department(new Faculty(resultSet3.getString(1)), resultSet3.getString(2)),
-											  resultSet2.getInt(6),
-											  resultSet2.getString(7),
-											  resultSet2.getInt(8),
-											  dateFormat.parse(resultSet2.getString(9))
-					));
-				}
-			}
-		} catch (Exception e){
-			System.out.println("Error on listCandidates(): " + e );
-			return null;
-		}
-
-		return candidates;
-	}
-
-	public void addCandidate(List list, Person person) throws RemoteException {
-		String message = "INSERT INTO votingListMembers VALUES (" + getListID(list) + ", " + person.cc + ")";
-		changeData(message);
-	}
-
-	public void removeCandidate(List list, Person person) throws RemoteException {
-		String message = "DELETE FROM votingListMembers WHERE listID = " + getListID(list) +
-		" AND personCC = " + person.cc +
-		")";
-		changeData(message);
-	}
-
-	public void createVotingTable(VotingTable votingTable) throws RemoteException {
-		String message = "INSERT INTO votingTable VALUES (" + getElectionID(votingTable.election) +
-				", '" + votingTable.department.name +
-				"')";
-		changeData(message);
-	}
-
-	public void removeVotingTable(VotingTable votingTable) throws RemoteException {
-		String message = "DELETE FROM votingTable WHERE electionID = " + getElectionID(votingTable.election) +
-		"AND depName = '" + votingTable.department.name +
-		"')";
-		changeData(message);
-	}
-
-	public ArrayList<VotingTable> listVotingTables(Election election) throws RemoteException{
-		ArrayList<VotingTable> votingTables = new ArrayList<VotingTable>();
-		String message = "SELECT depName FROM votingTable WHERE electionID = " + getElectionID(election) ;
-  		ResultSet resultSet_depName = fetchData(message);
-  		try{
-			while(resultSet_depName.next()){
-				String depName = resultSet_depName.getString("depName");
-				message = "SELECT faculty FROM department WHERE depName = '" + depName + "'";
-				ResultSet resultSet_faculty = fetchData(message);
-
-				votingTables.add(new VotingTable(
-									election,
-									new Department(new Faculty(resultSet_faculty.getString("facName")),
-										depName)
-				));
-			}
-		}catch(Exception e) {
-			System.out.println("Error on listLists(): " + e);
-			return null;
-		}
-
-		return votingTables;
-
-	}
-
-	public void sendVote(Vote vote) throws RemoteException{
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
-		String message = "INSERT INTO vote VALUES ("+ getElectionID(vote.election) +
-						", " + vote.terminalID +
-						", " + vote.voteNumber +
-						", '" + vote.list +
-						"', '" + dateFormat.format(vote.date) +
-						"')";
-		changeData(message);
-		return;
-	}
-
-
-	public void sendLog(Log log) throws RemoteException{
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy k:m");
-		String message = "INSERT INTO log VALUES ('" + log.department.name +
-							"', " + getElectionID(log.election) +
-							", '" + dateFormat.format(log.date) +
-							"', " + log.cc +
-							")";
-		changeData(message);
-		return;
-	}
-
-	public Hashtable<String, Integer> getResults(Election election) throws RemoteException{
-		Hashtable<String, Integer> elections = new Hashtable<String, Integer>();
-		// get all lists of an election
-		int electionID = getElectionID(election);
-		String message = "SELECT listID, listName FROM votingList WHERE electionID = " + electionID;
-		ResultSet resultSet1 = fetchData(message);
-		try{
-			while(resultSet1.next()){
-				message = "SELECT COUNT(*) FROM vote WHERE electionID = " + electionID +
-												   " AND votingListID = " + resultSet1.getInt("listID");
-				ResultSet resultSet2 = fetchData(message);
-				while(resultSet2.next()){
-					elections.put(resultSet1.getString("listName"),
-								  resultSet2.getInt(1));
-				}
-			}
-			return elections;
-		}catch(Exception e){
-			System.out.println("Error in getResults("+ election +"): " + e );
-		}
-		return null;
-	}
-
-	public Credential getCredentials(int cc) throws RemoteException{
-		String message = "SELECT personID, password FROM Person WHERE cc = " + cc ;
-		ResultSet resultSet = fetchData(message);
-		try{
-			while (resultSet.next()){
-				return new Credential(resultSet.getString("personID"),
-									  resultSet.getString("password"));
-			}
-		}  catch(Exception e){
-			System.out.println("Error on getCredentials("+ cc +"): " + e);
-		}
-		return null;
-	}
-
-	private int getListID(List list) {
-		String message = "SELECT listID FROM votingList WHERE listName = '" + list.name
-		+ "' AND electionID = " + getElectionID(list.election);
-		ResultSet resultSet = fetchData(message);
-		int listID = -1; // if an error occurs, return an invalid ID
-		try {
-			while(resultSet.next()){
-				listID = resultSet.getInt("listID");
-			}
-			return listID;
-		} catch(SQLException e) {
-			System.out.println("Error on getListID("+ list +"): " + e);
-			return -1;
-		}
-	}
-
-	private int createListID(List list) {
-
-		// check if list already exists
-		if(getListID(list) == -1){
-			System.out.println("List already exists: " + list);
-			return -1;
-		}
-
-		// get MAX ID
-		String message = "SELECT MAX(listID) FROM votingList";
-		ResultSet resultSet = fetchData(message);
-		int maxListID = 0; // the first listID created will have this value
-		try{
-			while(resultSet.next()){
-				maxListID = resultSet.getInt("listID");
-			}
-			return maxListID;
-		}catch(SQLException e) {
-			System.out.println("Error on createListID("+ list +"): " + e);
-			return -1;
-		}
-	}
-
-	private int getElectionID(Election election) {
-		String message = "SELECT electionID FROM election WHERE electionName = '" + election.name
-		+ "' AND electionType = '" + election.type + "'";
-		ResultSet resultSet = fetchData(message);
-		int electionID = -1; // if an error occurs, return an invalid ID
-		try {
-			while(resultSet.next()){
-				electionID = resultSet.getInt("electionID");
-			}
-			return electionID;
-		} catch(SQLException e) {
-			System.out.println("Error on getElectionID("+ election +"): " + e);
-			return -1;
-		}
-	}
-
-	private int createElectionID(Election election) {
-
-		// check if election already exists
-		if(getElectionID(election) == -1){
-			System.out.println("Election already exists: " + election);
-			return -1;
-		}
-
-		// get MAX ID
-		String message = "SELECT MAX(electionID) FROM election";
-		ResultSet resultSet = fetchData(message);
-		int maxElectionID = 0; // the first electionID created will have this value
-		try{
-			while(resultSet.next()){
-				maxElectionID = resultSet.getInt("electionID");
-			}
-			return maxElectionID;
-		}catch(SQLException e) {
-			System.out.println("Error on createElectionID("+ election +"): " + e);
-			return -1;
-		}
-	}
-
-	public void changeData(String message) {
-		try{
-			database.insert(message);
-			System.out.println(message);
-		}catch(Exception e){
-			System.out.println("Error in changeData(" + message + "): " + e);
-		}
-	}
-
-	public ResultSet fetchData(String message) {
-		try{
-			ResultSet resultQuery = database.query(message);
-			System.out.println(message);
-			return resultQuery;
-		} catch(Exception e){
-			System.out.println("Error in fetchData(" + message + "): " + e);
-			return null;
-		}
-	}
-
-
-	public static int getPort(String args[]) {
-		try {
-			return Integer.parseInt(args[0]);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return 7000;
-		} catch (NumberFormatException e) {
-			return 7000;
-		}
-	}
-
-	public static String getReference(String args[]) {
-		try {
-			return args[1].toString();
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return "iVotas";
-		}
-	}
-
-	public static Registry createAndBindRegistry() throws RemoteException {
-		Registry reg = LocateRegistry.createRegistry(port);
-		reg.rebind(reference, server);
-		return reg;
-	}
-
-
-	public static Remote lookupRegistry(int port, String reference) throws RemoteException, NotBoundException {
-		return LocateRegistry.getRegistry(port).lookup(reference);
-	}
-
-	public static void setSecurityPolicies() {
-		System.getProperties().put("java.security.policy", "policy.all");
-		System.setSecurityManager(new SecurityManager());
-	}
-
-	public DataServer() throws RemoteException {
-		super();
-	}
-
-
-
+  }
+  
+  public boolean voteVotingList(int electionID, String votingList) {
+    ResultSet resultSet = this.query("UPDATE VotingList"
+      + "SET votes = ( SELECT votes FROM VotingList"
+        + " WHERE name = " + votingList
+        + " AND electionID = " + electionID
+        + " ) + 1"
+      + " WHERE name = " + votingList
+      + " AND electionID = " + electionID
+    );
+
+    return resultSet != null;
+  }
+
+  public void sendLog(VotingLog votingLog) throws RemoteException {
+    this.query("INSERT INTO VotingLog VALUES ("
+      + " " + votingLog.electionID 
+      + ", " + votingLog.cc
+      + ", " + votingLog.votingTableID
+      + ", " + electionDateFormat.format(votingLog.date)
+      + " )"
+    );
+    
+    return;
+  }
+
+  public ArrayList<Result> getResults(int electionID) throws RemoteException {  
+	ArrayList<Result> results = new ArrayList<Result>();
+	  
+    ResultSet electionNonVotingListsVotes = this.query(
+      "SELECT votes, blankVotes, nullVotes FROM Election"
+      + " WHERE id = " + electionID
+    );
+    
+    try {
+	    results.add(
+	      new Result("Branco", electionNonVotingListsVotes.getInt("blankVotes"))
+	    );
+	    
+	    results.add(
+  	      new Result("Nulo", electionNonVotingListsVotes.getInt("nullVotes"))
+  	    );
+    } catch (SQLException sqlException) {
+    	return results;
+    }
+    
+    ResultSet electionVotingListsVotes = this.query("SELECT name, votes FROM VotingList"
+      + " WHERE electionID = " + electionID
+    );
+   
+    try {
+      while (electionVotingListsVotes.next()) {
+        results.add(
+          new Result(
+            electionVotingListsVotes.getString("name"),
+            electionVotingListsVotes.getInt("votes")
+          )
+        );
+      }
+    } catch (Exception e) {
+      System.out.println("Error in getResults(" + electionID + "): " + e);
+    }
+    
+    return results;
+  }
+
+  public Credential getCredentials(int cc) throws RemoteException {
+    ResultSet resultSet = this.query("SELECT number, password FROM Person WHERE cc = " + cc);
+    
+    try {
+      if (resultSet.next())
+        return new Credential(
+          resultSet.getInt("number"),
+          resultSet.getString("password")
+        );
+    } catch (Exception e) {
+      System.out.println("Error on getCredentials(" + cc + "): " + e);
+    }
+    
+    return null;
+  }
+
+  public ResultSet query(String query) {
+    try {
+      return database.query(query);
+    } catch (Exception exception) {
+      System.out.println("Error on query(" + query + "): " + exception);
+      return null;
+    }
+  }
+
+  public static int getPort(String args[]) {
+    try {
+      return Integer.parseInt(args[0]);
+    } catch (ArrayIndexOutOfBoundsException e) {
+      return 7000;
+    } catch (NumberFormatException e) {
+      return 7000;
+    }
+  }
+
+  public static String getReference(String args[]) {
+    try {
+      return args[1].toString();
+    } catch (ArrayIndexOutOfBoundsException e) {
+      return "iVotas";
+    }
+  }
+
+  public static Registry createAndBindRegistry() throws RemoteException {
+    Registry reg = LocateRegistry.createRegistry(port);
+    reg.rebind(reference, server);
+    return reg;
+  }
+
+  public static Remote lookupRegistry(int port, String reference) throws RemoteException, NotBoundException {
+    return LocateRegistry.getRegistry(port).lookup(reference);
+  }
+
+  public static void setSecurityPolicies() {
+    System.getProperties().put("java.security.policy", "policy.all");
+    System.setSecurityManager(new SecurityManager());
+  }
+
+  public DataServer() throws RemoteException {
+    super();
+  }
 }

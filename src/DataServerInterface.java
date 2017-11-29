@@ -4,42 +4,51 @@ import java.util.*;
 
 
 public interface DataServerInterface extends Remote {
-	// People
-	public void createPerson(Person person) throws RemoteException;
+	// Person
+	public int createPerson(Person person) throws RemoteException;
 	
-	// Buildings
-	public void createZone(Zone zone) throws RemoteException;
-	public void updateZone(Zone zone, Zone newZone) throws RemoteException;
-	public void removeZone(Zone zone) throws RemoteException;
+	// Faculty
+	public String createFaculty(Faculty faculty) throws RemoteException;
+	public void removeFaculty(String name) throws RemoteException;
+	public void updateFaculty(Faculty faculty, Faculty newFaculty) throws RemoteException;
 	public ArrayList<Faculty> listFaculties() throws RemoteException;
+	
+	// Department
+	public String createDepartment(Department department) throws RemoteException;
+	public void removeDepartment(String name) throws RemoteException;
+	public void updateDepartment(Department department, Department newDepartment) throws RemoteException;
 	public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException;
 	
-	// Elections
-	public void createElection(Election election) throws RemoteException;
+	// Election
+	public int createElection(Election election) throws RemoteException;
+	public Election getElection(int id) throws RemoteException;
 	public ArrayList<Election> listElections(String type, String subtype) throws RemoteException;
-	public ArrayList<Election> listElections(Department department, int cc) throws RemoteException;
+	//public ArrayList<Election> listElections(Department department, int cc) throws RemoteException;
 	
-	// Lists
-	public void createList(List list) throws RemoteException;
-	public ArrayList<List> listLists(Election election) throws RemoteException;
-	public void removeList(List list) throws RemoteException;
-	public ArrayList<Person> listCandidates(List list) throws RemoteException;
+	// VotingList
+	public int createVotingList(VotingList votingList) throws RemoteException;
+	public void removeVotingList(int id) throws RemoteException;
+	public ArrayList < VotingList > listVotingLists(int electionID) throws RemoteException;
 	
-	// List candidates
-	public void addCandidate(List list, Person person) throws RemoteException;
-	public void removeCandidate(List list, Person person) throws RemoteException;
+	// VotingListMember
+	public void addCandidate(int votingListID, int personCC) throws RemoteException;
+	public void removeCandidate(int votingListID, int personCC) throws RemoteException;
+	public ArrayList < Person > listCandidates(int votingListID) throws RemoteException;
 	
-	// Voting tables
-	public void createVotingTable(VotingTable votingTable) throws RemoteException;
-	public void removeVotingTable(VotingTable votingTable) throws RemoteException;
-	public ArrayList<VotingTable> listVotingTables(Election election) throws RemoteException;
+	// VotingTable
+	public int createVotingTable(VotingTable votingTable) throws RemoteException;
+	public void removeVotingTable(int id) throws RemoteException;
+	public ArrayList < VotingTable > listVotingTables(int electionID) throws RemoteException;
 
-	// Votes
-	public void sendVote(Vote vote) throws RemoteException;
-	public void sendLog(Log log) throws RemoteException;
-	// String é o nome da lista/Branco/Nulo e Integer é o numero de votos
-	public Hashtable<String, Integer> getResults(Election election) throws RemoteException;
+	// VotingLog
+	public void sendLog(VotingLog log) throws RemoteException;
 	
-	// Authentication
+	// Vote
+	public void sendVote(int electionID, String votingList) throws RemoteException;
+	
+	// Credential
 	public Credential getCredentials(int cc) throws RemoteException;
+	
+	// Result
+	public ArrayList<Result> getResults(int electionID) throws RemoteException;
 }

@@ -57,16 +57,4 @@ class OracleCon {
             return null;
         }
     }
-
-
-    public void insert(String string) throws Exception {
-        try {
-            stmt.executeUpdate(string);
-            if(showLogs) 
-                System.out.println(string);
-        }catch(Exception e) {
-            if(showLogs)
-                System.out.println("Error on insert(\"" + string + "\"): "+ e);
-        }
-    }
 }

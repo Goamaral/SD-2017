@@ -4,13 +4,20 @@ import java.io.Serializable;
 
 
 public class VotingTable implements Serializable {
-	public Department department;
-	public Election election;
+	public int id;
+	public int electionID;
+	public String departmentName;
 
 	public static final long serialVersionUID = 8381774809865881000L;
 
-	public VotingTable(Election election, Department department) {
-		this.department = department;
-		this.election = election;
+	public VotingTable(int id, int electionID, String departmentName) {
+		this.id = id;
+		this.electionID = electionID;
+		this.departmentName = departmentName;
+	}
+	
+	public VotingTable(int electionID, String departmentName) {
+		this.electionID = electionID;
+		this.departmentName = departmentName;
 	}
 }

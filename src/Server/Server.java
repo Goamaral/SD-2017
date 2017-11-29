@@ -25,7 +25,7 @@ class Server {
 		Socket terminalSocket;
 		String terminalReference;
 		LinkedList<Vote> votes;
-		LinkedList<Log> logs;
+		LinkedList<VotingLog> logs;
 
 		setSecurityPolicies();
 		getOptions(args);
@@ -361,7 +361,7 @@ class VotingTableAutentication extends Thread {
 							terminal.credentials = credentials;
 							terminal.election = election;
 							terminal.lists = listLists(election);
-							terminal.log = new Log(location, election, cc);
+							terminal.log = new VotingLog(location, election, cc);
 							synchronized (terminal.terminalLock) {
 								terminal.terminalLock.notify();
 							}
@@ -493,7 +493,7 @@ class TerminalConnection extends Thread {
 	ArrayList<List> lists;
 	VoteSender voteSender;
 	DataServerInterface registry;
-	Log log;
+	VotingLog log;
 	TerminalWatcher terminalWatcher;
 	boolean watcherTimedout = false;
 	Object watcherLock = new Object();
@@ -538,10 +538,11 @@ class TerminalConnection extends Thread {
 						this.logout();
 					} else if (this.authorized && response.get("type").equals("request")) {
 						if (response.get("datatype").equals("list")) {
-							query = "type|item_list;datatype|list;item_count|" + this.lists.size();
+							query = "type|item_list;datatype|list;item_count|" + this.lists.size() + 2;
+							query = query + ";item_0|Nulo;item_1|Branco";
 							for (int i = 0; i<this.lists.size(); ++i) {
 								list = this.lists.get(i);
-								query = new String(query + ";item_" + i + "|" + list.name);
+								query = new String(query + ";item_" + i + 2 + "|" + list.name);
 							}
 
 							this.writeSocket(query);
@@ -730,7 +731,7 @@ class VoteSender extends Thread {
 	ArrayList<String> terminals;
 	ArrayList<Integer> voteNumbers;
 	LinkedList<Vote> votes = new LinkedList<Vote>();
-	LinkedList<Log> logs = new LinkedList<Log>();
+	LinkedList<VotingLog> logs = new LinkedList<VotingLog>();
 	int id;
 	DataServerInterface registry;
 	RmiNapper rmiNapper;
@@ -739,7 +740,7 @@ class VoteSender extends Thread {
 	public void run() {
 		Vote vote;
 		int delta;
-		Log log;
+		VotingLog log;
 
 		while (true) {
 			synchronized (this.terminals) {

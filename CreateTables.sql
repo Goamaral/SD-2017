@@ -8,112 +8,95 @@ drop table department;
 drop table faculty;
 drop table election;
 
-/*
-Creates table "election", which has a unique id for referencing.
-Each "election" line represents an election of a list (from a pool of lists).
-*/
-CREATE TABLE election
-(electionID           int                 PRIMARY KEY,
- electionName         VARCHAR(255)        NOT NULL,
- electionDescription  VARCHAR(255),
- electionType         VARCHAR(255)        NOT NULL,
- electionSubType      VARCHAR(255)        NOT NULL,
- electionStart        VARCHAR(255)        NOT NULL,
- electionEnd          VARCHAR(255)        NOT NULL  
+CREATE TABLE Election (
+  id            int            PRIMARY KEY,
+  name          VARCHAR(255)   NOT NULL,
+  description   VARCHAR(255)   NOT NULL,
+  type          VARCHAR(255)   NOT NULL,
+  subtype       VARCHAR(255)   NOT NULL,
+  start         VARCHAR(255)   NOT NULL,
+  end           VARCHAR(255)   NOT NULL,
+  votes         int            NOT NULL,
+  blankVotes    int            NOT NULL,
+  nullVotes     int            NOT NULL
 );
 
-/*
-Creates table "faculty", which has a unique name
-Each "faculty" line represents a group of university departments concerned with a major division of knowledge. 
-*/
-CREATE TABLE faculty
-(facName        VARCHAR(255)        PRIMARY KEY
+CREATE TABLE Faculty (
+  name   VARCHAR(255)   PRIMARY KEY
 );
 
-/*
-Creates table "department", with a unique name
-Each "department" line represents a building of the university dealing with a specific area of activity.
-*/
-CREATE TABLE department
-(depName        VARCHAR(255)        PRIMARY KEY,
- faculty        VARCHAR(255)        ,
-                                    FOREIGN KEY (faculty)
-                                        REFERENCES faculty(facName)
+CREATE TABLE Department (
+  name          VARCHAR(255)   PRIMARY KEY,
+  facultyName   VARCHAR(255)   NOT NULL,
+  CONSTRAINT    FK_Faculty     FOREIGN KEY     (facultyName)
+                REFERENCES     Faculty(name)
 );
 
-/*
-Creates table "votingList", which has a unique id for referencing.
-Each "votingList" line represents a group of people who want to get elected
-*/
-CREATE TABLE votingList
-(listID         int                 NOT NULL        PRIMARY KEY,
- listName       VARCHAR(255)         NOT NULL,
- electionID           int, 
-                                    FOREIGN KEY (electionID) 
-                                        REFERENCES election(electionId)
+CREATE TABLE VotingList (
+  id          int            PRIMARY KEY,
+  electionID  int            NOT NULL,
+  name        VARCHAR(255)   NOT NULL,
+  votes       int            NOT NULL,
+  CONSTRAINT  FK_Election    FOREIGN KEY    (electionID)
+              REFERENCES     Election(id)
 );
 
-CREATE TABLE votingTable
-(electionID,    int                 NOT NULL,
- depName,       VARCHAR(255)        NOT NULL,
-                                    FOREIGN KEY (depName) 
-                                        REFERENCES department(depName)
-                                    CONSTRAINT PK_votingTable PRIMARY KEY (electionID, depName)
+CREATE TABLE VotingTable (
+  id               int              PRIMARY KEY,
+  electionID       int              NOT NULL,
+  departmentName   VARCHAR(255)     NOT NULL,
+  CONSTRAINT       FK_Election
+                   FOREIGN KEY      (electionID)
+                   REFERENCES       Election(id),
+  CONSTRAINT       FK_Department
+                   FOREIGN KEY      (depName)
+                   REFERENCES       Department(name)
 );
 
-
-/* 
-Creates table "person", which is identified by its cc number.
-Password is encrypted
-Each "person" line represents one person (voter)
-*/
-CREATE TABLE person
-(type           VARCHAR(255)        NOT NULL,
- name           VARCHAR(255)        NOT NULL,
- personID       int                 NOT NULL,
- password       VARCHAR(255)        NOT NULL,
- depName        VARCHAR(255)        NOT NULL, 
-                                    FOREIGN KEY (depName) 
-                                        REFERENCES department(depName),
- phone          int,
- address        VARCHAR(255),
- cc             int                 PRIMARY KEY,
- ccExpire       VARCHAR(255)
-);
- 
-CREATE TABLE votingListMembers
-(listID         int                 NOT NULL,
-                                    FOREIGN KEY (listID)
-                                        REFERENCES votingList(listID),
- personCC       int                 NOT NULL,
-                                    FOREIGN KEY (personCC)
-                                        REFERENCES person(cc),
-                                    CONSTRAINT PK_votingListMemebers PRIMARY KEY (listID, personCC)
-
+CREATE TABLE Person (
+  cc               int             PRIMARY KEY,
+  type             VARCHAR(255)    NOT NULL,
+  name             VARCHAR(255)    NOT NULL,
+  password         VARCHAR(255)    NOT NULL,
+  address          VARCHAR(255)    NOT NULL,
+  number           int             NOT NULL,
+  phone            int             NOT NULL,
+  ccExpire         VARCHAR(255)    NOT NULL,
+  departmentName   VARCHAR(255)    NOT NULL,
+  CONSTRAINT       FK_Department
+                   FOREIGN KEY     (depName)
+                   REFERENCES      Department(name)
 );
 
-CREATE TABLE vote
-(electionID     int                 NOT NULL,
-                                    FOREIGN KEY (electionID)
-                                        REFERENCES election(electionID)
- terminalID     int                 NOT NULL,
- votingListID   int                 NOT NULL,
-                                    FOREIGN KEY (votingListID)
-                                        REFERENCES votingList(votingListID),
- voteDate       VARCHAR(255)        NOT NULL
+CREATE TABLE VotingListMember (
+  personCC       int                    NOT NULL,
+  votingListID   int                    NOT NULL,
+  CONSTRAINT     PK_votingListMembers
+                 PRIMARY KEY            (personCC, votingListID),
+  CONSTRAINT     FK_Person
+                 FOREIGN KEY            (personCC)
+                 REFERENCES             Person(id),
+  CONSTRAINT     FK_VotingList
+                 FOREIGN KEY            (votingListID)
+                 REFERENCES             VotingList(id)
 );
 
-CREATE TABLE log
-(depName        VARCHAR(255)        NOT NULL,
-                                    FOREIGN KEY (depName)
-                                        REFERENCES department(depName),
-electionID      int                 NOT NULL,
-                                    FOREIGN KEY (electionID)
-                                        REFERENCES election (electionID),
-logDate         VARCHAR(255),    
-personCC        int                 NOT NULL,
-                                    FOREIGN KEY (personCC)
-                                        REFERENCES person(cc)
+CREATE TABLE VotingLog (
+  electionID      int              NOT NULL,
+  personCC        int              NOT NULL,
+  votingTableID   int              NOT NULL,
+  date            VARCHAR(255)     NOT NULL,
+  CONSTRAINT      PK_VotingLog
+                  PRIMARY KEY      (electionID, personCC),
+  CONSTRAINT      FK_Election
+                  FOREIGN KEY      (electionID)
+                  REFERENCES       Election(id)
+  CONSTRAINT      FK_VotingTable
+                  FOREIGN KEY      (votingTableID)
+                  REFERENCES       votingTable(id),
+  CONSTRAINT      FK_Person
+                  FOREIGN KEY      (personCC)
+                  REFERENCES       Person(cc)
 );
 
 COMMIT;
