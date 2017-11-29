@@ -376,8 +376,8 @@ class VotingTableAutentication extends Thread {
 		scanner.close();
 	}
 
-	public ArrayList<List> listLists(Election election) {
-		ArrayList<List> ret;
+	public ArrayList<VotingList> listLists(Election election) {
+		ArrayList<VotingList> ret;
 
 		try {
 			ret = this.registry.listLists(election);
@@ -490,7 +490,7 @@ class TerminalConnection extends Thread {
 	boolean debug = true;
 	boolean authorized = false;
 	Election election;
-	ArrayList<List> lists;
+	ArrayList<VotingList> votingLists;
 	VoteSender voteSender;
 	DataServerInterface registry;
 	VotingLog log;
@@ -501,7 +501,7 @@ class TerminalConnection extends Thread {
 	public void run() {
 		HashMap<String, String> response;
 		String query;
-		List list;
+		VotingList votingList;
 		Vote vote;
 		Date date;
 

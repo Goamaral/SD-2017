@@ -175,17 +175,10 @@ public class Console {
 		return null;
 	} 
 
-	/*
 	public static void executeAction(String action) {
-		Job job = null;
 		String[] actions = action.split(" ");
-		Object data1 = null;
-		Object data2 = null;
-		Faculty faculty;
-		Department department;
-		String subtype = null;
-		List list;
-		Election election;
+		String subtype;
+		int electionID, votingListID, personCC;
 
 		if (debug) System.out.println("ACTION " + action);
 				
@@ -193,30 +186,25 @@ public class Console {
 			|| "Person Register Teacher".equals(action)
 			|| "Person Register Employee".equals(action)
 		) {
-			data1 = buildPerson(actions[2]);
+			buildPerson(actions[2]);
 		}
 		else if ("Zone Faculty Add".equals(action)) {
-			data1 = buildFaculty();
+			buildFaculty();
 		}
 		else if ("Zone Faculty Edit".equals(action)) {
-			data1 = pickFaculty();
-			faculty = (Faculty)data1;
-			data2 = editFaculty(faculty);
-			System.out.println(data1 + " | " + data2);
+			editFaculty(null);
 		}
 		else if ("Zone Faculty Remove".equals(action)) {
-			data1 = pickFaculty();
+			removeFaculty(null);
 		}
 		else if ("Zone Department Add".equals(action)) {
-			data1 = pickDepartment(pickFaculty());
+			buildDepartment(null);
 		}
 		else if ("Zone Department Edit".equals(action)) {
-			data1 = pickDepartment(null);
-			department = (Department)data1;
-			data2 = editDepartment(department);
+			editDepartment(null);
 		}
 		else if ("Zone Department Remove".equals(action)) {
-			data1 = pickDepartment(pickFaculty());
+			removeDepartment(null);
 		}
 		else if ("Election General Student-Election Add".equals(action)
 			|| "Election General Teacher-Election Add".equals(action)
@@ -225,10 +213,9 @@ public class Console {
 		) {
 			if (actions.length == 4) {
 				subtype = actions[2].split("-")[0];
-			} else {
-				subtype = pickDepartment(pickFaculty()).name;
-			}
-			data1 = buildElection(actions[1], subtype);
+			} else subtype = pickDepartment(null);
+
+			buildElection(actions[1], subtype);
 		}
 		else if ("Election General Student-Election List Candidate Add".equals(action)
 			|| "Election General Teacher-Election List Candidate Add".equals(action)
@@ -241,10 +228,13 @@ public class Console {
 		) {
 			if (actions.length == 6) {
 				subtype = actions[2].split("-")[0];
-			}
-			data1 = pickList(pickElection(actions[1], subtype));
-			list = (List) data1;
-			data2 = pickCandidate(list);
+			} else subtype = pickDepartment(null);
+			
+			electionID = pickElection(actions[1], subtype);
+			votingListID = pickVotingList(electionID);
+			personCC = pickPersonElection(electionID);
+			
+			addCandidate(votingListID, personCC);
 		}
 		else if ("Election General Student-Election List Create".equals(action)
 			|| "Election General Teacher-Election List Create".equals(action)
@@ -298,34 +288,65 @@ public class Console {
 
 			data1 = pickVotingTable(pickElection(actions[1], subtype));
 		}
-
-		job = new Job(action, data1, data2);
-		
-		synchronized (jobs) {
-			jobs.addFirst(job);
-			if (worker.getState() == Thread.State.WAITING) {
-				jobs.notify();
-			}
-		}
-		return job;
 	}
-	*/
+	
+	public static void addCandidate(int votingListID, int personCC) {
+		try {
+			if (registry.addCandidate(votingListID, personCC) == -1) {
+				System.out.println("Candidato ja existente!");
+			}
+			return;
+		} catch(RemoteException remoteException) {
+			System.out.println("Adicao de candidato falhada\nA tentar novamente...");
+		}
+		
+		addCandidate(votingListID, personCC);
+	}
+	
+	public static void removeDepartment(String name) {
+		if (name == null) {
+			name = pickDepartment(null);
+		}
+		
+		try {
+			registry.removeDepartment(name);
+			return;
+		} catch(RemoteException remoteException) {
+			System.out.println("Remocao de departamento falhada\nA tentar novamente...");
+		}
+		removeDepartment(name);
+	}
+	
+	public static void removeFaculty(String name) {
+		if (name == null) {
+			name = pickFaculty();
+		}
+		
+		try {
+			registry.removeFaculty(name);
+			return;
+		} catch(RemoteException remoteException) {
+			System.out.println("Remocao de faculdade falhada\nA tentar novamente...");
+		}
+		removeFaculty(name);
+	}
 
 	public static void listResults(int electionID) {
 		ArrayList<Result> results = null;
 
 		try {
 			results = registry.getResults(electionID);
-			for (Result result : results) {
-				System.out.println(result.votingListName + ": " + result.votes);
-			}
 		} catch (RemoteException re) {
 			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
 			listResults(electionID);
 		}
+		
+		for (Result result : results) {
+			System.out.println(result.votingListName + ": " + result.votes);
+		}
 	}
 
-	public static VotingTable pickVotingTable(int electionID) {
+	public static int pickVotingTable(int electionID) {
 		ArrayList<VotingTable> votingTables = listVotingTables(electionID);
 		VotingTable ret;
 		
@@ -351,32 +372,27 @@ public class Console {
 			opcao = Integer.parseInt(line);
 		} catch (NumberFormatException nfe) {
 			System.out.println("Opcao invalida");
-			return pickVotingTable(election);
+			return pickVotingTable(electionID);
 		}
 
 		ret = votingTables.get(opcao);
 		if (ret == null) {
 			if (opcao == votingTables.size()) {
-				return buildVotingTable(election, pickDepartment(pickFaculty()));
+				return buildVotingTable(electionID, pickDepartment(null));
 			}
 			System.out.println("Opcao invalida");
-			return pickVotingTable(election);
+			return pickVotingTable(electionID);
 		} else {
-			return ret;
+			return ret.id;
 		}
 	}
 
-	public static ArrayList<VotingTable> listVotingTables(Election election) {
+	public static ArrayList<VotingTable> listVotingTables(int electionID) {
 		try {
-			return registry.listVotingTables(election);
+			return registry.listVotingTables(electionID);
 		} catch (RemoteException re) {
-			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException ie) {
-				System.exit(0);
-			}
-			return listVotingTables(election);
+			System.out.println("Obtencao de mesas de voto falhada.\nA tentar novamente novamente...");
+			return listVotingTables(electionID);
 		}
 	}
 
@@ -475,8 +491,8 @@ public class Console {
 		}
 	}
 
-	public static VotingList pickList(int electionID) {
-		ArrayList<VotingList> votingLists = listLists(electionID);
+	public static int pickVotingList(int electionID) {
+		ArrayList<VotingList> votingLists = listVotingLists(electionID);
 		
 		int i = 0;
 		int opcao;
@@ -500,32 +516,27 @@ public class Console {
 			opcao = Integer.parseInt(line);
 		} catch (NumberFormatException nfe) {
 			System.out.println("Opcao invalida");
-			return pickList(electionID);
+			return pickVotingList(electionID);
 		}
 
 		try {
-			return votingLists.get(opcao);
+			return votingLists.get(opcao).id;
 		} catch(IndexOutOfBoundsException indexOutOfBoundsException) {
 			if (opcao == votingLists.size()) {
 				return buildVotingList(electionID);
-			} else{
+			} else {
 				System.out.println("Opcao invalida");
-				return pickList(electionID);
+				return pickVotingList(electionID);
 			}
 		}		
 	}
 
-	public static ArrayList<List> listLists(Election election) {
+	public static ArrayList<VotingList> listVotingLists(int electionID) {
 		try {
-			return registry.listLists(election);
+			return registry.listVotingLists(electionID);
 		} catch (RemoteException re) {
-			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException ie) {
-				System.exit(0);
-			}
-			return listLists(election);
+			System.out.println("Obtencao de listas falhada.\nA tentar novamente novamente...");
+			return listVotingLists(electionID);
 		}
 	}
 
@@ -597,21 +608,13 @@ public class Console {
 		}
 	}
 
-	public static ArrayList<Election> listElections(String type, String subtype) throws RemoteException {
-		ArrayList<Election> ret;
+	public static ArrayList<Election> listElections(String type, String subtype) {
 		try {
-			ret = registry.listElections(type, subtype);
-			System.out.println("> " + ret + " " + type + " " + subtype);
-			return ret;
+			return registry.listElections(type, subtype);
 		} catch (RemoteException re) {
-			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException ie) {
-				System.exit(0);
-			}
-			return listElections(type, subtype);
+			System.out.println("Obtencao de eleicoes falhada.\nA tentar novamente novamente...");
 		}
+		return listElections(type, subtype);
 	}
 
 	public static int buildElection(String type, String subtype) {
@@ -672,17 +675,14 @@ public class Console {
 		);
 	}
 	
-	public static int createElection(Election election) {
-		int ret = -1;
-		
+	public static int createElection(Election election) {		
 		try {
-			ret = registry.createElection(election);
+			return registry.createElection(election);
 		} catch (RemoteException remoteException) {
 			System.out.println("Criacao de eleicao falhada\nA tentar novamente...");
-			createElection(election);
 		}
 		
-		return ret;
+		return createElection(election);
 	}
 
 	public static Department editDepartment(Department department) {
@@ -711,21 +711,37 @@ public class Console {
 		return new Department(name, facultyName);
 	}
 
-	public static Faculty editFaculty(Faculty faculty) {
+	public static String editFaculty(String name) {
+		if (name == null) {
+			name = pickFaculty();
+		}
+		
 		String line;
-		String name = faculty.name;
+		String newName = name;
 
 		System.out.println("----------");
-		System.out.println("Nome: " + faculty.name);
+		System.out.println("Nome: " + name);
 		System.out.print("Editar? [s/N]: ");
 
 		line = System.console().readLine();
 		if (line.equals("s")) {
 			System.out.print("Novo nome: ");
-			name = System.console().readLine();
+			newName = System.console().readLine();
 		}
 		
-		return new Faculty(name);
+		return updateFaculty(
+			new Faculty(name),
+			new Faculty(newName)
+		);
+	}
+	
+	public static String updateFaculty(Faculty faculty, Faculty newFaculty) {
+		try {
+			return registry.updateFaculty(faculty, newFaculty);
+		} catch(RemoteException remoteException) {
+			System.out.println("Atualizacao da faculdade falhada\nA tentar novamente...");
+		}
+		return updateFaculty(faculty, newFaculty);
 	}
 
 	public static int buildPerson(String type) {
@@ -910,8 +926,9 @@ public class Console {
 			return registry.createDepartment(department);
 		} catch (RemoteException remoteException) {
 			System.out.println("Criacao de departamento falhada\nA tentar novamente...");
-			createDepartment(department);
 		}
+		
+		return createDepartment(department);
 	}
 
 	public static ArrayList<Faculty> listFaculties() {

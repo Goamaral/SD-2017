@@ -10,7 +10,7 @@ public interface DataServerInterface extends Remote {
 	// Faculty
 	public String createFaculty(Faculty faculty) throws RemoteException;
 	public void removeFaculty(String name) throws RemoteException;
-	public void updateFaculty(Faculty faculty, Faculty newFaculty) throws RemoteException;
+	public String updateFaculty(Faculty faculty, Faculty newFaculty) throws RemoteException;
 	public ArrayList<Faculty> listFaculties() throws RemoteException;
 	
 	// Department
@@ -31,7 +31,7 @@ public interface DataServerInterface extends Remote {
 	public ArrayList < VotingList > listVotingLists(int electionID) throws RemoteException;
 	
 	// VotingListMember
-	public void addCandidate(int votingListID, int personCC) throws RemoteException;
+	public int addCandidate(int votingListID, int personCC) throws RemoteException;
 	public void removeCandidate(int votingListID, int personCC) throws RemoteException;
 	public ArrayList < Person > listCandidates(int votingListID) throws RemoteException;
 	

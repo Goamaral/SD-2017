@@ -5,10 +5,7 @@ import java.net.*;
 import java.rmi.registry.*;
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 import java.text.*;
-
-import com.sun.org.apache.regexp.internal.REUtil;
 
 public class DataServer extends UnicastRemoteObject implements DataServerInterface {
   private static final long serialVersionUID = -977374215791991679L;
@@ -150,10 +147,12 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     } catch(SQLException sqlException) {
     	System.out.println("Error getting election:\n" + sqlException);
     }
+    
+    return null;
   }
   
   public int createPerson(Person person) throws RemoteException {	  
-    this.query("INSERT INTO Person VALUES ("
+    ResultSet resultSet = this.query("INSERT INTO Person VALUES ("
       + person.cc
       + ", '" + person.type + "'"
       + ", '" + person.name + "'"
@@ -166,33 +165,39 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
       + ")"
     );
     
+    if (resultSet == null) return null;
     return person.cc;
   }
 
   public String createFaculty(Faculty faculty) throws RemoteException {
-    this.query("INSERT INTO Faculty VALUES ("
+    ResultSet resultSet = this.query("INSERT INTO Faculty VALUES ("
       + "'" + faculty.name + "'"
       + ")"
     );
     
+    if (resultSet == null) return null;
     return faculty.name;
   }
   
   public String createDepartment(Department department) throws RemoteException {
-    this.query("INSERT INTO Department VALUES ("
+    ResultSet resultSet = this.query("INSERT INTO Department VALUES ("
       + "'" + department.name + "'"
       + ", '" + department.facultyName + "'"
       + ")"
     );
     
+    if (resultSet == null) return null;
     return department.name;
   }
 
-  public void updateFaculty(Faculty faculty, Faculty newFaculty) throws RemoteException {
-    this.query("UPDATE Faculty"
+  public String updateFaculty(Faculty faculty, Faculty newFaculty) throws RemoteException {
+    ResultSet resultSet = this.query("UPDATE Faculty"
   	  + " SET name = '" + newFaculty.name + "'"
       + " WHERE name = '" + faculty.name + "'"
     );
+    
+    if (resultSet == null) return null;
+    return newFaculty.name;
   }
   
   public void updateDepartment(Department department, Department newDepartment) {
@@ -298,8 +303,8 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
               resultSet.getString("description"),
               type,
               subtype,
-              electionDateFormat.parse(resultSet.getString("start")),
-              electionDateFormat.parse(resultSet.getString("end"))
+              resultSet.getString("start"),
+              resultSet.getString("end")
             )
           );
         }
@@ -396,8 +401,14 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     return candidates;
   }
 
-  public void addCandidate(int votingListID, int personCC) throws RemoteException {
-    this.query("INSERT INTO VotingListMembers VALUES (" + personCC + ", " + votingListID + ")");
+  // Do candidates need an id?
+  public int addCandidate(int votingListID, int personCC) throws RemoteException {
+    ResultSet resultSet = this.query("INSERT INTO VotingListMembers VALUES ("
+      + personCC + ", " + votingListID + ")"
+    );
+    
+    if (resultSet == null) return -1;
+    return 0;
   }
 
   public void removeCandidate(int votingListID, int personCC) throws RemoteException {
