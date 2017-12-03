@@ -49,7 +49,7 @@ CREATE TABLE VotingTable (
                    FOREIGN KEY      (electionID)
                    REFERENCES       Election(id),
   CONSTRAINT       FK_Department
-                   FOREIGN KEY      (depName)
+                   FOREIGN KEY      (departmentName)
                    REFERENCES       Department(name)
 );
 
@@ -64,7 +64,7 @@ CREATE TABLE Person (
   ccExpire         VARCHAR(255)    NOT NULL,
   departmentName   VARCHAR(255)    NOT NULL,
   CONSTRAINT       FK_Department
-                   FOREIGN KEY     (depName)
+                   FOREIGN KEY     (departmentName)
                    REFERENCES      Department(name)
 );
 

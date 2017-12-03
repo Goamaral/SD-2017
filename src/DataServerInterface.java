@@ -6,9 +6,11 @@ import java.util.*;
 public interface DataServerInterface extends Remote {
 	// Person
 	public int createPerson(Person person) throws RemoteException;
+	public ArrayList<Person> listStudentsFromDepartment(String departmentName) throws RemoteException;
+	public ArrayList<Person> listPeopleOfType(String type) throws RemoteException;
 	
 	// Faculty
-	public String createFaculty(Faculty faculty) throws RemoteException;
+	public String createFaculty(String name) throws RemoteException;
 	public void removeFaculty(String name) throws RemoteException;
 	public String updateFaculty(Faculty faculty, Faculty newFaculty) throws RemoteException;
 	public ArrayList<Faculty> listFaculties() throws RemoteException;
@@ -17,7 +19,7 @@ public interface DataServerInterface extends Remote {
 	public String createDepartment(Department department) throws RemoteException;
 	public void removeDepartment(String name) throws RemoteException;
 	public void updateDepartment(Department department, Department newDepartment) throws RemoteException;
-	public ArrayList<Department> listDepartments(Faculty faculty) throws RemoteException;
+	public ArrayList<Department> listDepartments(String facultyName) throws RemoteException;
 	
 	// Election
 	public int createElection(Election election) throws RemoteException;

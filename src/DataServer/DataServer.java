@@ -127,8 +127,74 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
       runBackupServer(1500);
     }
   }
-
+  
   // DataServer Console Interface Methods
+  public ArrayList<Person> listStudentsFromDepartment(String departmentName) throws RemoteException {
+	  ArrayList<Person> people = new ArrayList<Person>();
+		
+	    ResultSet resultSet = this.query(
+	      "SELECT cc, type, name, password, address, number, phone, ccExpire"
+	      + " FROM Person"
+	      + " WHERE departmentName = " + departmentName
+	    );
+	    
+	    try {
+	        while (resultSet.next()) {
+	          people.add(
+	            new Person(
+	              resultSet.getInt("cc"),
+	              resultSet.getString("type"),
+	              resultSet.getString("name"),
+	              resultSet.getString("password"),
+	              resultSet.getString("address"),
+	              resultSet.getInt("number"),
+	              resultSet.getInt("phone"),
+	              resultSet.getString("ccExpire"),
+	              departmentName
+	            )
+	          );
+	        }
+	      } catch (SQLException e) {
+	        System.out.println("Error on listStudentsFromDepartment(): " + e);
+	        return new ArrayList<Person>();
+	      }
+
+	      return people;
+  }
+  
+  public ArrayList<Person> listPeopleOfType(String type) throws RemoteException {
+	ArrayList<Person> people = new ArrayList<Person>();
+	
+    ResultSet resultSet = this.query(
+      "SELECT cc, name, password, address, number, phone, ccExpire, departmentName"
+      + " FROM Person"
+      + " WHERE type = " + type
+    );
+    
+    try {
+        while (resultSet.next()) {
+          people.add(
+            new Person(
+              resultSet.getInt("cc"),
+              type,
+              resultSet.getString("name"),
+              resultSet.getString("password"),
+              resultSet.getString("address"),
+              resultSet.getInt("number"),
+              resultSet.getInt("phone"),
+              resultSet.getString("ccExpire"),
+              resultSet.getString("departmentName")
+            )
+          );
+        }
+      } catch (SQLException e) {
+        System.out.println("Error on listPeopleOfType(): " + e);
+        return new ArrayList<Person>();
+      }
+
+      return people;
+  }
+  
   public Election getElection(int id) throws RemoteException {
     ResultSet resultSet = this.query("SELECT name, description, type, subtype, start, end"
       + " FROM Election WHERE id = " + id
@@ -165,18 +231,18 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
       + ")"
     );
     
-    if (resultSet == null) return null;
+    if (resultSet == null) return -1;
     return person.cc;
   }
 
-  public String createFaculty(Faculty faculty) throws RemoteException {
+  public String createFaculty(String name) throws RemoteException {
     ResultSet resultSet = this.query("INSERT INTO Faculty VALUES ("
-      + "'" + faculty.name + "'"
+      + "'" + name + "'"
       + ")"
     );
     
     if (resultSet == null) return null;
-    return faculty.name;
+    return name;
   }
   
   public String createDepartment(Department department) throws RemoteException {
@@ -234,13 +300,13 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     return faculties;
   }
 
-  public ArrayList < Department > listDepartments(Faculty faculty) throws RemoteException {
+  public ArrayList < Department > listDepartments(String facultyName) throws RemoteException {
     ArrayList < Department > departments = new ArrayList < Department > ();    
     
     ResultSet resultSet = this.query(
 	  "SELECT name, facultyName"
 	  + " FROM Department "
-	  + " WHERE faculty = '" + faculty.name + "'"
+	  + " WHERE faculty = '" + facultyName + "'"
     );
     
     try {
@@ -312,16 +378,9 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     } catch (SQLException sqlException) {
       System.out.println("SQL failure on listElections()");
       return new ArrayList<Election>();
-    } catch (ParseException parseException) {
-      System.out.println("Error parsing date on listElections()");
-      return new ArrayList<Election>();
     }
 
     return elections;
-  }
-
-  public ArrayList < Election > listElections(String departmentName, int cc) throws RemoteException {
-    
   }
 
   public int createVotingList(VotingList votingList) throws RemoteException {
