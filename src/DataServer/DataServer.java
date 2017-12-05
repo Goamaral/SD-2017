@@ -132,10 +132,10 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList<Person> listStudentsFromDepartment(String departmentName) throws RemoteException {
 	  ArrayList<Person> people = new ArrayList<Person>();
 		
-	    ResultSet resultSet = this.query(
-	      "SELECT cc, type, name, password, address, number, phone, ccExpire"
-	      + " FROM Person"
-	      + " WHERE departmentName = " + departmentName
+	    ResultSet resultSet = query(
+	      "SELECT cc, type, name, password, address, num, phone, cc_expire"
+	      + " FROM person"
+	      + " WHERE department_name = " + departmentName
 	    );
 	    
 	    try {
@@ -147,9 +147,9 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 	              resultSet.getString("name"),
 	              resultSet.getString("password"),
 	              resultSet.getString("address"),
-	              resultSet.getInt("number"),
+	              resultSet.getInt("num"),
 	              resultSet.getInt("phone"),
-	              resultSet.getString("ccExpire"),
+	              resultSet.getString("cc_expire"),
 	              departmentName
 	            )
 	          );
@@ -165,10 +165,10 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList<Person> listPeopleOfType(String type) throws RemoteException {
 	ArrayList<Person> people = new ArrayList<Person>();
 	
-    ResultSet resultSet = this.query(
-      "SELECT cc, name, password, address, number, phone, ccExpire, departmentName"
-      + " FROM Person"
-      + " WHERE type = " + type
+    ResultSet resultSet = query(
+      "SELECT cc, name, password, address, num, phone, cc_expire, department_name"
+      + " FROM person"
+      + " WHERE type = '" + type + "'"
     );
     
     try {
@@ -180,15 +180,15 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
               resultSet.getString("name"),
               resultSet.getString("password"),
               resultSet.getString("address"),
-              resultSet.getInt("number"),
+              resultSet.getInt("num"),
               resultSet.getInt("phone"),
-              resultSet.getString("ccExpire"),
-              resultSet.getString("departmentName")
+              resultSet.getString("cc_expire"),
+              resultSet.getString("department_name")
             )
           );
         }
       } catch (SQLException e) {
-        System.out.println("Error on listPeopleOfType(): " + e);
+        System.out.println("Error at listPeopleOfType(): " + e);
         return new ArrayList<Person>();
       }
 
@@ -196,10 +196,10 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   }
   
   public Election getElection(int id) throws RemoteException {
-    ResultSet resultSet = this.query("SELECT name, description, type, subtype, start, end"
-      + " FROM Election WHERE id = " + id
+    ResultSet resultSet = query("SELECT name, description, type, subtype, started_at, ended_at"
+      + " FROM election WHERE id = " + id
     );
-    
+        
     try {
 	   return new Election(
 	      id,
@@ -207,18 +207,18 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 	      resultSet.getString("description"),
 	      resultSet.getString("type"),
 	      resultSet.getString("subtype"),
-	      resultSet.getString("start"),
-	      resultSet.getString("end")
+	      resultSet.getString("started_at"),
+	      resultSet.getString("ended_at")
 	    );
     } catch(SQLException sqlException) {
-    	System.out.println("Error getting election:\n" + sqlException);
+    	System.out.println("Error at getElection():\n" + sqlException);
     }
     
     return null;
   }
   
   public int createPerson(Person person) throws RemoteException {	  
-    ResultSet resultSet = this.query("INSERT INTO Person VALUES ("
+    ResultSet resultSet = query("INSERT INTO person VALUES ("
       + person.cc
       + ", '" + person.type + "'"
       + ", '" + person.name + "'"
@@ -230,61 +230,64 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
       + ", '" + person.departmentName + "'"
       + ")"
     );
-    
+        
     if (resultSet == null) return -1;
     return person.cc;
   }
 
   public String createFaculty(String name) throws RemoteException {
-    ResultSet resultSet = this.query("INSERT INTO Faculty VALUES ("
+    ResultSet resultSet = query("INSERT INTO faculty VALUES ("
       + "'" + name + "'"
       + ")"
     );
-    
+        
     if (resultSet == null) return null;
     return name;
   }
   
   public String createDepartment(Department department) throws RemoteException {
-    ResultSet resultSet = this.query("INSERT INTO Department VALUES ("
+    ResultSet resultSet = query("INSERT INTO department VALUES ("
       + "'" + department.name + "'"
       + ", '" + department.facultyName + "'"
       + ")"
     );
-    
+        
     if (resultSet == null) return null;
     return department.name;
   }
 
   public String updateFaculty(Faculty faculty, Faculty newFaculty) throws RemoteException {
-    ResultSet resultSet = this.query("UPDATE Faculty"
+    ResultSet resultSet = query("UPDATE faculty"
   	  + " SET name = '" + newFaculty.name + "'"
       + " WHERE name = '" + faculty.name + "'"
     );
-    
+      
     if (resultSet == null) return null;
     return newFaculty.name;
   }
   
-  public void updateDepartment(Department department, Department newDepartment) {
-    this.query("UPDATE Department SET"
+  public String updateDepartment(Department department, Department newDepartment) {
+    ResultSet resultSet = query("UPDATE department SET"
       + " name = '" + newDepartment.name + "'"
-      + ", facultyName = '" + newDepartment.facultyName + "'"
+      + ", faculty_name = '" + newDepartment.facultyName + "'"
       + " WHERE name = '" + department.name + "'"
     );
+        
+    if (resultSet == null) return null;
+    return newDepartment.name;
   }
 
   public void removeFaculty(String name) throws RemoteException {  
-    this.query("DELETE FROM Faculty WHERE name = '" + name + "'");
+    query("DELETE FROM faculty WHERE name = '" + name + "'");
   }
   
   public void removeDepartment(String name) throws RemoteException {
-    this.query("DELETE FROM Department WHERE name = '" + name + "'");
+    query("DELETE FROM department WHERE name = '" + name + "'");
   }
 
   public ArrayList < Faculty > listFaculties() throws RemoteException {
     ArrayList < Faculty > faculties = new ArrayList < Faculty > ();
-    ResultSet resultSet = this.query("SELECT name FROM Faculty");
+    ResultSet resultSet = query("SELECT name FROM faculty");
     
     try {
       while (resultSet.next()) {
@@ -293,7 +296,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
         );
       }
     } catch (SQLException e) {
-      System.out.println("Error on listFaculties(): " + e);
+      System.out.println("Error at listFaculties(): " + e);
       return new ArrayList<Faculty>();
     }
 
@@ -303,23 +306,23 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList < Department > listDepartments(String facultyName) throws RemoteException {
     ArrayList < Department > departments = new ArrayList < Department > ();    
     
-    ResultSet resultSet = this.query(
-	  "SELECT name, facultyName"
-	  + " FROM Department "
-	  + " WHERE faculty = '" + facultyName + "'"
+    ResultSet resultSet = query(
+	  "SELECT name, faculty_name"
+	  + " FROM department "
+	  + " WHERE faculty_name = '" + facultyName + "'"
     );
-    
+        
     try {
       while (resultSet.next()) {
         departments.add(
           new Department(
             resultSet.getString("name"),
-            resultSet.getString("facultyName")
+            resultSet.getString("faculty_name")
           )
         );
       }
     } catch (SQLException e) {
-      System.out.println("Error on listDepartments(): " + e);
+      System.out.println("Error at listDepartments(): " + e);
       return new ArrayList<Department>();
     }
 
@@ -327,35 +330,43 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   }
 
   public int createElection(Election election) throws RemoteException {
-    ResultSet resultSet = this.query("INSERT INTO Election VALUES ("
-      + " (SELECT MAX(id)+1 as newID from Election)"
-      + ", '" + election.name + "'"
-      + ", '" + election.description + "'"
-      + ", '" + election.type + "'"
-      + ", '" + election.subtype + "'"
-      + ", '" + electionDateFormat.format(election.start) + "'"
-      + ", '" + electionDateFormat.format(election.end) + "'"
-      + ", 0" // blank votes
-      + ", 0" // null votes
-      + "') RETURNING newID"
-     );
-    
-    try {
-    	return resultSet.getInt("newID");
-    } catch(SQLException sqlException) {
-    	System.out.println("Failed to return electionID");
-    	return -1;
-    }
+	int id = -1;
+	ResultSet resultSet = this.query("SELECT election_seq.nextval AS id from dual");
+	
+	try {
+		resultSet.next();
+		id = resultSet.getInt("id");
+	} catch(SQLException sqlException) {
+		System.out.println("Failed to generate election_id");
+		return id;
+	}
+			
+    resultSet = this.query("INSERT INTO Election VALUES ("
+		      + id
+		      + ", '" + election.name + "'"
+		      + ", '" + election.description + "'"
+		      + ", '" + election.type + "'"
+		      + ", '" + election.subtype + "'"
+		      + ", '" + election.start + "'"
+		      + ", '" + election.end + "'"
+		      + ", 0" // votes
+		      + ", 0" // blank votes
+		      + ", 0" // null votes
+		      + ")"
+	);
+        
+    if (resultSet != null) return id;
+    return -1;
   }
 
   public ArrayList < Election > listElections(String type, String subtype) throws RemoteException {
     ArrayList < Election > elections = new ArrayList < Election > ();
     
-    ResultSet resultSet = this.query(
-      "SELECT id, name, description, start, end"
-      + " FROM Election"
-      + " WHERE electionType = '" + type + "'"
-      + " AND electionSubType = '" + subtype + "'"
+    ResultSet resultSet = query(
+      "SELECT id, name, description, started_at, ended_at"
+      + " FROM election"
+      + " WHERE type = '" + type + "'"
+      + " AND subtype = '" + subtype + "'"
     );
     
     try {
@@ -369,14 +380,14 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
               resultSet.getString("description"),
               type,
               subtype,
-              resultSet.getString("start"),
-              resultSet.getString("end")
+              resultSet.getString("started_at"),
+              resultSet.getString("ended_at")
             )
           );
         }
       //}
     } catch (SQLException sqlException) {
-      System.out.println("SQL failure on listElections()");
+      System.out.println("Failed at listElections(): " + sqlException);
       return new ArrayList<Election>();
     }
 
@@ -384,26 +395,34 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   }
 
   public int createVotingList(VotingList votingList) throws RemoteException {
-    ResultSet resultSet = this.query("INSERT INTO VotingList VALUES ("
-      + " (SELECT MAX(id)+1 as newID from VotingList)"
-      + ", '" + votingList.name + "'"
+	int id = -1;
+	ResultSet resultSet = this.query("SELECT voting_list_seq.nextval AS id FROM dual");
+	
+	try {
+		resultSet.next();
+		id = resultSet.getInt("id");
+	} catch (SQLException sqlException) {
+		System.out.println("Failed to generate voting_list_id");
+		return id;
+	}
+	
+    resultSet = this.query("INSERT INTO voting_list VALUES ("
+      + id
       + ", " + votingList.electionID
-      + ") RETURNING newID"
+      + ", '" + votingList.name + "'"
+      + ", 0"
+      + ")"
     );
-    
-    try {
-    	return resultSet.getInt("newID");
-    } catch(SQLException sqlException) {
-    	System.out.println("Failed to return votingListID");
-    	return -1;
-    }
+                
+    if (resultSet != null) return id;
+    return -1;
   }
 
   public ArrayList < VotingList > listVotingLists(int electionID) throws RemoteException {
     ArrayList < VotingList > votingLists = new ArrayList < VotingList > ();
         
-    ResultSet resultSet = this.query("SELECT id, name FROM VotingList"
-      + " WHERE electionID = " + electionID
+    ResultSet resultSet = query("SELECT id, name FROM voting_list"
+      + " WHERE election_id = " + electionID
     );
     
     try {
@@ -417,7 +436,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     	  );
       }
     } catch (Exception e) {
-      System.out.println("Error on listLists(): " + e);
+      System.out.println("Falied at listLists(): " + e);
       return null;
     }
 
@@ -425,16 +444,16 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   }
 
   public void removeVotingList(int id) throws RemoteException {	
-	  this.query("DELETE FROM VotingList WHERE listID = " + id + ")");
+	  query("DELETE FROM voting_list WHERE id = " + id + ")");
   }
 
   public ArrayList < Person > listCandidates(int votingListID) throws RemoteException {
     ArrayList < Person > candidates = new ArrayList < Person > ();
 
-    ResultSet resultSet = this.query(
-      "SELECT cc, type, name, password, address, number, phone, ccExpire, departmentName FROM Person"
-      + " WHERE cc in ( SELECT personCC FROM VotingListMember"
-        + " WHERE votingListID = " + votingListID + " )"
+    ResultSet resultSet = query(
+      "SELECT cc, type, name, password, address, num, phone, cc_expire, department_name FROM person"
+      + " WHERE cc in ( SELECT person_cc FROM voting_list_member"
+        + " WHERE voting_list_id = " + votingListID + " )"
     );
 
     try {
@@ -446,15 +465,15 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
         	resultSet.getString("name"),
         	resultSet.getString("password"),
         	resultSet.getString("address"),
-            resultSet.getInt("number"),
+            resultSet.getInt("num"),
             resultSet.getInt("phone"),
-            resultSet.getString("ccExpire"),
-            resultSet.getString("departmentName")  
+            resultSet.getString("cc_expire"),
+            resultSet.getString("department_name")  
           )
         );
       }
     } catch (Exception e) {
-      System.out.println("Error on listCandidates(): " + e);
+      System.out.println("Failed at listCandidates(): " + e);
     }
 
     return candidates;
@@ -462,40 +481,46 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 
   // Do candidates need an id?
   public int addCandidate(int votingListID, int personCC) throws RemoteException {
-    ResultSet resultSet = this.query("INSERT INTO VotingListMembers VALUES ("
+    ResultSet resultSet = query("INSERT INTO voting_list_member VALUES ("
       + personCC + ", " + votingListID + ")"
     );
     
     if (resultSet == null) return -1;
-    return 0;
+    return personCC;
   }
 
   public void removeCandidate(int votingListID, int personCC) throws RemoteException {
-	this.query("DELETE FROM VotingListMembers"
-      + " WHERE listID = " + votingListID
-      + " AND personCC = " + personCC
-      + ")"
+	this.query("DELETE FROM voting_list_member"
+      + " WHERE voting_list_id = " + votingListID
+      + " AND person_cc = " + personCC
     );
   }
 
   public int createVotingTable(VotingTable votingTable) throws RemoteException {
-    ResultSet resultSet = this.query("INSERT INTO votingTable VALUES ("
-      + " ( SELECT MAX(id)+1 as newID FROM VotingTable )"
+	int id = -1;
+	ResultSet resultSet = this.query("SELECT voting_table_se.nextval AS id FROM dual");
+	
+	try {
+		resultSet.next();
+		id = resultSet.getInt("id");
+	} catch (SQLException sqlException) {
+		System.out.println("Failed to generate voting_table_id");
+		return id;
+	}
+	  
+    resultSet = this.query("INSERT INTO voting_table VALUES ("
+      + id
       + ", " + votingTable.electionID
       + ", '" + votingTable.departmentName + "'"
-      + ") RETURNING newID"
+      + ")"
     );
     
-    try {
-    	return resultSet.getInt("newID");
-    } catch(SQLException sqlException) {
-    	System.out.println("Failed to return votingTableID");
-    	return -1;
-    }
+    if (resultSet != null) return id;
+    return -1;
   }
 
   public void removeVotingTable(int id) throws RemoteException {	  
-    this.query("DELETE FROM VotingTable"
+    this.query("DELETE FROM voting_table"
       + " WHERE id = " + id
       + ")"
     );
@@ -504,8 +529,8 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList < VotingTable > listVotingTables(int electionID) throws RemoteException {
     ArrayList < VotingTable > votingTables = new ArrayList < VotingTable > ();
     
-    ResultSet resultSet = this.query("SELECT id, departmentName FROM VotingTable"
-      + " WHERE electionID = " + electionID
+    ResultSet resultSet = query("SELECT id, department_name FROM voting_table"
+      + " WHERE election_id = " + electionID
     );
     
     try {
@@ -514,12 +539,12 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     	  new VotingTable(
     	    resultSet.getInt("id"), 
     		electionID,
-    		resultSet.getString("departmentName")
+    		resultSet.getString("department_name")
     	  )
     	);
       }
     } catch (Exception e) {
-      System.out.println("Error on listLists(): " + e);
+      System.out.println("Failed at listLists(): " + e);
       new ArrayList < VotingTable > ();
     }
 
@@ -553,20 +578,20 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   
   public void voteElection(int electionID, int type) {
 	if (type == 0) {
-		this.query("UPDATE Election"
-		  + " SET blankVotes = ( SELECT blankVotes FROM Election"
+		query("UPDATE election"
+		  + " SET blank_votes = ( SELECT blank_votes FROM election"
 		    + " WHERE id = " + electionID + " ) + 1"
 		  + " WHERE id = " + electionID
-		);
+		);		
 	} else if (type == 1) {
-		this.query("UPDATE Election"
-		  + " SET nullVotes = ( SELECT nullVotes FROM Election"
+		query("UPDATE election"
+		  + " SET null_votes = ( SELECT null_votes FROM election"
 		    + " WHERE id = " + electionID + " ) + 1"
 		  + " WHERE id = " + electionID
 		);
 	} else if (type == 2) {
-		this.query("UDPATE Election"
-		  + "SET votes = ( SELECT votes FROM Election"
+		query("UDPATE election"
+		  + "SET votes = ( SELECT votes FROM election"
 		   + " WHERE id = " + electionID + " ) + 1"
 		  + " WHERE id = " + electionID
 		);
@@ -574,20 +599,20 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   }
   
   public boolean voteVotingList(int electionID, String votingList) {
-    ResultSet resultSet = this.query("UPDATE VotingList"
-      + "SET votes = ( SELECT votes FROM VotingList"
+    ResultSet resultSet = query("UPDATE voting_list"
+      + "SET votes = ( SELECT votes FROM voting_list"
         + " WHERE name = " + votingList
-        + " AND electionID = " + electionID
+        + " AND election_id = " + electionID
         + " ) + 1"
       + " WHERE name = " + votingList
-      + " AND electionID = " + electionID
+      + " AND election_id = " + electionID
     );
 
     return resultSet != null;
   }
 
-  public void sendLog(VotingLog votingLog) throws RemoteException {
-    this.query("INSERT INTO VotingLog VALUES ("
+  public boolean sendLog(VotingLog votingLog) throws RemoteException {
+    ResultSet resultSet = this.query("INSERT INTO voting_log VALUES ("
       + " " + votingLog.electionID 
       + ", " + votingLog.cc
       + ", " + votingLog.votingTableID
@@ -595,33 +620,33 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
       + " )"
     );
     
-    return;
+   return resultSet != null;
   }
 
   public ArrayList<Result> getResults(int electionID) throws RemoteException {  
 	ArrayList<Result> results = new ArrayList<Result>();
 	  
-    ResultSet electionNonVotingListsVotes = this.query(
-      "SELECT votes, blankVotes, nullVotes FROM Election"
+    ResultSet electionNonVotingListsVotes = query(
+      "SELECT votes, blank_votes, null_votes FROM election"
       + " WHERE id = " + electionID
     );
     
     try {
 	    results.add(
-	      new Result("Branco", electionNonVotingListsVotes.getInt("blankVotes"))
+	      new Result("Branco", electionNonVotingListsVotes.getInt("blank_votes"))
 	    );
 	    
 	    results.add(
-  	      new Result("Nulo", electionNonVotingListsVotes.getInt("nullVotes"))
+  	      new Result("Nulo", electionNonVotingListsVotes.getInt("null_votes"))
   	    );
     } catch (SQLException sqlException) {
     	return results;
     }
     
-    ResultSet electionVotingListsVotes = this.query("SELECT name, votes FROM VotingList"
-      + " WHERE electionID = " + electionID
+    ResultSet electionVotingListsVotes = query("SELECT name, votes FROM voting_list"
+      + " WHERE election_id = " + electionID
     );
-   
+    
     try {
       while (electionVotingListsVotes.next()) {
         results.add(
@@ -632,23 +657,23 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
         );
       }
     } catch (Exception e) {
-      System.out.println("Error in getResults(" + electionID + "): " + e);
+      System.out.println("Failed at getResults(): " + e);
     }
     
     return results;
   }
 
   public Credential getCredentials(int cc) throws RemoteException {
-    ResultSet resultSet = this.query("SELECT number, password FROM Person WHERE cc = " + cc);
+    ResultSet resultSet = query("SELECT num, password FROM person WHERE cc = " + cc);
     
     try {
       if (resultSet.next())
         return new Credential(
-          resultSet.getInt("number"),
+          resultSet.getInt("num"),
           resultSet.getString("password")
         );
     } catch (Exception e) {
-      System.out.println("Error on getCredentials(" + cc + "): " + e);
+      System.out.println("Failed at getCredentials(): " + e);
     }
     
     return null;
@@ -658,7 +683,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     try {
       return database.query(query);
     } catch (Exception exception) {
-      System.out.println("Error on query(" + query + "): " + exception);
+      System.out.println("Failed at query(): " + exception);
       return null;
     }
   }

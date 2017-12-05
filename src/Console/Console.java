@@ -199,7 +199,7 @@ public class Console {
 			buildDepartment(null);
 		}
 		else if ("Zone Department Edit".equals(action)) {
-			editDepartment(null);
+			editDepartment();
 		}
 		else if ("Zone Department Remove".equals(action)) {
 			removeDepartment(null);
@@ -256,7 +256,7 @@ public class Console {
 					subtype = actions[2].split("-")[0];
 				} else subtype = pickDepartment(null);
 				
-				listCandidates(pickVotingList(pickElection(actions[1], subtype)));
+				logCandidates(pickVotingList(pickElection(actions[1], subtype)));
 		}
 		else if ("Election General Student-Election Results".equals(action)
 			|| "Election General Teacher-Election Results".equals(action)
@@ -293,6 +293,17 @@ public class Console {
 			
 			removeVotingTable(pickVotingTable(pickElection(actions[1], subtype)));
 		}
+	}
+	
+	public static void logCandidates(int votingListID) {
+		ArrayList<Person> candidates = listCandidates(votingListID);
+		
+		System.out.println("--------------------\nCandidato | CC\n--------------------");
+		for (Person candidate : candidates) {
+			System.out.println(candidate.name + " | " + candidate.cc);
+		}
+		
+		if (candidates.size() == 0) System.out.println("Lista vazia"); 
 	}
 	
 	public static void removeVotingTable(int votingTableID) {
@@ -452,7 +463,6 @@ public class Console {
 		ArrayList<Person> people = listPeopleOfType(type);
 		int i = 0, opcao;
 		String line;
-		Person ret;
 		
 		System.out.println("--------------------");
 		System.out.println("Escolher membro");
@@ -475,15 +485,14 @@ public class Console {
 			return pickPersonByType(type);
 		}
 
-		ret = people.get(opcao);
-		if (ret == null) {
+		try {
+			return people.get(opcao).cc;
+		} catch(IndexOutOfBoundsException indexOutOfBoundsException) {
 			if (opcao == people.size()) {
 				return buildPerson(type);
 			}
 			System.out.println("Opcao invalida");
 			return pickPersonByType(type);
-		} else {
-			return ret.cc;
 		}
 	}
 	
@@ -688,7 +697,7 @@ public class Console {
 		try {
 			return registry.listCandidates(votingListID);
 		} catch (RemoteException re) {
-			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
+			System.out.println("Falha na obtencao dos candidatos de uma lista.\nA tentar novamente novamente ...");
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ie) {
@@ -829,6 +838,8 @@ public class Console {
 		String description;
 		Date start = null;
 		Date end = null;
+		String started_at = null;
+		String ended_at = null;
 
 		boolean pass;
 		String line;
@@ -847,10 +858,11 @@ public class Console {
 			try {
 				System.out.print("Data inicio (Ex: \"10-01-2005 14:30\"): ");
 				line = System.console().readLine();
-				start = dateFormat.parse(line);
+				start = electionDateFormat.parse(line);
+				started_at = electionDateFormat.format(start);
 				pass = true;
-	    } catch(ParseException pe) {
-	      System.out.println("Data invalida");
+			} catch(ParseException pe) {
+				System.out.println("Data invalida");
 				pass = false;
 			}
 		} while (!pass);
@@ -859,14 +871,15 @@ public class Console {
 			try {
 				System.out.print("Data fim (Ex: \"10-01-2005 14:30\"): ");
 				line = System.console().readLine();
-				end = dateFormat.parse(line);
+				end = electionDateFormat.parse(line);
 				if (end.compareTo(start) <= 0) {
-					System.out.println("A data tem que ser depois de " + dateFormat.format(start));
+					System.out.println("A data tem que ser depois de " + electionDateFormat.format(start));
 					pass = false;
 				} else pass = true;
+				ended_at = electionDateFormat.format(end);
 		    } catch(ParseException e) {
 		      System.out.println("Data invalida");
-					pass = false;
+		      pass = false;
 			}
 		} while (!pass);
 		
@@ -876,8 +889,8 @@ public class Console {
 			description,
 			type, 
 			subtype, 
-			electionDateFormat.format(start), 
-			electionDateFormat.format(end)
+			started_at, 
+			ended_at
 		  )
 		);
 	}
@@ -892,30 +905,45 @@ public class Console {
 		return createElection(election);
 	}
 
-	public static Department editDepartment(Department department) {
-		String line;
-		String name = department.name;
-		String facultyName = department.facultyName;
+	public static void editDepartment() {
+		String line, newName, name, facultyName, newFacultyName;
+		facultyName = pickFaculty();
+		newFacultyName = facultyName;
+		name = pickDepartment(facultyName);
+		newName = name;
 
 		System.out.println("----------");
-		System.out.println("Nome: " + department.name);
+		System.out.println("Nome: " + name);
 		System.out.print("Editar? [s/N]: ");
 
 		line = System.console().readLine();
 		if (line.equals("s")) {
 			System.out.print("Novo nome: ");
-			name = System.console().readLine();
+			newName = System.console().readLine();
 		}
 
-		System.out.println("Faculdade: " + department.facultyName);
+		System.out.println("Faculdade: " + facultyName);
 		System.out.print("Editar? [s/N]: ");
 
 		line = System.console().readLine();
 		if (line.equals("s")) {
-			facultyName = pickFaculty();
+			newFacultyName = pickFaculty();
 		}
 		
-		return new Department(name, facultyName);
+		updateDepartment(
+		  new Department(name, facultyName),
+		  new Department(newName, newFacultyName)
+		);
+	}
+	
+	public static void updateDepartment(Department department, Department newDepartment) {
+		try {
+			registry.updateDepartment(department, newDepartment);
+			return;
+		} catch(RemoteException remoteException) {
+			System.out.println("Edicao de departamento falhada. A tentar novamente...");
+		}
+		updateDepartment(department, newDepartment);
 	}
 
 	public static String editFaculty(String name) {
@@ -1051,9 +1079,11 @@ public class Console {
 	}
 
 	public static String pickDepartment(String facultyName) {
+		if (facultyName == null) facultyName = pickFaculty();
+		
 		ArrayList<Department> departments = listDepartments(facultyName);
 		Department ret;
-		
+				
 		int i = 0;
 		int opcao;
 		String line;
@@ -1093,14 +1123,10 @@ public class Console {
 	}
 
 	public static ArrayList<Department> listDepartments(String facultyName) {
-		if (facultyName == null) {
-			facultyName = pickFaculty();
-		}
-				
 		try {
 			 return registry.listDepartments(facultyName);
 		} catch (RemoteException re) {
-			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
+			System.out.println("Obtencao de departamentos falhada.\nA tentar novamente novamente ...");
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ie) {
@@ -1119,7 +1145,7 @@ public class Console {
 		}
 
 		System.out.println("--------------------");
-		System.out.println("Criar departmento\nFaculdade " + facultyName);
+		System.out.println("Criar departmento na faculdade " + facultyName);
 		System.out.println("--------------------");
 
 		System.out.print("Nome: ");

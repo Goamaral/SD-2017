@@ -17,7 +17,6 @@ class OracleCon {
             if(showLogs)
                 System.out.println("Connected to Oracle Database");
             stmt = con.createStatement();
-
         }catch(Exception e){ 
             if(showLogs)
                 System.out.println(e);
