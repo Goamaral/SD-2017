@@ -5,6 +5,7 @@ import java.net.*;
 import java.rmi.registry.*;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.text.*;
 
 public class DataServer extends UnicastRemoteObject implements DataServerInterface {
@@ -135,7 +136,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 	    ResultSet resultSet = query(
 	      "SELECT cc, type, name, password, address, num, phone, cc_expire"
 	      + " FROM person"
-	      + " WHERE department_name = " + departmentName
+	      + " WHERE department_name = '" + departmentName + "' AND type = 'Student'"
 	    );
 	    
 	    try {
@@ -201,6 +202,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     );
         
     try {
+      resultSet.next();
 	   return new Election(
 	      id,
 	      resultSet.getString("name"),
@@ -362,7 +364,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList < Election > listElections(String type, String subtype) throws RemoteException {
     ArrayList < Election > elections = new ArrayList < Election > ();
     
-    ResultSet resultSet = query(
+    ResultSet resultSet = this.query(
       "SELECT id, name, description, started_at, ended_at"
       + " FROM election"
       + " WHERE type = '" + type + "'"
@@ -371,8 +373,15 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     
     try {
       while (resultSet.next()) {
-        //Date eventEndDate = dateFormat.parse(resultSet.getString("electionEnd"));
-        //if (eventEndDate.compareTo(new Date()) >= 0) { // if still running
+    	Date eventEndDate = new Date();
+    	
+    	try {
+    		electionDateFormat.parse(resultSet.getString("ended_at"));
+    	} catch (ParseException parseException) {
+    		System.out.println("Failed to get election end: " + parseException);
+    	}
+    	
+        if (eventEndDate.compareTo(new Date()) >= 0) { // if still running
           elections.add(
             new Election(
               resultSet.getInt("id"),
@@ -385,7 +394,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
             )
           );
         }
-      //}
+      }
     } catch (SQLException sqlException) {
       System.out.println("Failed at listElections(): " + sqlException);
       return new ArrayList<Election>();
@@ -444,7 +453,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   }
 
   public void removeVotingList(int id) throws RemoteException {	
-	  query("DELETE FROM voting_list WHERE id = " + id + ")");
+	  this.query("DELETE FROM voting_list WHERE id = " + id);
   }
 
   public ArrayList < Person > listCandidates(int votingListID) throws RemoteException {
@@ -498,7 +507,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 
   public int createVotingTable(VotingTable votingTable) throws RemoteException {
 	int id = -1;
-	ResultSet resultSet = this.query("SELECT voting_table_se.nextval AS id FROM dual");
+	ResultSet resultSet = this.query("SELECT voting_table_seq.nextval AS id FROM dual");
 	
 	try {
 		resultSet.next();
@@ -520,16 +529,13 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   }
 
   public void removeVotingTable(int id) throws RemoteException {	  
-    this.query("DELETE FROM voting_table"
-      + " WHERE id = " + id
-      + ")"
-    );
+    this.query("DELETE FROM voting_table WHERE id = " + id);
   }
 
   public ArrayList < VotingTable > listVotingTables(int electionID) throws RemoteException {
     ArrayList < VotingTable > votingTables = new ArrayList < VotingTable > ();
     
-    ResultSet resultSet = query("SELECT id, department_name FROM voting_table"
+    ResultSet resultSet = this.query("SELECT id, department_name FROM voting_table"
       + " WHERE election_id = " + electionID
     );
     
@@ -613,7 +619,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 
   public boolean sendLog(VotingLog votingLog) throws RemoteException {
     ResultSet resultSet = this.query("INSERT INTO voting_log VALUES ("
-      + " " + votingLog.electionID 
+      + " " + votingLog.election.id 
       + ", " + votingLog.cc
       + ", " + votingLog.votingTableID
       + ", " + electionDateFormat.format(votingLog.date)
@@ -626,38 +632,40 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList<Result> getResults(int electionID) throws RemoteException {  
 	ArrayList<Result> results = new ArrayList<Result>();
 	  
-    ResultSet electionNonVotingListsVotes = query(
+    ResultSet resultSet = this.query(
       "SELECT votes, blank_votes, null_votes FROM election"
       + " WHERE id = " + electionID
     );
     
     try {
+    	resultSet.next();
 	    results.add(
-	      new Result("Branco", electionNonVotingListsVotes.getInt("blank_votes"))
+	      new Result("Branco", resultSet.getInt("blank_votes"))
 	    );
 	    
 	    results.add(
-  	      new Result("Nulo", electionNonVotingListsVotes.getInt("null_votes"))
+  	      new Result("Nulo", resultSet.getInt("null_votes"))
   	    );
     } catch (SQLException sqlException) {
+    	System.out.println("Failed to get results from election: " + sqlException);
     	return results;
     }
     
-    ResultSet electionVotingListsVotes = query("SELECT name, votes FROM voting_list"
+    resultSet = this.query("SELECT name, votes FROM voting_list"
       + " WHERE election_id = " + electionID
     );
     
     try {
-      while (electionVotingListsVotes.next()) {
+      while (resultSet.next()) {
         results.add(
           new Result(
-            electionVotingListsVotes.getString("name"),
-            electionVotingListsVotes.getInt("votes")
+    		  resultSet.getString("name"),
+    		  resultSet.getInt("votes")
           )
         );
       }
     } catch (Exception e) {
-      System.out.println("Failed at getResults(): " + e);
+      System.out.println("Failed to get results from voting lists(): " + e);
     }
     
     return results;
@@ -677,6 +685,40 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     }
     
     return null;
+  }
+	
+  public ArrayList<VotingTable> getVotingTables(String departmentName, int cc) throws RemoteException {
+    ArrayList<VotingTable> votingTables = new ArrayList<VotingTable>();
+    
+	ResultSet resultSet = this.query("SELECT id, election_id, department_name"
+      + " FROM voting_table"
+      + " WHERE election_id IN ("
+        + " (SELECT id FROM election WHERE type = 'Nucleous' AND subtype = ("
+        	+ " SELECT '" + departmentName + "' from person INTERSECT SELECT department_name FROM person WHERE cc = " + cc
+        	+ " )"
+        + " UNION"
+        + " SELECT id FROM election WHERE type = 'General'"
+          + " AND subtype = ( SELECT type FROM person WHERE cc = " + cc + " )"
+        + " ) MINUS ( SELECT election_id FROM voting_log WHERE person_cc = " + cc + " )"
+      + " )"
+    );
+    
+    try {
+		while(resultSet.next()) {
+			votingTables.add(
+			  new VotingTable(
+			    resultSet.getInt("id"), 
+			    resultSet.getInt("election_id"),
+			    resultSet.getString("department_name")
+			  )
+			);
+		}
+	} catch (SQLException sqlException) {
+		System.out.println("Failed at getVotingTables(): " + sqlException);
+		return new ArrayList<VotingTable>();
+	}
+    
+    return votingTables;
   }
 
   public ResultSet query(String query) {

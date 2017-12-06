@@ -34,7 +34,7 @@ public class Console {
 		menuTable.put("Election", new Menu(menuElection, menuElectionTypes));
 
 		String[] menuNucleus = { "Criar", "Listas", "Mesas de Voto", "Resultados" };
-		String[] menuNucleusTypes = { "Add", "Votinglist", "VotingTable", "Results" };
+		String[] menuNucleusTypes = { "Add", "VotingList", "VotingTable", "Results" };
 		menuTable.put("Nucleus", new Menu(menuNucleus, menuNucleusTypes));
 
 		String[] menuGeneral = { "Estudante", "Docente", "Funcionario" };
@@ -45,9 +45,9 @@ public class Console {
 		menuTable.put("Teacher-Election", new Menu(menuNucleus, menuNucleusTypes));
 		menuTable.put("Employee-Election", new Menu(menuNucleus, menuNucleusTypes));
 
-		String[] menuVotinglist = { "Candidatos", "Criar", "Remover" };
-		String[] menuVotinglistTypes = { "Candidate", "Create", "Remove" };
-		menuTable.put("Votinglist", new Menu(menuVotinglist, menuVotinglistTypes));
+		String[] menuVotingList = { "Candidatos", "Criar", "Remover" };
+		String[] menuVotingListTypes = { "Candidate", "Create", "Remove" };
+		menuTable.put("VotingList", new Menu(menuVotingList, menuVotingListTypes));
 
 		String[] menuCandidate = { "Adicionar", "Remover", "Listar" };
 		String[] menuCandidateTypes = { "Add", "Remove", "Log" };
@@ -176,7 +176,7 @@ public class Console {
 	public static void executeAction(String action) {
 		String[] actions = action.split(" ");
 		String subtype, departmentName;
-		int votingListID, personCC;
+		int votingListID, personCC, electionID;
 
 		if (debug) System.out.println("ACTION " + action);
 				
@@ -215,14 +215,14 @@ public class Console {
 
 			buildElection(actions[1], subtype);
 		}
-		else if ("Election General Student-Election Votinglist Candidate Add".equals(action)
-			|| "Election General Teacher-Election Votinglist Candidate Add".equals(action)
-			|| "Election General Employee-Election Votinglist Candidate Add".equals(action)
-			|| "Election General Student-Election Votinglist Candidate Remove".equals(action)
-			|| "Election General Teacher-Election Votinglist Candidate Remove".equals(action)
-			|| "Election General Employee-Election Votinglist Candidate Remove".equals(action)
-			|| "Election Nucleus Candidate Add".equals(action)
-			|| "Election Nucleus Candidate Remove".equals(action)
+		else if ("Election General Student-Election VotingList Candidate Add".equals(action)
+			|| "Election General Teacher-Election VotingList Candidate Add".equals(action)
+			|| "Election General Employee-Election VotingList Candidate Add".equals(action)
+			|| "Election General Student-Election VotingList Candidate Remove".equals(action)
+			|| "Election General Teacher-Election VotingList Candidate Remove".equals(action)
+			|| "Election General Employee-Election VotingList Candidate Remove".equals(action)
+			|| "Election Nucleus VotingList Candidate Add".equals(action)
+			|| "Election Nucleus VotingList Candidate Remove".equals(action)
 		) {
 			if (actions.length == 6) {
 				subtype = actions[2].split("-")[0];
@@ -240,17 +240,31 @@ public class Console {
 				removeCandidate(votingListID, pickCandidate(votingListID));
 			}
 		}
-		else if ("Election General Student-Election Votinglist Create".equals(action)
-			|| "Election General Teacher-Election Votinglist Create".equals(action)
-			|| "Election General Employee-Election Votinglist Create".equals(action)
+		else if ("Election General Student-Election VotingList Create".equals(action)
+			|| "Election General Teacher-Election VotingList Create".equals(action)
+			|| "Election General Employee-Election VotingList Create".equals(action)
+			|| "Election General Student-Election VotingList Remove".equals(action)
+			|| "Election General Teacher-Election VotingList Remove".equals(action)
+			|| "Election General Employee-Election VotingList Remove".equals(action)
+			|| "Election Nucleus VotingList Create".equals(action)
+			|| "Election Nucleus VotingList Remove".equals(action)
 		) {
-			subtype = actions[2].split("-")[0];
-			buildVotingList(pickElection(actions[1], subtype));
+			if (actions.length == 5) {
+				subtype = actions[2].split("-")[0];
+			} else subtype = pickDepartment(null);
+			
+			electionID = pickElection(actions[1], subtype);
+									
+			if (actions[actions.length-1].equals("Create")) {
+				buildVotingList(electionID);
+			} else {
+				removeVotingList(pickVotingList(electionID));
+			}
 		}
-		else if ("Election General Student-Election Votinglist Candidate Log".equals(action)
-			|| "Election General Teacher-Election Votinglist Candidate Log".equals(action)
-			|| "Election General Employee-Election Votinglist Candidate Log".equals(action)
-			|| "Election Nucleus Candidate Log".equals(action)
+		else if ("Election General Student-Election VotingList Candidate Log".equals(action)
+			|| "Election General Teacher-Election VotingList Candidate Log".equals(action)
+			|| "Election General Employee-Election VotingList Candidate Log".equals(action)
+			|| "Election Nucleus VotingList Candidate Log".equals(action)
 		) {
 				if (actions.length == 6) {
 					subtype = actions[2].split("-")[0];
@@ -267,7 +281,7 @@ public class Console {
 					subtype = actions[2].split("-")[0];
 				} else subtype = pickDepartment(null);
 				
-				listResults(pickElection(actions[1], subtype));
+				logResults(pickElection(actions[1], subtype));
 		}
 		else if ("Election General Student-Election VotingTable Add".equals(action)
 			|| "Election General Teacher-Election VotingTable Add".equals(action)
@@ -289,10 +303,30 @@ public class Console {
 		) {
 			if (actions.length == 5) {
 				subtype = actions[2].split("-")[0];
-			} subtype = pickDepartment(null);
+			} else subtype = pickDepartment(null);			
 			
 			removeVotingTable(pickVotingTable(pickElection(actions[1], subtype)));
 		}
+	}
+	
+	public static void logResults(int electionID) {
+		ArrayList<Result> results = listResults(electionID);
+		
+		System.out.println("--------------------\nResultados da eleicao\n--------------------");
+		for (Result result : results) {
+			System.out.println(result.votingListName + " " + result.votes);
+		}
+	}
+	
+	public static void removeVotingList(int votingListID) {
+		try {
+			registry.removeVotingList(votingListID);
+			return;
+		} catch (RemoteException remoteException) {
+			System.out.println("Remocao de lista falhada\nA tentar novamente...");
+		}
+		
+		removeVotingList(votingListID);
 	}
 	
 	public static void logCandidates(int votingListID) {
@@ -547,19 +581,19 @@ public class Console {
 		removeFaculty(name);
 	}
 
-	public static void listResults(int electionID) {
-		ArrayList<Result> results = null;
-
+	public static ArrayList<Result> listResults(int electionID) {
 		try {
-			results = registry.getResults(electionID);
-		} catch (RemoteException re) {
-			System.out.println("Falha na ligacao ao servidor.\nA tentar novamente novamente ...");
-			listResults(electionID);
+			return registry.getResults(electionID);
+		} catch (RemoteException remoteException) {
+			System.out.println("Falha na obtencao de resultados de eleicao.\nA tentar novamente novamente ...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
-		for (Result result : results) {
-			System.out.println(result.votingListName + ": " + result.votes);
-		}
+		return listResults(electionID);
 	}
 
 	public static int pickVotingTable(int electionID) {

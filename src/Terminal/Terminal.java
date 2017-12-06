@@ -58,9 +58,6 @@ public class Terminal {
 							list.add(i, response.get("item_" + i));
 						}
 
-						list.add("Nulo");
-						list.add("Branco");
-
 						opcao = selector(list, "Vote numa lista");
 
 						writeSocket("type|vote;list|" + list.get(opcao));
@@ -75,7 +72,6 @@ public class Terminal {
 	public static int selector(ArrayList<String> list, String title) {
 		int i = 0;
 		int opcao;
-		Scanner scanner = new Scanner(System.in);
 		String line;
 
 		System.out.println("--------------------");
@@ -88,9 +84,7 @@ public class Terminal {
 		}
 
 		System.out.print("Opcao: ");
-		line = scanner.nextLine();
-
-		scanner.close();
+		line = System.console().readLine();
 		
 		try {
 			opcao = Integer.parseInt(line);
@@ -149,16 +143,12 @@ public class Terminal {
 	}
 
 	public static void auth() {
-		Scanner scanner = new Scanner(System.in);
-
 		System.out.print("Numero estudante: ");
-		username = scanner.nextLine();
+		username = System.console().readLine();
 
 		System.out.print("Password: ");
-		password = scanner.nextLine();
+		password = System.console().readLine();
 		
-		scanner.close();
-
 		writeSocket("type|login;username|" + username + ";password|" + password);
 	}
 

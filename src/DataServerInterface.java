@@ -25,7 +25,6 @@ public interface DataServerInterface extends Remote {
 	public int createElection(Election election) throws RemoteException;
 	public Election getElection(int id) throws RemoteException;
 	public ArrayList<Election> listElections(String type, String subtype) throws RemoteException;
-	//public ArrayList<Election> listElections(Department department, int cc) throws RemoteException;
 	
 	// VotingList
 	public int createVotingList(VotingList votingList) throws RemoteException;
@@ -41,7 +40,8 @@ public interface DataServerInterface extends Remote {
 	public int createVotingTable(VotingTable votingTable) throws RemoteException;
 	public void removeVotingTable(int id) throws RemoteException;
 	public ArrayList < VotingTable > listVotingTables(int electionID) throws RemoteException;
-
+	public ArrayList<VotingTable> getVotingTables(String departmentName, int cc) throws RemoteException;
+	
 	// VotingLog
 	public boolean sendLog(VotingLog log) throws RemoteException;
 	
