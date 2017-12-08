@@ -5,7 +5,6 @@ import java.net.*;
 import java.rmi.registry.*;
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 import java.text.*;
 
 public class DataServer extends UnicastRemoteObject implements DataServerInterface {
@@ -364,36 +363,24 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList < Election > listElections(String type, String subtype) throws RemoteException {
     ArrayList < Election > elections = new ArrayList < Election > ();
     
-    ResultSet resultSet = this.query(
-      "SELECT id, name, description, started_at, ended_at"
-      + " FROM election"
-      + " WHERE type = '" + type + "'"
-      + " AND subtype = '" + subtype + "'"
+	ResultSet resultSet = this.query(
+      "SELECT id, name, description, started_at, ended_at FROM election"
+      + " WHERE type = '" + type + "' AND subtype = '" + subtype + "'"
     );
     
     try {
       while (resultSet.next()) {
-    	Date eventEndDate = new Date();
-    	
-    	try {
-    		electionDateFormat.parse(resultSet.getString("ended_at"));
-    	} catch (ParseException parseException) {
-    		System.out.println("Failed to get election end: " + parseException);
-    	}
-    	
-        if (eventEndDate.compareTo(new Date()) >= 0) { // if still running
-          elections.add(
-            new Election(
-              resultSet.getInt("id"),
-              resultSet.getString("name"),
-              resultSet.getString("description"),
-              type,
-              subtype,
-              resultSet.getString("started_at"),
-              resultSet.getString("ended_at")
-            )
-          );
-        }
+        elections.add(
+          new Election(
+            resultSet.getInt("id"),
+            resultSet.getString("name"),
+            resultSet.getString("description"),
+            type,
+            subtype,
+            resultSet.getString("started_at"),
+            resultSet.getString("ended_at")
+          )
+        );
       }
     } catch (SQLException sqlException) {
       System.out.println("Failed at listElections(): " + sqlException);
@@ -596,8 +583,8 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		  + " WHERE id = " + electionID
 		);
 	} else if (type == 2) {
-		query("UDPATE election"
-		  + "SET votes = ( SELECT votes FROM election"
+		query("UPDATE election"
+		  + " SET votes = ( SELECT votes FROM election"
 		   + " WHERE id = " + electionID + " ) + 1"
 		  + " WHERE id = " + electionID
 		);
@@ -606,11 +593,11 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   
   public boolean voteVotingList(int electionID, String votingList) {
     ResultSet resultSet = query("UPDATE voting_list"
-      + "SET votes = ( SELECT votes FROM voting_list"
-        + " WHERE name = " + votingList
+      + " SET votes = ( SELECT votes FROM voting_list"
+        + " WHERE name = '" + votingList + "'"
         + " AND election_id = " + electionID
         + " ) + 1"
-      + " WHERE name = " + votingList
+      + " WHERE name = '" + votingList + "'"
       + " AND election_id = " + electionID
     );
 
@@ -622,7 +609,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
       + " " + votingLog.election.id 
       + ", " + votingLog.cc
       + ", " + votingLog.votingTableID
-      + ", " + electionDateFormat.format(votingLog.date)
+      + ", '" + electionDateFormat.format(votingLog.date) + "'"
       + " )"
     );
     
@@ -690,17 +677,17 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList<VotingTable> getVotingTables(String departmentName, int cc) throws RemoteException {
     ArrayList<VotingTable> votingTables = new ArrayList<VotingTable>();
     
-	ResultSet resultSet = this.query("SELECT id, election_id, department_name"
-      + " FROM voting_table"
-      + " WHERE election_id IN ("
-        + " (SELECT id FROM election WHERE type = 'Nucleous' AND subtype = ("
-        	+ " SELECT '" + departmentName + "' from person INTERSECT SELECT department_name FROM person WHERE cc = " + cc
-        	+ " )"
-        + " UNION"
-        + " SELECT id FROM election WHERE type = 'General'"
-          + " AND subtype = ( SELECT type FROM person WHERE cc = " + cc + " )"
-        + " ) MINUS ( SELECT election_id FROM voting_log WHERE person_cc = " + cc + " )"
-      + " )"
+	ResultSet resultSet = this.query("SELECT id, election_id, department_name FROM voting_table"
+	  + " WHERE election_id IN ("
+        + "(SELECT id FROM election WHERE type = 'Nucleous' AND subtype ="
+          + "(SELECT UNIQUE '" + departmentName +"' FROM person" 
+            + " INTERSECT SELECT department_name FROM person WHERE cc = " + cc + ")" 
+        + " AND SYSDATE >= to_date(started_at) AND SYSDATE <= to_date(ended_at))"
+        + " UNION SELECT id FROM election WHERE type = 'General' AND subtype ="
+          + "(SELECT type FROM person WHERE cc = " + cc +")"
+          + " AND SYSDATE >= to_date(started_at) AND SYSDATE <= to_date(ended_at)"
+        + " MINUS (SELECT election_id FROM voting_log WHERE person_cc = " + cc +")"
+      + ")"
     );
     
     try {

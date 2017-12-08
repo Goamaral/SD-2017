@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.*;
 
-
-public class VotingLog {
+public class VotingLog implements Serializable {
+	private static final long serialVersionUID = -7810083636809588197L;
 	public Election election;
 	public int cc;
 	public int votingTableID;

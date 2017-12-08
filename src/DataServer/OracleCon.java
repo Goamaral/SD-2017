@@ -17,6 +17,7 @@ class OracleCon {
             if(showLogs)
                 System.out.println("Connected to Oracle Database");
             stmt = con.createStatement();
+            query("alter SESSION set NLS_DATE_FORMAT = 'DD-MM-YYYY HH24:MI'");
         }catch(Exception e){ 
             if(showLogs)
                 System.out.println(e);

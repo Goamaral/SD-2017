@@ -94,11 +94,8 @@ class ServerListener extends Thread {
 	}
 		
 	public void run() {
-		TerminalConnection terminalConnection;
 		int terminalID;
-		Socket terminalSocket;
-		String terminalReference;
-		
+		Socket terminalSocket;		
 		lookupRegistry();
 		createServerSocket();
 		
@@ -112,47 +109,13 @@ class ServerListener extends Thread {
 
 		while(true) {
 			terminalSocket = waitForRequest();
-			terminalReference = new String(
-				terminalSocket.getInetAddress() + ":" + terminalSocket.getPort()
-			);
 
 			synchronized (terminals) {
-				terminalID = findTerminal(terminalReference);
-								
-				if (terminalID != -1) {
-					terminalConnection = terminals.get(terminalID);
-
-					terminalConnection.terminate();
-
-					terminals.set(
-						terminalID,
-						new TerminalConnection(terminalReference, terminalSocket, registry, this.rmiNapper)
-					);
-
-					System.out.println("Terminal " + terminalID + " reconectado (" + terminalReference + ")");
-				} else {
-					terminalID = terminals.size();
-					
-					terminals.add(
-						terminalID,
-						new TerminalConnection(terminalReference, terminalSocket, registry, this.rmiNapper)
-				    );
-
-				  System.out.println("Novo terminal (" + terminalID + ") conectado " + terminalReference);
-				}
+			  terminalID = terminals.size();
+			  terminals.add(new TerminalConnection(this, terminalID, terminalSocket));
+			  System.out.println("Novo terminal (" + terminalID + ") conectado");
 			}
 		}
-	}
-	
-	public int findTerminal(String terminalReference) {
-		TerminalConnection terminalConnection;
-		
-		for (int i = 0; i < terminals.size(); ++i) {
-			terminalConnection = terminals.get(i);
-			if (terminalConnection.reference.equals(terminalReference)) return i;
-		}
-		
-		return -1;
 	}
 
 	public String getLocation() {
@@ -258,22 +221,7 @@ class ServerListener extends Thread {
 	}
 
 	public void lookupRegistry() {
-		try {
-			try {
-				registry = (DataServerInterface)LocateRegistry.getRegistry(portRMI).lookup(referenceRMI);
-				rmiNapper.awake();
-				return;
-			} catch (RemoteException re) {
-				Thread.sleep(1000);
-				rmiNapper.nap();
-			} catch (NotBoundException nbe) {
-				Thread.sleep(1000);
-				rmiNapper.nap();
-			}
-			lookupRegistry();
-		} catch(InterruptedException interruptedException) {
-			System.exit(0);
-		}		
+		rmiNapper.nap();		
 	}
 }
 
@@ -281,9 +229,14 @@ class VotingTableAutentication extends Thread {
 	ArrayList<VotingTable> votingTables;
 	RmiNapper rmiNapper;
 	ServerListener serverListener;
-	boolean terminalAssigned = false;
 
-	public void run() {
+	public void run() {		
+		while(true) {
+			this.cycle();
+		}
+	}
+	
+	public void cycle() {
 		String line;
 		int cc = -1, opcao;
 		Election election = null;
@@ -291,87 +244,76 @@ class VotingTableAutentication extends Thread {
 		boolean pass = false;
 		Credential credentials = null;
 		ArrayList<String> list = new ArrayList<String>();
-		TerminalConnection terminal;
-
-		while (true) { 
-			if (credentials == null) {
-				do {
-					System.out.print("Cartao Cidadao: ");
-					line = System.console().readLine();
-					try {
-						cc = Integer.parseInt(line);
-						if (cc == -1) {
-							pass = false;
-						} else {
-							pass = true;
-						}
-					} catch (Exception e) {
+		TerminalConnection terminal = null;
+		Boolean waitingForTerminal = false;
+		
+		// Auth
+		while (credentials == null) {
+			do {
+				System.out.print("Cartao Cidadao: ");
+				line = System.console().readLine();
+				try {
+					cc = Integer.parseInt(line);
+					if (cc == -1) {
 						pass = false;
+					} else {
+						pass = true;
 					}
-				} while (!pass);
-	
-				credentials = this.getCredentials(cc);
-			}
-
-			if (credentials != null) {
-				this.votingTables = this.getVotingTables(cc);
-				list.clear();
-				
-				if (this.votingTables.size() != 0 && election == null) {
-					System.out.println("id: " + this.votingTables.size());
-					for (VotingTable aux : this.votingTables) {
-						election = getElection(aux.electionID);
-						list.add(election.name);
-					}
-
-					opcao = this.selector(list, "Escolha uma eleicao");
-					votingTable = this.votingTables.get(opcao);
-					
-					election = getElection(votingTable.electionID);
-					
-					synchronized (this.serverListener.terminals) {
-						if (this.serverListener.terminals.size() != 0) {
-							for (int i = 0; i < this.serverListener.terminals.size(); ++i) {
-								terminal = this.serverListener.terminals.get(i);
-								System.out.println("HERE: " + terminal.getState());
-								if (terminal.getState() == Thread.State.WAITING) {
-									terminalAssigned = true;
-									System.out.println("Terminal " + i + " desbloqueado");
-									terminal.credentials = credentials;
-									terminal.election = election;
-									terminal.votingLists = listVotingLists(election.id);
-									terminal.log = new VotingLog(election, cc, votingTable.id);
-									synchronized (terminal.terminalLock) {
-										terminal.terminalLock.notify();
-									}
-									credentials = null;
-									election = null;
-								}
-								
-								if (!terminalAssigned)
-									System.out.println("Nao existem terminais disponiveis de momento, aguarde");
-								
-								terminalAssigned = false;
-							}
-						} else {
-							System.out.println("Nao existem terminais disponiveis de momento, aguarde");
-							try {
-								Thread.sleep(500);
-							} catch (InterruptedException interruptedException) {
-								System.exit(0);
-							}
-						}
-					}
-				} else {
-					if (election == null) {
-						System.out.println("Nao existem eleicoes disponiveis");
-						credentials = null;
+				} catch (Exception e) {
+					pass = false;
+				}
+			} while (!pass);
+			
+			credentials = this.getCredentials(cc);
+			
+			if (credentials == null) System.out.println("Membro nao registado ou credenciais invalidas");
+		}
+		
+		while (terminal == null) {
+			synchronized (this.serverListener.terminals) {
+				for (TerminalConnection terminalConnection : this.serverListener.terminals) {
+					if (terminalConnection.getState() == Thread.State.WAITING) {
+						terminal = terminalConnection;
 					}
 				}
-			} else {
-				System.out.println("Membro nao resgistado");
 			}
+			
+			if (terminal == null && !waitingForTerminal) {
+				System.out.println("Nao existem terminais disponiveis de momento, aguarde...");
+				waitingForTerminal = true;
+			}	
 		}
+		
+		this.votingTables = this.getVotingTables(cc);
+		list.clear();
+		
+		if (this.votingTables.size() != 0) {
+			for (VotingTable aux : this.votingTables) {
+				election = getElection(aux.electionID);
+				list.add(election.name);
+			}
+
+			opcao = this.selector(list, "Escolha uma eleicao");
+			votingTable = this.votingTables.get(opcao);
+			
+			election = getElection(votingTable.electionID);
+			
+			synchronized (this.serverListener.terminals) {
+				System.out.println("Terminal " + terminal.terminalID + " desbloqueado");
+				terminal.credentials = credentials;
+				terminal.election = election;
+				terminal.votingLists = listVotingLists(election.id);
+				terminal.log = new VotingLog(election, cc, votingTable.id);
+				synchronized (terminal.terminalLock) {
+					terminal.terminalLock.notify();
+				}
+				credentials = null;
+				election = null;
+			}
+		} else {
+			System.out.println("Nao existem eleicoes disponiveis");
+		}
+
 	}
 
 	private Election getElection(int electionID) {
@@ -439,8 +381,8 @@ class VotingTableAutentication extends Thread {
 	public Credential getCredentials(int cc) {
 		try {
 			return this.serverListener.registry.getCredentials(cc);
-		} catch (Exception e) {
-			System.out.println("Falha na obtencao de credenciais: " + e);
+		} catch (RemoteException remoteException) {
+			System.out.println("Falha na obtencao de credenciais: " + remoteException);
 			this.rmiNapper.nap();
 		}
 		
@@ -459,23 +401,19 @@ class TerminalConnection extends Thread {
 	boolean end = false;
 	Object lock = new Object();
 	Object terminalLock = new Object();
-	String reference;
 	Credential credentials;
 	DataInputStream in;
 	DataOutputStream out;
-	Socket terminalSocket;
 	boolean locked = true;
-	boolean debug = true;
-	boolean authorized = false;
 	Election election;
 	ArrayList<VotingList> votingLists;
-	DataServerInterface registry;
 	VotingLog log;
-	boolean watcherTimedout = false;
+	boolean watcherTimedout;
 	Object watcherLock = new Object();
-	RmiNapper rmiNapper;
-	Boolean lockDown = false;
 	TerminalWatcher terminalWatcher = null;
+	int terminalID;
+	ServerListener serverListener;
+	Socket terminalSocket;
 
 	public void run() {
 		while(true) {
@@ -487,14 +425,17 @@ class TerminalConnection extends Thread {
 			}
 			
 			this.cycle();
+			// TODO Write logout
+			System.out.println("Terminal " + terminalID + " bloqueado");
 		}
 	}
 	
 	public void cycle() {
-		HashMap<String, String> response;
+		HashMap<String, String> response = null;
 		String query;
 		VotingList votingList;
 		Date date;
+		Boolean authorized = false;
 		
 		synchronized (this.terminalLock) {
 			try {
@@ -503,95 +444,131 @@ class TerminalConnection extends Thread {
 				this.terminate();
 			}
 		}
-
-		this.auth();
 		
-		while(true) {
-			if (this.waitForRequest()) {
-				response = this.parseResponse(this.readSocket());
-				if (response != null) {
-					if (response.get("type").equals("login")) {
-						System.out.println("HERE: " + credentials.username + " " + credentials.password);
-						this.authorized = response.get("username").equals(credentials.username)
-													&& response.get("password").equals(credentials.password);
-						
-						if (this.authorized) {
-							this.writeSocket("type|status;login|sucessful");
-						} else {
-							this.writeSocket("type|status;login|failed");
-						}
-					} else if (this.authorized && response.get("type").equals("vote")) {
-						date = new Date();
-						this.log.date = date;
-						this.sendLog(log);
-						this.sendVote(election.id, response.get("list"));
-						break;
-					} else if (this.authorized && response.get("type").equals("request")) {
-						if (response.get("datatype").equals("list")) {
-							query = "type|item_list;datatype|list;item_count|" + (this.votingLists.size() + 2);
-							query = query + ";item_0|Nulo;item_1|Branco";
-							for (int i = 0; i < this.votingLists.size(); ++i) {
-								votingList = this.votingLists.get(i);
-								query = new String(query + ";item_" + (i + 2) + "|" + votingList.name);
-							}
+		this.watcherTimedout = false;
 
-							this.writeSocket(query);
-						}
-					}
+		// Auth
+		while (response == null) {
+			synchronized (this.watcherLock) {
+				if (this.watcherTimedout) {
+					return;
 				}
-			} else {
-				if (this.lockDown) break;
 			}
+			
+			this.writeSocket("type|status;login|required");
+			
+			response = this.waitForRequest();
+			
+			if (response != null && response.get("type").equals("login")) {
+				authorized = response.get("username").equals(credentials.username)
+								  && response.get("password").equals(credentials.password);
+				
+				if (!authorized) {
+					this.writeSocket("type|status;login|failed");
+					response = null;
+				} else {
+					this.writeSocket("type|status;login|sucessful");
+				}
+			} else response = null;
 		}
 		
-		this.lockDown = false;
-		this.authorized = false;
+		response = null;
+		
+		// Get Elections
+		while (response == null) {
+			synchronized (this.watcherLock) {
+				if (this.watcherTimedout) {
+					return;
+				}
+			}
+			
+			response = this.waitForRequest();
+			
+			if (response != null && response.get("type").equals("request")) {
+				if (response.get("datatype").equals("list")) {
+					query = "type|item_list;datatype|list;item_count|" + (this.votingLists.size() + 2);
+					query = query + ";item_0|Nulo;item_1|Branco";
+					for (int i = 0; i < this.votingLists.size(); ++i) {
+						votingList = this.votingLists.get(i);
+						query = new String(query + ";item_" + (i + 2) + "|" + votingList.name);
+					}
+
+					this.writeSocket(query);
+				} else response = null;
+			} else response = null;
+		}
+		
+		response = null;
+		
+		// Vote
+		while (response == null) {
+			synchronized (this.watcherLock) {
+				if (this.watcherTimedout) {
+					return;
+				}
+			}
+			System.out.println("AWAIT");
+			
+			response = this.waitForRequest();
+			
+			
+			if (response != null && response.get("type").equals("vote")) {
+				date = new Date();
+				this.log.date = date;
+				this.sendLog(log);
+				this.sendVote(election.id, response.get("list"));
+			} else response = null;
+		}
 	}
-	
+		
 	private void sendLog(VotingLog log) {
 		try {
-			registry.sendLog(log);
+			this.serverListener.registry.sendLog(log);
+			System.out.println("SUCCESS LOG");
 		} catch (RemoteException remoteException) {
-			this.rmiNapper.nap();
+			this.serverListener.rmiNapper.nap();
+			System.out.println("FAILED LOG: " + remoteException);
 			sendLog(log);
 		}
 	}
 
-	private void sendVote(int id, String string) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void auth() {
-		this.writeSocket("type|status;login|required");
-	}
-
-	public boolean waitForRequest() {
-		boolean ret = false;
+	private void sendVote(int electionID, String VotingList) {
 		try {
-			ret = this.in.available() != 0;
-			if (!ret) {
+			this.serverListener.registry.sendVote(electionID, VotingList);
+			System.out.println("SUCCESS VOTE");
+		} catch (RemoteException remoteException) {
+			this.serverListener.rmiNapper.nap();
+			System.out.println("FAILED VOTE: " + remoteException);
+			sendVote(electionID, VotingList);
+		}
+	}
+
+	public HashMap<String, String> waitForRequest() {
+		try {
+			while(this.in.available() == 0) {
 				if (this.terminalWatcher == null) {
 					this.terminalWatcher = new TerminalWatcher(this, this.watcherLock);
 				}
-			} else {
-				this.terminalWatcher.terminate();
-				this.terminalWatcher = null;
 			}
-
+			
+			this.terminalWatcher.terminate();
+			this.terminalWatcher = null;
+			
 			synchronized (this.watcherLock) {
 				if (this.watcherTimedout) {
-					this.lockDown = true;
-					return false;
+					return null;
 				}
 			}
+			
+			return this.parseResponse(this.readSocket());
+
 		} catch (IOException ioe) {
 			System.out.println("Falha na utilizacao da socket");
 			this.terminate();
 		}
 
 
-		return ret;
+		return null;
 	}
 
 	public void closeSocket() {
@@ -606,7 +583,7 @@ class TerminalConnection extends Thread {
 		try {
 			this.out.writeUTF(query);
 		} catch (IOException ioe) {
-			if (debug) System.out.println("Falha na escrita na socket");
+			System.out.println("Falha na escrita na socket");
 			this.end = true;
 		}
 	}
@@ -615,7 +592,7 @@ class TerminalConnection extends Thread {
 		try {
 			return this.in.readUTF();
 		} catch (IOException e) {
-			if (debug) System.out.println("Falha na leitura na socket");
+			System.out.println("Falha na leitura na socket");
 			this.end = true;
 			return null;
 		}
@@ -640,13 +617,10 @@ class TerminalConnection extends Thread {
 		}
 	}
 
-	public TerminalConnection(
-		String reference, Socket terminalSocket,
-		DataServerInterface registry, RmiNapper rmiNapper
-	) {
-		this.reference = reference;
+	public TerminalConnection(ServerListener serverListener, int terminalID, Socket terminalSocket) {
+		this.terminalID = terminalID;
+		this.serverListener = serverListener;
 		this.terminalSocket = terminalSocket;
-		this.rmiNapper = rmiNapper;
 
 		try {
 			this.in = new DataInputStream(terminalSocket.getInputStream());
@@ -660,7 +634,7 @@ class TerminalConnection extends Thread {
 }
 
 class TerminalWatcher extends Thread {
-	int timeout = 10;
+	int timeout = 30;
 	Object timeoutLock = new Object();
 	TerminalConnection terminalConnection;
 	Object watcherLock;
@@ -673,12 +647,6 @@ class TerminalWatcher extends Thread {
 				if(this.end) return;
 			}
 			
-			synchronized (this.watcherLock) {
-				if (this.terminalConnection.watcherTimedout) {
-					this.terminalConnection.watcherTimedout = false;
-				}
-			}
-			
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -687,6 +655,8 @@ class TerminalWatcher extends Thread {
 			
 			synchronized (this.timeoutLock) {
 				this.timeout = this.timeout - 1;
+				System.out.println(this.timeout + " s");
+				
 				if (this.timeout == 0) {
 					synchronized (this.watcherLock) {
 						this.terminalConnection.watcherTimedout = true;
@@ -731,6 +701,23 @@ class RmiNapper extends Thread {
 	}
 
 	synchronized public void nap() {
+		
+		try {
+			this.serverListener.registry = (DataServerInterface)LocateRegistry
+					.getRegistry(this.serverListener.portRMI)
+					.lookup(this.serverListener.referenceRMI);
+			return;
+		} catch (AccessException e) {
+			String error = e.getStackTrace().toString();
+			System.out.println(error);
+		} catch (RemoteException e) {
+			String error = e.getStackTrace().toString();
+			System.out.println(error);
+		} catch (NotBoundException e) {
+			String error = e.getStackTrace().toString();
+			System.out.println(error);
+		}
+		
 		this.tries = this.tries + 1;
 		System.out.println("Trying to connect to RMI server, " + this.tries);
 		

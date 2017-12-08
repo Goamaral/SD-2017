@@ -12,62 +12,76 @@ public class Terminal {
 	static String password;
 
 	public static void main(String args[]) {
-		HashMap<String, String> response;
-		boolean loginRequired;
-		boolean loginSucessful;
-		boolean loginFailed;
-		boolean listListRecieved;
-		int size;
-		ArrayList<String> list = new ArrayList<String>();
-		int opcao;
-
 		getOptions(args);
 		connectSocket();
 		createStreams();
 
 		System.out.println("Terminal de voto ativo");
 
-		while (true) {
-			if (newInput()) {
-				response = parseResponse(readSocket());
-				if (response != null) {
-					loginRequired = response.get("type").equals("status")
-														&& response.get("login").equals("required");
-
-					loginSucessful = response.get("type").equals("status")
-														&& response.get("login").equals("sucessful");
-
-					loginFailed = response.get("type").equals("status")
-														&& response.get("login").equals("failed");
-
-					listListRecieved = response.get("type").equals("item_list")
-																&& response.get("datatype").equals("list");
-
-					if (loginRequired) {
-						auth();
-					} else if (loginSucessful) {
-						writeSocket("type|request;datatype|list");
-					} else if (loginFailed) {
-						System.out.println("Credenciais invalidas");
-						auth();
-					} else if (listListRecieved) {
-						list.clear();
-						size = Integer.parseInt(response.get("item_count"));
-
-						for (int i = 0; i<size; ++i) {
-							list.add(i, response.get("item_" + i));
-						}
-
-						opcao = selector(list, "Vote numa lista");
-
-						writeSocket("type|vote;list|" + list.get(opcao));
-					}
-				} else {
-					System.out.printf("NULL RESPONSE");
-				}
-			}
+		while(true) {
+			cycle();
 		}
-  }
+	}
+	
+	public static void cycle() {
+		HashMap<String, String> response = null;
+		int size;
+		ArrayList<String> list = new ArrayList<String>();
+		int opcao;
+		
+		while(response == null) {
+			response = waitForRequest();
+			
+			if (response.get("type").equals("status")) {
+				if (response.get("login").equals("required")) {
+					System.out.print("Numero estudante: ");
+					username = System.console().readLine();
+
+					System.out.print("Password: ");
+					password = System.console().readLine();
+					
+					writeSocket("type|login;username|" + username + ";password|" + password);
+				} else response = null;
+			} else response = null;
+		}
+		
+		response = null;
+		
+		while (response == null) {
+			System.out.println("MEH");
+			response = waitForRequest();
+			System.out.println("IN: " + response.get("login"));
+			if (response.get("type").equals("status")) {
+				if (response.get("login").equals("sucessful")) {
+					writeSocket("type|request;datatype|list");
+				} else if (response.get("login").equals("failed")) {
+					System.out.println("Credenciais invalidas");
+					return;
+				} else response = null;
+			} else response = null;
+		}
+		
+		response = null;
+		
+		while (response == null) {
+			response = waitForRequest();
+			
+			if (response.get("type").equals("item_list")) {
+				if (response.get("datatype").equals("list")) {
+					list.clear();
+					size = Integer.parseInt(response.get("item_count"));
+
+					for (int i = 0; i<size; ++i) {
+						list.add(i, response.get("item_" + i));
+					}
+
+					opcao = selector(list, "Vote numa lista");
+
+					writeSocket("type|vote;list|" + list.get(opcao));
+				} else response = null;
+			} else response = null;
+		}
+	}
 
 	public static int selector(ArrayList<String> list, String title) {
 		int i = 0;
@@ -101,14 +115,17 @@ public class Terminal {
 		return opcao;
 	}
 
-	public static boolean newInput() {
+	public static HashMap<String, String> waitForRequest() {
 		try {
-			return in.available() != 0;
-		} catch (IOException e) {
+			while(in.available() == 0);
+			
+			return parseResponse(readSocket());
+
+		} catch (IOException ioe) {
 			System.out.println("Falha na ligacao a mesa de voto");
-			System.exit(0);
-			return false;
 		}
+
+		return null;
 	}
 
 	public static void createStreams() {
@@ -142,18 +159,9 @@ public class Terminal {
 		}
 	}
 
-	public static void auth() {
-		System.out.print("Numero estudante: ");
-		username = System.console().readLine();
-
-		System.out.print("Password: ");
-		password = System.console().readLine();
-		
-		writeSocket("type|login;username|" + username + ";password|" + password);
-	}
-
 	public static void writeSocket(String query) {
 		try {
+			System.out.println(query);
 			out.writeUTF(query);
 		} catch (IOException ioe) {
 			System.out.println("Falha na ligacao a mesa de voto");
