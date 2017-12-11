@@ -156,17 +156,20 @@ class ServerListener extends Thread {
 	public ArrayList<Department> listDepartments(String facultyName) {
 		try {
 			return registry.listDepartments(facultyName);
-		} catch (RemoteException re) {
-			lookupRegistry();
-			return listDepartments(facultyName);
+		} catch (RemoteException remoteException) {
+			System.out.println("Falha na obtencao de departamentos. A tentar novamente...");
+			this.rmiNapper.nap();
 		}
+		
+		return listDepartments(facultyName);
 	}
 
 	public ArrayList<Faculty> listFaculties() {
 		try {
 			return registry.listFaculties();
 		} catch (RemoteException remoteException) {
-			lookupRegistry();
+			System.out.println("Falha na obtencao de faculdades. A tentar novamente...");
+			this.rmiNapper.nap();
 		} 
 		
 		return listFaculties();
@@ -331,6 +334,7 @@ class VotingTableAutentication extends Thread {
 		try {
 			return this.serverListener.registry.listVotingLists(electionID);
 		} catch (RemoteException re) {
+			System.out.println("Obtencao de listas falhada. A tentar novamente...");
 			this.rmiNapper.nap();
 		}
 		
@@ -372,9 +376,11 @@ class VotingTableAutentication extends Thread {
 	public ArrayList<VotingTable> getVotingTables(int cc) {
 		try {
 			return this.serverListener.registry.getVotingTables(this.serverListener.departmentName, cc);
-		} catch (RemoteException re) {
+		} catch (RemoteException remoteException) {
+			System.out.println("Falha na obtencao de eleicoes disponiveis. A tentar novamente...");
 			this.rmiNapper.nap();
 		}
+		
 		return getVotingTables(cc);
 	}
 
@@ -382,7 +388,7 @@ class VotingTableAutentication extends Thread {
 		try {
 			return this.serverListener.registry.getCredentials(cc);
 		} catch (RemoteException remoteException) {
-			System.out.println("Falha na obtencao de credenciais: " + remoteException);
+			System.out.println("Falha na obtencao de credenciais. A tentar novamente...");
 			this.rmiNapper.nap();
 		}
 		
@@ -507,7 +513,6 @@ class TerminalConnection extends Thread {
 					return;
 				}
 			}
-			System.out.println("AWAIT");
 			
 			response = this.waitForRequest();
 			
@@ -524,23 +529,23 @@ class TerminalConnection extends Thread {
 	private void sendLog(VotingLog log) {
 		try {
 			this.serverListener.registry.sendLog(log);
-			System.out.println("SUCCESS LOG");
+			return;
 		} catch (RemoteException remoteException) {
 			this.serverListener.rmiNapper.nap();
-			System.out.println("FAILED LOG: " + remoteException);
-			sendLog(log);
 		}
+		
+		sendLog(log);
 	}
 
 	private void sendVote(int electionID, String VotingList) {
 		try {
 			this.serverListener.registry.sendVote(electionID, VotingList);
-			System.out.println("SUCCESS VOTE");
+			return;
 		} catch (RemoteException remoteException) {
-			this.serverListener.rmiNapper.nap();
-			System.out.println("FAILED VOTE: " + remoteException);
-			sendVote(electionID, VotingList);
+			this.serverListener.rmiNapper.nap();			
 		}
+		
+		sendVote(electionID, VotingList);
 	}
 
 	public HashMap<String, String> waitForRequest() {
@@ -655,7 +660,6 @@ class TerminalWatcher extends Thread {
 			
 			synchronized (this.timeoutLock) {
 				this.timeout = this.timeout - 1;
-				System.out.println(this.timeout + " s");
 				
 				if (this.timeout == 0) {
 					synchronized (this.watcherLock) {

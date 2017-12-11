@@ -48,9 +48,7 @@ public class Terminal {
 		response = null;
 		
 		while (response == null) {
-			System.out.println("MEH");
 			response = waitForRequest();
-			System.out.println("IN: " + response.get("login"));
 			if (response.get("type").equals("status")) {
 				if (response.get("login").equals("sucessful")) {
 					writeSocket("type|request;datatype|list");
@@ -161,7 +159,6 @@ public class Terminal {
 
 	public static void writeSocket(String query) {
 		try {
-			System.out.println(query);
 			out.writeUTF(query);
 		} catch (IOException ioe) {
 			System.out.println("Falha na ligacao a mesa de voto");
@@ -179,9 +176,6 @@ public class Terminal {
 
 	public static HashMap<String, String> parseResponse(String response) {
 		HashMap<String, String> out = new HashMap<String, String>();
-
-		System.out.println(response);
-
 		String[] pairs = response.split(";");
 		String[] pairParts;
 

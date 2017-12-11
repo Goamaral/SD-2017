@@ -4,7 +4,6 @@ import java.util.*;
 import java.text.*;
 
 public class Console {
-	static boolean debug = true;
 	static DataServerInterface registry;
 	static Hashtable<String, Menu> menuTable = new Hashtable<String, Menu>();
 	static int port;
@@ -78,7 +77,6 @@ public class Console {
 
 		while(true) {
 			action = menu("Start", "");
-			System.out.println("Pre-action: " + action);
 			executeAction(action);
 		}
 	}
@@ -114,6 +112,12 @@ public class Console {
 		
 		if (failed) {
 			System.out.println("Falha remota. A tentar novamente... " + reference + ":" + port);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
+			
 			lookupRegistry(port, reference);
 		}
 	}
@@ -136,10 +140,8 @@ public class Console {
 		boolean failed;
 
 		System.out.println("----------");
-		if (debug) System.out.println("TYPE: " + type);
 
 		if (Arrays.asList(endings).contains(type)) {
-			if (debug) System.out.println("FLOW: " + flow);
 			return flow.substring(0, flow.length()-1);
 		}
 
@@ -177,8 +179,6 @@ public class Console {
 		String[] actions = action.split(" ");
 		String subtype, departmentName;
 		int votingListID, personCC, electionID;
-
-		if (debug) System.out.println("ACTION " + action);
 				
 		if ("Person Register Student".equals(action)
 			|| "Person Register Teacher".equals(action)
@@ -324,6 +324,11 @@ public class Console {
 			return;
 		} catch (RemoteException remoteException) {
 			System.out.println("Remocao de lista falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
 		removeVotingList(votingListID);
@@ -346,7 +351,13 @@ public class Console {
 			return;
 		} catch(RemoteException remoteException) {
 			System.out.println("Remocao de mesa de voto falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
+		
 		removeVotingTable(votingTableID);
 	}
 	
@@ -356,6 +367,11 @@ public class Console {
 			return;
 		} catch(RemoteException remoteException) {
 			System.out.println("Remocao de candidato falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
 		removeCandidate(votingListID, personCC);
@@ -488,6 +504,11 @@ public class Console {
 			return registry.listStudentsFromDepartment(departmentName);
 		} catch(RemoteException remoteException) {
 			System.out.println("Obtencao de estudantes de um departamento falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
 		return listStudentsFromDepartment(departmentName);
@@ -535,6 +556,11 @@ public class Console {
 			return registry.listPeopleOfType(type);
 		} catch(RemoteException remoteException) {
 			System.out.println("Obtencao de um tipo de pessoas falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
 		return listPeopleOfType(type);
@@ -548,6 +574,11 @@ public class Console {
 			return;
 		} catch(RemoteException remoteException) {
 			System.out.println("Adicao de candidato falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
 		addCandidate(votingListID, personCC);
@@ -563,7 +594,13 @@ public class Console {
 			return;
 		} catch(RemoteException remoteException) {
 			System.out.println("Remocao de departamento falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
+		
 		removeDepartment(name);
 	}
 	
@@ -577,7 +614,13 @@ public class Console {
 			return;
 		} catch(RemoteException remoteException) {
 			System.out.println("Remocao de faculdade falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
+		
 		removeFaculty(name);
 	}
 
@@ -642,8 +685,14 @@ public class Console {
 			return registry.listVotingTables(electionID);
 		} catch (RemoteException re) {
 			System.out.println("Obtencao de mesas de voto falhada.\nA tentar novamente novamente...");
-			return listVotingTables(electionID);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
+		
+		return listVotingTables(electionID);
 	}
 
 	public static int buildVotingTable(int electionID, String departmentName) {
@@ -652,17 +701,19 @@ public class Console {
 		);
 	}
 	
-	public static int createVotingTable(VotingTable votingTable) {
-		int ret = -1;
-		
+	public static int createVotingTable(VotingTable votingTable) {		
 		try {
-			ret = registry.createVotingTable(votingTable);
+			return registry.createVotingTable(votingTable);
 		} catch (RemoteException remoteException) {
 			System.out.println("Criacao de mesa de voto falhada\nA tentar novamente...");
-			createVotingTable(votingTable);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
-		return ret;
+		return createVotingTable(votingTable);
 	}
 
 	public static int pickCandidate(int votingListID) {
@@ -716,15 +767,18 @@ public class Console {
 	}
 	
 	public static Election getElection(int id) {
-		Election ret = null;
-		
 		try {
-			ret = registry.getElection(id);
+			return registry.getElection(id);
 		} catch(RemoteException remoteException) {
 			System.out.println("Obtencao de eleicao falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
-		return ret;
+		return getElection(id);
 	}
 
 	public static ArrayList<Person> listCandidates(int votingListID) {
@@ -737,8 +791,9 @@ public class Console {
 			} catch (InterruptedException ie) {
 				System.exit(0);
 			}
-			return listCandidates(votingListID);
 		}
+		
+		return listCandidates(votingListID);
 	}
 
 	public static int pickVotingList(int electionID) {
@@ -786,8 +841,14 @@ public class Console {
 			return registry.listVotingLists(electionID);
 		} catch (RemoteException re) {
 			System.out.println("Obtencao de listas falhada.\nA tentar novamente novamente...");
-			return listVotingLists(electionID);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
+		
+		return listVotingLists(electionID);
 	}
 
 	public static int buildVotingList(int electionID) {
@@ -805,17 +866,19 @@ public class Console {
 		);
 	}
 	
-	public static int createVotingList(VotingList votingList) {
-		int ret = -1;
-		
+	public static int createVotingList(VotingList votingList) {		
 		try {
-			ret = registry.createVotingList(votingList);
+			return registry.createVotingList(votingList);
 		} catch (RemoteException remoteException) {
 			System.out.println("Criacao de lista falhada\nA tentar novamente...");
-			createVotingList(votingList);
-		}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
+		}	
 		
-		return ret;
+		return createVotingList(votingList);
 	}
 
 	public static int pickElection(String type, String subtype) {
@@ -863,7 +926,13 @@ public class Console {
 			return registry.listElections(type, subtype);
 		} catch (RemoteException re) {
 			System.out.println("Obtencao de eleicoes falhada.\nA tentar novamente novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
+		
 		return listElections(type, subtype);
 	}
 
@@ -934,6 +1003,11 @@ public class Console {
 			return registry.createElection(election);
 		} catch (RemoteException remoteException) {
 			System.out.println("Criacao de eleicao falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
 		return createElection(election);
@@ -976,7 +1050,13 @@ public class Console {
 			return;
 		} catch(RemoteException remoteException) {
 			System.out.println("Edicao de departamento falhada. A tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
+		
 		updateDepartment(department, newDepartment);
 	}
 
@@ -1009,7 +1089,13 @@ public class Console {
 			return registry.updateFaculty(faculty, newFaculty);
 		} catch(RemoteException remoteException) {
 			System.out.println("Atualizacao da faculdade falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
+		
 		return updateFaculty(faculty, newFaculty);
 	}
 
@@ -1099,17 +1185,19 @@ public class Console {
 		);
 	}
 	
-	public static int createPerson(Person person) {
-		int ret = -1;
-		
+	public static int createPerson(Person person) {		
 		try {
-			ret = registry.createPerson(person);
+			return registry.createPerson(person);
 		} catch(RemoteException remoteException) {
 			System.out.println("Insercao de pessoa falhada\nA tentar novamente...");
-			createPerson(person);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
-		return ret;
+		return createPerson(person);
 	}
 
 	public static String pickDepartment(String facultyName) {
@@ -1158,7 +1246,7 @@ public class Console {
 
 	public static ArrayList<Department> listDepartments(String facultyName) {
 		try {
-			 return registry.listDepartments(facultyName);
+			return registry.listDepartments(facultyName);
 		} catch (RemoteException re) {
 			System.out.println("Obtencao de departamentos falhada.\nA tentar novamente novamente ...");
 			try {
@@ -1166,9 +1254,9 @@ public class Console {
 			} catch (InterruptedException ie) {
 				System.exit(0);
 			}
-
-			return listDepartments(facultyName);
 		}
+		
+		return listDepartments(facultyName);
 	}
 
 	public static String buildDepartment(String facultyName) {
@@ -1193,6 +1281,11 @@ public class Console {
 			return registry.createDepartment(department);
 		} catch (RemoteException remoteException) {
 			System.out.println("Criacao de departamento falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
 		return createDepartment(department);
@@ -1208,9 +1301,9 @@ public class Console {
 			} catch (InterruptedException ie) {
 				System.exit(0);
 			}
-
-			return listFaculties();
 		}
+		
+		return listFaculties();
 	}
 
 	public static String pickFaculty() {
@@ -1269,15 +1362,18 @@ public class Console {
 	}
 	
 	public static String createFaculty(String name) {
-		String ret = null;
-		
 		try {
-			ret = registry.createFaculty(name);
+			return registry.createFaculty(name);
 		} catch (RemoteException remoteException) {
 			System.out.println("Criacao de faculdade falhada\nA tentar novamente...");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+				System.exit(0);
+			}
 		}
 		
-		return ret;
+		return createFaculty(name);
 	}
 
 }

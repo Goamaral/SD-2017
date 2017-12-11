@@ -278,7 +278,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     return newDepartment.name;
   }
 
-  public void removeFaculty(String name) throws RemoteException {  
+  public void removeFaculty(String name) throws RemoteException {
     query("DELETE FROM faculty WHERE name = '" + name + "'");
   }
   
@@ -506,6 +506,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 	  
     resultSet = this.query("INSERT INTO voting_table VALUES ("
       + id
+      + ", 0"
       + ", " + votingTable.electionID
       + ", '" + votingTable.departmentName + "'"
       + ")"
@@ -522,7 +523,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList < VotingTable > listVotingTables(int electionID) throws RemoteException {
     ArrayList < VotingTable > votingTables = new ArrayList < VotingTable > ();
     
-    ResultSet resultSet = this.query("SELECT id, department_name FROM voting_table"
+    ResultSet resultSet = this.query("SELECT id, status, department_name FROM voting_table"
       + " WHERE election_id = " + electionID
     );
     
@@ -531,6 +532,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     	votingTables.add(
     	  new VotingTable(
     	    resultSet.getInt("id"), 
+    	    resultSet.getInt("status"),
     		electionID,
     		resultSet.getString("department_name")
     	  )
@@ -677,7 +679,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   public ArrayList<VotingTable> getVotingTables(String departmentName, int cc) throws RemoteException {
     ArrayList<VotingTable> votingTables = new ArrayList<VotingTable>();
     
-	ResultSet resultSet = this.query("SELECT id, election_id, department_name FROM voting_table"
+	ResultSet resultSet = this.query("SELECT id, status, election_id, department_name FROM voting_table"
 	  + " WHERE election_id IN ("
         + "(SELECT id FROM election WHERE type = 'Nucleous' AND subtype ="
           + "(SELECT UNIQUE '" + departmentName +"' FROM person" 
@@ -695,6 +697,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 			votingTables.add(
 			  new VotingTable(
 			    resultSet.getInt("id"), 
+			    resultSet.getInt("status"),
 			    resultSet.getInt("election_id"),
 			    resultSet.getString("department_name")
 			  )
