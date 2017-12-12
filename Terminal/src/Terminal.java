@@ -73,7 +73,7 @@ public class Terminal {
 						list.add(i, response.get("item_" + i));
 					}
 
-					opcao = selector(list, "Vote numa lista");
+					opcao = Utility.selector(list, "Vote numa lista");
 
 					writeSocket("type|vote;list|" + list.get(opcao));
 				} else response = null;

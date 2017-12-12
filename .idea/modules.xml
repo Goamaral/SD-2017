@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Console/Console.iml" filepath="$PROJECT_DIR$/Console/Console.iml" />
       <module fileurl="file://$PROJECT_DIR$/Core/Core.iml" filepath="$PROJECT_DIR$/Core/Core.iml" />
       <module fileurl="file://$PROJECT_DIR$/DataServer/DataServer.iml" filepath="$PROJECT_DIR$/DataServer/DataServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HttpServer/HttpServer.iml" filepath="$PROJECT_DIR$/HttpServer/HttpServer.iml" />
       <module fileurl="file://$PROJECT_DIR$/Server/Server.iml" filepath="$PROJECT_DIR$/Server/Server.iml" />
       <module fileurl="file://$PROJECT_DIR$/Terminal/Terminal.iml" filepath="$PROJECT_DIR$/Terminal/Terminal.iml" />
     </modules>

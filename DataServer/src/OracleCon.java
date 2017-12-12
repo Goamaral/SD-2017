@@ -5,7 +5,7 @@ class OracleCon {
     private Boolean showLogs;
 
 
-    private OracleCon (String username, String password, Boolean logs){
+    OracleCon(String username, String password, Boolean logs){
         showLogs = logs;
 
         try {

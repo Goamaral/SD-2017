@@ -69,7 +69,7 @@ class VotingTableAutentication extends Thread {
 				list.add(election.name);
 			}
 
-			opcao = this.selector(list, "Escolha uma eleicao");
+			opcao = Utility.selector(list, "Escolha uma eleicao");
 			votingTable = this.votingTables.get(opcao);
 
 			election = getElection(votingTable.electionID);

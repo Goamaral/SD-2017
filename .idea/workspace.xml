@@ -2,37 +2,20 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="Console:jar" />
-      <artifact name="DataServer:jar" />
+      <artifact name="HttpServer" />
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e23fc5f9-93af-42e7-9e25-edb669072b40" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/Console/Console.iml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/Core/Core.iml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/DataServer/DataServer.iml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/Server/Server.iml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/Server/src/RmiNapper.java" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/Server/src/ServerListener.java" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/Terminal/Terminal.iml" />
-      <change beforePath="$PROJECT_DIR$/CreateTables.sql" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/CreateUser.sql" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Console/Console.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Console/Menu.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Credential.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/DataServer/DataServer.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/DataServer/OracleCon.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/DataServerInterface.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Department.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Election.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Faculty.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Person.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Result.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Server/Server.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/Terminal/Terminal.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/VotingList.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/VotingLog.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/VotingTable.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.classpath" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/.project" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/DataServer/src/OracleCon.java" afterPath="$PROJECT_DIR$/DataServer/src/OracleCon.java" />
+      <change beforePath="$PROJECT_DIR$/Relatorio SD.pdf" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/Server/src/VotingTableAutentication.java" afterPath="$PROJECT_DIR$/Server/src/VotingTableAutentication.java" />
+      <change beforePath="$PROJECT_DIR$/Terminal/src/Terminal.java" afterPath="$PROJECT_DIR$/Terminal/src/Terminal.java" />
+      <change beforePath="$PROJECT_DIR$/sd_projeto_meta1.pdf" afterPath="" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -56,24 +39,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ServerListener.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Server/src/ServerListener.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="23" column="17" lean-forward="false" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
-              <folding>
-                <element signature="e#3160#3161#0" expanded="true" />
-                <element signature="e#3182#3183#0" expanded="true" />
-              </folding>
-            </state>
+      <file leaf-file-name="struts.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/HttpServer/src/struts.xml">
+          <provider editor-type-id="com.intellij.struts2.graph.fileEditor.Struts2GraphFileEditorProvider">
+            <state />
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TerminalConnection.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Server/src/TerminalConnection.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="9" column="6" lean-forward="false" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
+            <state relative-caret-position="150">
+              <caret line="28" column="59" lean-forward="false" selection-start-line="28" selection-start-column="59" selection-end-line="28" selection-end-column="59" />
               <folding />
             </state>
           </provider>
@@ -126,12 +99,14 @@
         <option value="$PROJECT_DIR$/DataServer/src/OracleCon.java" />
         <option value="$PROJECT_DIR$/Server/src/TerminalConnection.java" />
         <option value="$PROJECT_DIR$/Server/src/TerminalWatcher.java" />
-        <option value="$PROJECT_DIR$/Server/src/VotingTableAutentication.java" />
         <option value="$PROJECT_DIR$/Core/src/Utility.java" />
-        <option value="$PROJECT_DIR$/Terminal/src/Terminal.java" />
         <option value="$PROJECT_DIR$/Server/src/ServerListener.java" />
         <option value="$PROJECT_DIR$/Server/src/RmiNapper.java" />
         <option value="$PROJECT_DIR$/Server/src/Server.java" />
+        <option value="$PROJECT_DIR$/Terminal/src/Terminal.java" />
+        <option value="$PROJECT_DIR$/Server/src/VotingTableAutentication.java" />
+        <option value="$PROJECT_DIR$/HttpServer/src/hey/model/HeyBean.java" />
+        <option value="$PROJECT_DIR$/HttpServer/src/struts.xml" />
       </list>
     </option>
   </component>
@@ -140,6 +115,13 @@
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="10" />
@@ -307,21 +289,17 @@
           <expand>
             <path>
               <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Core" type="462c0819:PsiDirectoryNode" />
+              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Core" type="462c0819:PsiDirectoryNode" />
+              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
+              <item name="web" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -337,7 +315,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/DataServer/lib/ojdbc14.jar!/" />
-    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
@@ -355,7 +333,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Tomcat Server.Tomcat 8.5.23">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="HTML_USED" value="false" />
       <option name="WIDTH" value="400" />
@@ -457,12 +435,89 @@
       <properties />
       <listeners />
     </configuration>
+    <configuration name="Tomcat 8.5.23" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 8.5.23" ALTERNATIVE_JRE_ENABLED="false">
+      <option name="BROWSER_ID" value="a7bb68e0-33c0-4d6f-a81a-aac1fdb870c8" />
+      <option name="UPDATING_POLICY" value="restart-server" />
+      <deployment>
+        <artifact name="HttpServer">
+          <settings>
+            <option name="CONTEXT_PATH" value="/" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="Tomcat_8_5_23_SD" />
+      </server-settings>
+      <predefined_log_file id="Tomcat" enabled="true" />
+      <predefined_log_file id="Tomcat Catalina" enabled="true" />
+      <predefined_log_file id="Tomcat Manager" enabled="false" />
+      <predefined_log_file id="Tomcat Host Manager" enabled="false" />
+      <predefined_log_file id="Tomcat Localhost Access" enabled="false" />
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="9193" />
+      </RunnerSettings>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method>
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="HttpServer" />
+        </option>
+      </method>
+    </configuration>
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
       <option name="PROGRAM_PARAMETERS" />
       <predefined_log_file id="idea.log" enabled="true" />
     </configuration>
+    <list size="2">
+      <item index="0" class="java.lang.String" itemvalue="Tomcat Server.Tomcat 8.5.23" />
+      <item index="1" class="java.lang.String" itemvalue="Application.Console" />
+    </list>
     <recent_temporary>
       <list size="1">
         <item index="0" class="java.lang.String" itemvalue="Application.Console" />
@@ -482,12 +537,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1513039444544</updated>
-      <workItem from="1513039452903" duration="8734000" />
+      <workItem from="1513039452903" duration="15228000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="8734000" />
+    <option name="totallyTimeSpent" value="15228000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -500,29 +555,31 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="30" width="1366" height="738" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294893" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2031746" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3825397" sideWeight="0.5043924" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35555556" sideWeight="0.50512445" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294893" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31587303" sideWeight="0.4956076" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24597365" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329429" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32857144" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.38220757" sideWeight="0.4969697" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294893" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4031746" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35555556" sideWeight="0.49487555" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294893" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31587303" sideWeight="0.4956076" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24597365" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32857144" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -538,7 +595,9 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="1" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
@@ -551,14 +610,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/.project">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SD.iml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -638,23 +689,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DataServer/src/DataServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-32">
-          <caret line="716" column="18" lean-forward="true" selection-start-line="716" selection-start-column="18" selection-end-line="716" selection-end-column="18" />
-          <folding>
-            <element signature="e#8847#8848#0" expanded="true" />
-            <element signature="e#8913#8914#0" expanded="true" />
-            <element signature="e#8962#8963#0" expanded="true" />
-            <element signature="e#9031#9032#0" expanded="true" />
-            <element signature="e#13639#13640#0" expanded="true" />
-            <element signature="e#13702#13703#0" expanded="true" />
-            <element signature="e#16017#16018#0" expanded="true" />
-            <element signature="e#16082#16083#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Core/src/VotingTable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
@@ -711,14 +745,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/VotingTableAutentication.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="114" column="5" lean-forward="false" selection-start-line="114" selection-start-column="5" selection-end-line="114" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Terminal/Terminal.iml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -740,16 +766,8 @@
         <state relative-caret-position="217">
           <caret line="57" column="0" lean-forward="true" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Terminal/src/Terminal.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="75" column="48" lean-forward="false" selection-start-line="75" selection-start-column="48" selection-end-line="75" selection-end-column="48" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -761,21 +779,136 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/TerminalConnection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="9" column="6" lean-forward="false" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/ServerListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="191">
           <caret line="23" column="17" lean-forward="false" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
           <folding>
-            <element signature="e#3160#3161#0" expanded="true" />
-            <element signature="e#3182#3183#0" expanded="true" />
+            <element signature="e#3160#3161#0" expanded="false" />
+            <element signature="e#3182#3183#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/TerminalConnection.java">
+    <entry file="file://$PROJECT_DIR$/SD.iml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="9" column="6" lean-forward="false" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/src/log4j.dtd">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2295">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/src/log4j.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-122">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/src/rmiserver/RMIServerInterface.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/index.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/src/hey/action/LoginAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-15">
+          <caret line="10" column="70" lean-forward="false" selection-start-line="10" selection-start-column="58" selection-end-line="10" selection-end-column="70" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/src/hey/model/HeyBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Terminal/src/Terminal.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="431">
+          <caret line="81" column="5" lean-forward="true" selection-start-line="81" selection-start-column="5" selection-end-line="81" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/VotingTableAutentication.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="101">
+          <caret line="70" column="0" lean-forward="false" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataServer/src/DataServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="116">
+          <caret line="34" column="20" lean-forward="false" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/hey.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="21" column="13" lean-forward="false" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/WEB-INF/web.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/error.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/src/struts.xml">
+      <provider editor-type-id="com.intellij.struts2.graph.fileEditor.Struts2GraphFileEditorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="28" column="59" lean-forward="false" selection-start-line="28" selection-start-column="59" selection-end-line="28" selection-end-column="59" />
           <folding />
         </state>
       </provider>
@@ -786,7 +919,7 @@
       <state key="ArtifactsStructureConfigurable.UI">
         <settings>
           <artifact-editor />
-          <last-edited>DataServer:jar</last-edited>
+          <last-edited>HttpServer</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -799,7 +932,7 @@
       </state>
       <state key="FacetStructureConfigurable.UI">
         <settings>
-          <last-edited>No facets are configured</last-edited>
+          <last-edited>Web</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -834,12 +967,11 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>Core</last-edited>
+          <last-edited>HttpServer</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
                 <option value="0.2" />
-                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>
@@ -847,7 +979,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>ojdbc14</last-edited>
+          <last-edited>Struts 2</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

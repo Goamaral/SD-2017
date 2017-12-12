@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="HttpServer">
+    <output-path>$PROJECT_DIR$/classes/artifacts/HttpServer</output-path>
+    <root id="archive" name="HttpServer.war">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Struts 2" />
+        </element>
+        <element id="module-output" name="HttpServer" />
+        <element id="directory" name="models">
+          <element id="module-output" name="Core" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="HttpServer/web/Web" />
+    </root>
+  </artifact>
+</component>
