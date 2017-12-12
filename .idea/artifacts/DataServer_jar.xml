@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DataServer:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/DataServer_jar</output-path>
+    <root id="archive" name="DataServer.jar">
+      <element id="module-output" name="DataServer" />
+      <element id="module-output" name="Core" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/DataServer/lib/ojdbc14.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
