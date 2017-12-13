@@ -8,5 +8,11 @@
 	</head>
 	<body>
 		<h1>Index</h1>
+		<s:form action="login">
+			<s:textfield name="cc" label="Cartao cidadao" />
+			<s:textfield name="username" label="Numero cartao" />
+			<s:textfield name="password" label="Password" type="password" />
+			<s:submit />
+		</s:form>
 	</body>
 </html>
