@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Terminal:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/Terminal_jar</output-path>
+    <root id="archive" name="Terminal.jar">
+      <element id="module-output" name="Terminal" />
+    </root>
+  </artifact>
+</component>

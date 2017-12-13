@@ -10,7 +10,7 @@ public class VotingLog implements Serializable {
 	public int votingTableID;
 	public Date date;
 
-	VotingLog(Election election, int cc, int votingTableID) {
+	public VotingLog(Election election, int cc, int votingTableID) {
 		this.election = election;
 		this.cc = cc;
 		this.votingTableID = votingTableID;

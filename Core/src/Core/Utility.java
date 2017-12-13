@@ -3,7 +3,7 @@ package Core;
 import java.util.ArrayList;
 
 public class Utility {
-    static int selector(ArrayList<String> list, String title) {
+    public static int selector(ArrayList<String> list, String title) {
         int i = 0;
         int opcao;
         String line;

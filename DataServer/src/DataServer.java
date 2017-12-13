@@ -1,5 +1,4 @@
 import Core.*;
-import Core.DataServerInterface.Person;
 
 import java.rmi.*;
 import java.rmi.server.*;
@@ -348,7 +347,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		return id;
 	}
 			
-    resultSet = this.query("INSERT INTO Core.Election VALUES ("
+    resultSet = this.query("INSERT INTO Election VALUES ("
 		      + id
 		      + ", '" + election.name + "'"
 		      + ", '" + election.description + "'"

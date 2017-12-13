@@ -47,7 +47,7 @@ CREATE TABLE voting_list
      election_id INT NOT NULL, 
      name        VARCHAR(255) NOT NULL, 
      votes       INT NOT NULL, 
-     CONSTRAINT  fk_voting_list_election FOREIGN KEY (election_id) REFERENCES election(id) 
+     CONSTRAINT  fk_voting_list_election FOREIGN KEY (election_id) REFERENCES election(id) ON DELETE CASCADE
   ); 
 
 CREATE TABLE faculty 
@@ -59,7 +59,7 @@ CREATE TABLE department
   ( 
      name         VARCHAR(255) PRIMARY KEY, 
      faculty_name VARCHAR(255) NOT NULL, 
-     CONSTRAINT fk_department_faculty FOREIGN KEY (faculty_name) REFERENCES faculty(name) 
+     CONSTRAINT fk_department_faculty FOREIGN KEY (faculty_name) REFERENCES faculty(name) ON DELETE CASCADE
   ); 
 
 CREATE TABLE voting_table 
@@ -68,8 +68,8 @@ CREATE TABLE voting_table
      status          INT NOT NULL,
      election_id     INT NOT NULL, 
      department_name VARCHAR(255) NOT NULL, 
-     CONSTRAINT      fk_voting_table_election FOREIGN KEY (election_id) REFERENCES election(id), 
-     CONSTRAINT      fk_voting_table_department FOREIGN KEY (department_name) REFERENCES department(name) 
+     CONSTRAINT      fk_voting_table_election FOREIGN KEY (election_id) REFERENCES election(id) ON DELETE CASCADE,
+     CONSTRAINT      fk_voting_table_department FOREIGN KEY (department_name) REFERENCES department(name) ON DELETE CASCADE
   ); 
 
 CREATE TABLE person 
@@ -83,7 +83,7 @@ CREATE TABLE person
      phone           INT NOT NULL, 
      cc_expire       VARCHAR(255) NOT NULL, 
      department_name VARCHAR(255) NOT NULL, 
-     CONSTRAINT      fk_person_department FOREIGN KEY (department_name) REFERENCES department(name) 
+     CONSTRAINT      fk_person_department FOREIGN KEY (department_name) REFERENCES department(name) ON DELETE CASCADE
   ); 
 
 CREATE TABLE voting_log 
@@ -93,9 +93,9 @@ CREATE TABLE voting_log
      voting_table_id INT NOT NULL, 
      created_at     VARCHAR(255) NOT NULL, 
      CONSTRAINT     pk_voting_log PRIMARY KEY (election_id, person_cc), 
-     CONSTRAINT     fk_voting_log_election FOREIGN KEY (election_id) REFERENCES election(id), 
-     CONSTRAINT     fk_voting_log_voting_table FOREIGN KEY (voting_table_id) REFERENCES voting_table(id), 
-     CONSTRAINT     fk_voting_log_person FOREIGN KEY (person_cc) REFERENCES person(cc) 
+     CONSTRAINT     fk_voting_log_election FOREIGN KEY (election_id) REFERENCES election(id) ON DELETE CASCADE,
+     CONSTRAINT     fk_voting_log_voting_table FOREIGN KEY (voting_table_id) REFERENCES voting_table(id) ON DELETE CASCADE,
+     CONSTRAINT     fk_voting_log_person FOREIGN KEY (person_cc) REFERENCES person(cc) ON DELETE CASCADE
   ); 
 
 CREATE TABLE voting_list_member 
@@ -103,8 +103,8 @@ CREATE TABLE voting_list_member
      person_cc     INT NOT NULL, 
      voting_list_id INT NOT NULL, 
      CONSTRAINT pk_voting_list_members PRIMARY KEY (person_cc, voting_list_id), 
-     CONSTRAINT fk_voting_list_member_person FOREIGN KEY (person_cc) REFERENCES person(cc), 
-     CONSTRAINT fk_votinglistmember_votinglist FOREIGN KEY (voting_list_id) REFERENCES voting_list(id) 
+     CONSTRAINT fk_voting_list_member_person FOREIGN KEY (person_cc) REFERENCES person(cc) ON DELETE CASCADE,
+     CONSTRAINT fk_votinglistmember_votinglist FOREIGN KEY (voting_list_id) REFERENCES voting_list(id) ON DELETE CASCADE
   ); 
   
 CREATE SEQUENCE election_seq MINVALUE 0;

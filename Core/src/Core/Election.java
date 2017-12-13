@@ -13,7 +13,7 @@ public class Election implements Serializable {
   
   public static final long serialVersionUID = 2848095557101780926L;
 
-  Election(int id, String name, String description, String type, String subtype, String start, String end) {
+  public Election(int id, String name, String description, String type, String subtype, String start, String end) {
     this.id = id;
 	this.name = name;
     this.description = description;

@@ -2,34 +2,23 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="HttpServer" />
+      <artifact name="Terminal:jar" />
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e23fc5f9-93af-42e7-9e25-edb669072b40" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/HttpServer.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/HttpServer.xml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/Console/src/Console.java" afterPath="$PROJECT_DIR$/Console/src/Console.java" />
-      <change beforePath="$PROJECT_DIR$/Core/src/Credential.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/Core/src/DataServerInterface.java" afterPath="$PROJECT_DIR$/Core/src/Core/DataServerInterface.java" />
-      <change beforePath="$PROJECT_DIR$/Core/src/Department.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/Core/src/Election.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/Core/src/Faculty.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/Core/src/Person.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/Core/src/Result.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/Core/src/Utility.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/Core/src/VotingList.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/Core/src/VotingLog.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/Core/src/VotingTable.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/Core/src/Core/Credential.java" afterPath="$PROJECT_DIR$/Core/src/Core/Credential.java" />
+      <change beforePath="$PROJECT_DIR$/Core/src/Core/Election.java" afterPath="$PROJECT_DIR$/Core/src/Core/Election.java" />
+      <change beforePath="$PROJECT_DIR$/Core/src/Core/Result.java" afterPath="$PROJECT_DIR$/Core/src/Core/Result.java" />
+      <change beforePath="$PROJECT_DIR$/Core/src/Core/Utility.java" afterPath="$PROJECT_DIR$/Core/src/Core/Utility.java" />
+      <change beforePath="$PROJECT_DIR$/Core/src/Core/VotingList.java" afterPath="$PROJECT_DIR$/Core/src/Core/VotingList.java" />
+      <change beforePath="$PROJECT_DIR$/Core/src/Core/VotingLog.java" afterPath="$PROJECT_DIR$/Core/src/Core/VotingLog.java" />
+      <change beforePath="$PROJECT_DIR$/Core/src/Core/VotingTable.java" afterPath="$PROJECT_DIR$/Core/src/Core/VotingTable.java" />
       <change beforePath="$PROJECT_DIR$/DataServer/src/DataServer.java" afterPath="$PROJECT_DIR$/DataServer/src/DataServer.java" />
-      <change beforePath="$PROJECT_DIR$/HttpServer/HttpServer.iml" afterPath="$PROJECT_DIR$/HttpServer/HttpServer.iml" />
-      <change beforePath="$PROJECT_DIR$/HttpServer/src/iVotas/actions/Index.java" afterPath="$PROJECT_DIR$/HttpServer/src/iVotas/actions/Index.java" />
-      <change beforePath="$PROJECT_DIR$/HttpServer/src/struts.xml" afterPath="$PROJECT_DIR$/HttpServer/src/struts.xml" />
-      <change beforePath="$PROJECT_DIR$/HttpServer/web/error.jsp" afterPath="$PROJECT_DIR$/HttpServer/web/error.jsp" />
+      <change beforePath="$PROJECT_DIR$/Server/src/RmiNapper.java" afterPath="$PROJECT_DIR$/Server/src/RmiNapper.java" />
       <change beforePath="$PROJECT_DIR$/Server/src/ServerListener.java" afterPath="$PROJECT_DIR$/Server/src/ServerListener.java" />
-      <change beforePath="$PROJECT_DIR$/Server/src/TerminalConnection.java" afterPath="$PROJECT_DIR$/Server/src/TerminalConnection.java" />
-      <change beforePath="$PROJECT_DIR$/Server/src/VotingTableAutentication.java" afterPath="$PROJECT_DIR$/Server/src/VotingTableAutentication.java" />
-      <change beforePath="$PROJECT_DIR$/Terminal/src/Terminal.java" afterPath="$PROJECT_DIR$/Terminal/src/Terminal.java" />
+      <change beforePath="$PROJECT_DIR$/setup.sql" afterPath="$PROJECT_DIR$/setup.sql" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -56,68 +45,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Index.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/HttpServer/src/iVotas/actions/Index.java">
+      <file leaf-file-name="setup.sql" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/setup.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#866#867#0" expanded="true" />
-                <element signature="e#897#898#0" expanded="true" />
-                <element signature="e#972#973#0" expanded="true" />
-                <element signature="e#1012#1013#0" expanded="true" />
-                <element signature="e#1047#1048#0" expanded="true" />
-                <element signature="e#1078#1079#0" expanded="true" />
-                <element signature="e#1126#1127#0" expanded="true" />
-                <element signature="e#1166#1167#0" expanded="true" />
-                <element signature="e#1192#1193#0" expanded="true" />
-                <element signature="e#1217#1218#0" expanded="true" />
-                <element signature="e#1253#1254#0" expanded="true" />
-                <element signature="e#1299#1300#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="struts.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/HttpServer/src/struts.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="20" column="32" lean-forward="false" selection-start-line="20" selection-start-column="32" selection-end-line="20" selection-end-column="32" />
-              <folding />
-            </state>
-          </provider>
-          <provider editor-type-id="com.intellij.struts2.graph.fileEditor.Struts2GraphFileEditorProvider">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="error.jsp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/HttpServer/web/error.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="6" lean-forward="false" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="home.jsp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/HttpServer/web/home.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="16" lean-forward="false" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="16" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.jsp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/HttpServer/web/index.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="10" lean-forward="false" selection-start-line="8" selection-start-column="10" selection-end-line="8" selection-end-column="10" />
+            <state relative-caret-position="218">
+              <caret line="85" column="117" lean-forward="true" selection-start-line="85" selection-start-column="99" selection-end-line="85" selection-end-column="117" />
               <folding />
             </state>
           </provider>
@@ -144,6 +76,8 @@
       <find>action</find>
       <find>index</find>
       <find>getC</find>
+      <find>COre</find>
+      <find>Core</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -169,15 +103,11 @@
         <option value="$PROJECT_DIR$/Core/src/VotingList.java" />
         <option value="$PROJECT_DIR$/Core/src/VotingLog.java" />
         <option value="$PROJECT_DIR$/Core/src/VotingTable.java" />
-        <option value="$PROJECT_DIR$/DataServer/src/DataServer.java" />
         <option value="$PROJECT_DIR$/DataServer/src/OracleCon.java" />
         <option value="$PROJECT_DIR$/Server/src/TerminalConnection.java" />
         <option value="$PROJECT_DIR$/Server/src/TerminalWatcher.java" />
         <option value="$PROJECT_DIR$/Core/src/Utility.java" />
-        <option value="$PROJECT_DIR$/Server/src/ServerListener.java" />
-        <option value="$PROJECT_DIR$/Server/src/RmiNapper.java" />
         <option value="$PROJECT_DIR$/Server/src/Server.java" />
-        <option value="$PROJECT_DIR$/Terminal/src/Terminal.java" />
         <option value="$PROJECT_DIR$/Server/src/VotingTableAutentication.java" />
         <option value="$PROJECT_DIR$/HttpServer/src/hey/model/HeyBean.java" />
         <option value="$PROJECT_DIR$/HttpServer/HttpServer.iml" />
@@ -190,11 +120,16 @@
         <option value="$PROJECT_DIR$/Core/src/Core/DataServerInterface/DataServerInterface.java" />
         <option value="$PROJECT_DIR$/Core/src/Core/DataServerInterface/Person.java" />
         <option value="$PROJECT_DIR$/Core/src/Core/DataServerInterface.java" />
-        <option value="$PROJECT_DIR$/Core/src/Core/VotingTable.java" />
         <option value="$PROJECT_DIR$/Console/src/Console.java" />
         <option value="$PROJECT_DIR$/HttpServer/src/iVotas/actions/Index.java" />
         <option value="$PROJECT_DIR$/HttpServer/src/struts.xml" />
         <option value="$PROJECT_DIR$/HttpServer/web/error.jsp" />
+        <option value="$PROJECT_DIR$/Terminal/src/Terminal.java" />
+        <option value="$PROJECT_DIR$/Core/src/Core/VotingTable.java" />
+        <option value="$PROJECT_DIR$/Server/src/ServerListener.java" />
+        <option value="$PROJECT_DIR$/Server/src/RmiNapper.java" />
+        <option value="$PROJECT_DIR$/setup.sql" />
+        <option value="$PROJECT_DIR$/DataServer/src/DataServer.java" />
       </list>
     </option>
   </component>
@@ -212,10 +147,10 @@
     <option name="CUSTOM_FILTER" />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="10" />
-    <option name="y" value="50" />
-    <option name="width" value="1346" />
-    <option name="height" value="698" />
+    <option name="x" value="683" />
+    <option name="y" value="30" />
+    <option name="width" value="683" />
+    <option name="height" value="738" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -388,50 +323,12 @@
           <expand>
             <path>
               <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Core" type="462c0819:PsiDirectoryNode" />
+              <item name="DataServer" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Core" type="462c0819:PsiDirectoryNode" />
+              <item name="DataServer" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Core" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="Core" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="actions" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="META-INF" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="WEB-INF" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -671,12 +568,12 @@
       <option name="presentableId" value="Default" />
       <updated>1513039444544</updated>
       <workItem from="1513039452903" duration="15228000" />
-      <workItem from="1513166369240" duration="13959000" />
+      <workItem from="1513166369240" duration="19169000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="29187000" />
+    <option name="totallyTimeSpent" value="34397000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -688,7 +585,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="10" y="50" width="1366" height="738" extended-state="6" />
+    <frame x="0" y="30" width="1366" height="738" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -709,7 +606,7 @@
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294893" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35555556" sideWeight="0.49487555" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35555556" sideWeight="0.49487555" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329429" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31587303" sideWeight="0.4956076" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24597365" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -777,6 +674,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="6" lean-forward="false" selection-start-line="0" selection-start-column="6" selection-end-line="0" selection-end-column="6" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -787,20 +685,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/RmiNapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="57" column="0" lean-forward="true" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/Server.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="124">
           <caret line="31" column="22" lean-forward="true" selection-start-line="31" selection-start-column="22" selection-end-line="31" selection-end-column="22" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -809,17 +698,6 @@
         <state relative-caret-position="30">
           <caret line="9" column="6" lean-forward="false" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/ServerListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="23" column="17" lean-forward="false" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
-          <folding>
-            <element signature="e#3227#3228#0" expanded="false" />
-            <element signature="e#3249#3250#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -833,22 +711,6 @@
     <entry file="file://$PROJECT_DIR$/HttpServer/src/rmiserver/RMIServerInterface.java" />
     <entry file="file://$PROJECT_DIR$/HttpServer/src/hey/action/LoginAction.java" />
     <entry file="file://$PROJECT_DIR$/HttpServer/src/hey/model/HeyBean.java" />
-    <entry file="file://$PROJECT_DIR$/Terminal/src/Terminal.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="431">
-          <caret line="81" column="5" lean-forward="true" selection-start-line="81" selection-start-column="5" selection-end-line="81" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/VotingTableAutentication.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="101">
-          <caret line="70" column="0" lean-forward="false" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/HttpServer/web/hey.jsp" />
     <entry file="jar://$PROJECT_DIR$/HttpServer/web/WEB-INF/lib/xwork-core-2.3.16.3.jar!/com/opensymphony/xwork2/ActionSupport.class">
       <provider selected="true" editor-type-id="text-editor">
@@ -909,36 +771,10 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DataServer/src/DataServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="109">
-          <caret line="684" column="40" lean-forward="false" selection-start-line="684" selection-start-column="36" selection-end-line="684" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/HttpServer/HttpServer.iml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
           <caret line="20" column="14" lean-forward="false" selection-start-line="20" selection-start-column="14" selection-end-line="20" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/DataServerInterface.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="18" lean-forward="false" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/Person.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="10" lean-forward="false" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
           <folding />
         </state>
       </provider>
@@ -953,112 +789,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/VotingTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="4" lean-forward="true" selection-start-line="13" selection-start-column="4" selection-end-line="13" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/VotingLog.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="41">
-          <caret line="5" column="13" lean-forward="false" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/VotingList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/Utility.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/Result.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/Faculty.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/Election.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/Department.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/Credential.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/web/home.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="16" lean-forward="false" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/web/index.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="10" lean-forward="false" selection-start-line="8" selection-start-column="10" selection-end-line="8" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/HttpServer/src/iVotas/actions/Index.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
           <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#866#867#0" expanded="true" />
-            <element signature="e#897#898#0" expanded="true" />
-            <element signature="e#972#973#0" expanded="true" />
-            <element signature="e#1012#1013#0" expanded="true" />
-            <element signature="e#1047#1048#0" expanded="true" />
-            <element signature="e#1078#1079#0" expanded="true" />
-            <element signature="e#1126#1127#0" expanded="true" />
-            <element signature="e#1166#1167#0" expanded="true" />
-            <element signature="e#1192#1193#0" expanded="true" />
-            <element signature="e#1217#1218#0" expanded="true" />
-            <element signature="e#1253#1254#0" expanded="true" />
-            <element signature="e#1299#1300#0" expanded="true" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#866#867#0" expanded="false" />
+            <element signature="e#897#898#0" expanded="false" />
+            <element signature="e#972#973#0" expanded="false" />
+            <element signature="e#1012#1013#0" expanded="false" />
+            <element signature="e#1047#1048#0" expanded="false" />
+            <element signature="e#1078#1079#0" expanded="false" />
+            <element signature="e#1126#1127#0" expanded="false" />
+            <element signature="e#1166#1167#0" expanded="false" />
+            <element signature="e#1192#1193#0" expanded="false" />
+            <element signature="e#1217#1218#0" expanded="false" />
+            <element signature="e#1253#1254#0" expanded="false" />
+            <element signature="e#1299#1300#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1082,13 +830,167 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Terminal/src/Terminal.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="76" column="0" lean-forward="true" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/home.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="16" lean-forward="false" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/index.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="10" lean-forward="false" selection-start-line="8" selection-start-column="10" selection-end-line="8" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/Credential.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/DataServerInterface.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="7" column="18" lean-forward="false" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/Department.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/Election.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/Faculty.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/Person.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="10" lean-forward="false" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/Result.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/Utility.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/VotingList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="20">
+          <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/VotingLog.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="5" column="13" lean-forward="false" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/VotingTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/ServerListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="23" lean-forward="true" selection-start-line="4" selection-start-column="23" selection-end-line="4" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/RmiNapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/VotingTableAutentication.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="116">
+          <caret line="83" column="35" lean-forward="false" selection-start-line="83" selection-start-column="35" selection-end-line="83" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataServer/src/DataServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="11" lean-forward="false" selection-start-line="0" selection-start-column="7" selection-end-line="0" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setup.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="85" column="117" lean-forward="true" selection-start-line="85" selection-start-column="99" selection-end-line="85" selection-end-column="117" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
   </component>
   <component name="masterDetails">
     <states>
       <state key="ArtifactsStructureConfigurable.UI">
         <settings>
           <artifact-editor />
-          <last-edited>HttpServer</last-edited>
+          <last-edited>Console:jar</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -1136,7 +1038,7 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>HttpServer</last-edited>
+          <last-edited>Console</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
