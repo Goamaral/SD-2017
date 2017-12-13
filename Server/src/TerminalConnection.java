@@ -1,3 +1,8 @@
+import Core.Credential;
+import Core.Election;
+import Core.VotingList;
+import Core.VotingLog;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

@@ -7,8 +7,10 @@
           <element id="library" level="project" name="Struts 2" />
         </element>
         <element id="directory" name="classes">
-          <element id="directory" name="models">
-            <element id="module-output" name="Core" />
+          <element id="directory" name="iVotas">
+            <element id="directory" name="models">
+              <element id="module-output" name="Core" />
+            </element>
           </element>
           <element id="module-output" name="HttpServer" />
         </element>

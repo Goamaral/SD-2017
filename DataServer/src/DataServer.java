@@ -1,3 +1,6 @@
+import Core.*;
+import Core.DataServerInterface.Person;
+
 import java.rmi.*;
 import java.rmi.server.*;
 import java.io.IOException;
@@ -303,7 +306,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
     return faculties;
   }
 
-  public ArrayList < Department > listDepartments(String facultyName) {
+  public ArrayList <Department> listDepartments(String facultyName) {
     ArrayList < Department > departments = new ArrayList <> ();
     
     ResultSet resultSet = query(
@@ -345,7 +348,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 		return id;
 	}
 			
-    resultSet = this.query("INSERT INTO Election VALUES ("
+    resultSet = this.query("INSERT INTO Core.Election VALUES ("
 		      + id
 		      + ", '" + election.name + "'"
 		      + ", '" + election.description + "'"
@@ -364,7 +367,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   }
 
   public ArrayList < Election > listElections(String type, String subtype) {
-    ArrayList < Election > elections = new ArrayList <> ();
+    ArrayList <Election> elections = new ArrayList <> ();
     
 	ResultSet resultSet = this.query(
       "SELECT id, name, description, started_at, ended_at FROM election"
@@ -452,7 +455,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
 	  this.query("DELETE FROM voting_list WHERE id = " + id);
   }
 
-  public ArrayList < Person > listCandidates(int votingListID) {
+  public ArrayList <Person> listCandidates(int votingListID) {
     ArrayList < Person > candidates = new ArrayList <> ();
 
     ResultSet resultSet = query(
@@ -554,7 +557,7 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
         }
     } catch (Exception e) {
       System.out.println("Failed at listLists(): " + e);
-      new ArrayList < VotingTable > ();
+      new ArrayList <VotingTable> ();
     }
 
     return votingTables;

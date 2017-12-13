@@ -18,12 +18,12 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 	<default-action-ref name="index" />
 
 	<global-results>
-		<result name="error">/error.jsp</result>
+		<result name="exception">/error.jsp</result>
 	</global-results>
 
 	<!-- all exceptions not caught by the application will lead to error.jsp -->
 	<global-exception-mappings>
-		<exception-mapping exception="java.lang.Exception" result="error" />
+		<exception-mapping exception="java.lang.Exception" result="exception" />
 	</global-exception-mappings>
 
     <action name="index" class="iVotas.actions.Index" method="index">
@@ -32,6 +32,7 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 
     <action name="login" class="iVotas.actions.Index" method="login">
         <result name="success">/home.jsp</result>
+        <result name="error" type="redirect">/home.jsp</result>
     </action>
 
   </package>

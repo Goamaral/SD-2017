@@ -1,3 +1,7 @@
+import Core.Department;
+import Core.Faculty;
+import Core.Utility;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

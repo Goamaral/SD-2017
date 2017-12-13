@@ -1,3 +1,4 @@
+import Core.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -18,40 +19,40 @@ public class Console {
 
     public static void main(String args[]) {
         String[] menuStart = {"Membros", "Faculdades / Departamentos", "Eleicoes"};
-        String[] menuStartTypes = {"Person", "Zone", "Election"};
+        String[] menuStartTypes = {"Core.DataServerInterface.Person", "Zone", "Core.Election"};
         menuTable.put("Start", new Menu(menuStart, menuStartTypes));
 
         String[] menuPerson = {"Registar membro"};
         String[] menuPersonTypes = {"Register"};
-        menuTable.put("Person", new Menu(menuPerson, menuPersonTypes));
+        menuTable.put("Core.DataServerInterface.Person", new Menu(menuPerson, menuPersonTypes));
 
         String[] menuRegister = {"Estudante", "Docente", "Funcionario"};
         String[] menuRegisterTypes = {"Student", "Teacher", "Employee"};
         menuTable.put("Register", new Menu(menuRegister, menuRegisterTypes));
 
         String[] menuZone = {"Faculdades", "Departamentos"};
-        String[] menuZoneTypes = {"Faculty", "Department"};
+        String[] menuZoneTypes = {"Core.Faculty", "Core.Department"};
         menuTable.put("Zone", new Menu(menuZone, menuZoneTypes));
 
         String[] menuElection = {"Eleicao Geral", "Eleicao Nucleo de Estudantes"};
         String[] menuElectionTypes = {"General", "Nucleus"};
-        menuTable.put("Election", new Menu(menuElection, menuElectionTypes));
+        menuTable.put("Core.Election", new Menu(menuElection, menuElectionTypes));
 
         String[] menuNucleus = {"Criar", "Listas", "Mesas de Voto", "Resultados"};
-        String[] menuNucleusTypes = {"Add", "VotingList", "VotingTable", "Results"};
+        String[] menuNucleusTypes = {"Add", "Core.VotingList", "Core.VotingTable", "Results"};
         menuTable.put("Nucleus", new Menu(menuNucleus, menuNucleusTypes));
 
         String[] menuGeneral = {"Estudante", "Docente", "Funcionario"};
-        String[] menuGeneralTypes = {"Student-Election", "Teacher-Election", "Employee-Election"};
+        String[] menuGeneralTypes = {"Student-Core.Election", "Teacher-Core.Election", "Employee-Core.Election"};
         menuTable.put("General", new Menu(menuGeneral, menuGeneralTypes));
 
-        menuTable.put("Student-Election", new Menu(menuNucleus, menuNucleusTypes));
-        menuTable.put("Teacher-Election", new Menu(menuNucleus, menuNucleusTypes));
-        menuTable.put("Employee-Election", new Menu(menuNucleus, menuNucleusTypes));
+        menuTable.put("Student-Core.Election", new Menu(menuNucleus, menuNucleusTypes));
+        menuTable.put("Teacher-Core.Election", new Menu(menuNucleus, menuNucleusTypes));
+        menuTable.put("Employee-Core.Election", new Menu(menuNucleus, menuNucleusTypes));
 
         String[] menuVotingList = {"Candidatos", "Criar", "Remover"};
         String[] menuVotingListTypes = {"Candidate", "Create", "Remove"};
-        menuTable.put("VotingList", new Menu(menuVotingList, menuVotingListTypes));
+        menuTable.put("Core.VotingList", new Menu(menuVotingList, menuVotingListTypes));
 
         String[] menuCandidate = {"Adicionar", "Remover", "Listar"};
         String[] menuCandidateTypes = {"Add", "Remove", "Log"};
@@ -59,12 +60,12 @@ public class Console {
 
         String[] menuVotingTable = {"Adicionar", "Remover"};
         String[] menuVotingTableTypes = {"Add", "Remove"};
-        menuTable.put("VotingTable", new Menu(menuVotingTable, menuVotingTableTypes));
+        menuTable.put("Core.VotingTable", new Menu(menuVotingTable, menuVotingTableTypes));
 
         String[] menuFaculty = {"Criar", "Editar", "Remover"};
         String[] menuFacultyTypes = {"Add", "Edit", "Remove"};
-        menuTable.put("Faculty", new Menu(menuFaculty, menuFacultyTypes));
-        menuTable.put("Department", new Menu(menuFaculty, menuFacultyTypes));
+        menuTable.put("Core.Faculty", new Menu(menuFaculty, menuFacultyTypes));
+        menuTable.put("Core.Department", new Menu(menuFaculty, menuFacultyTypes));
 
         setSecurityPolicies();
         port = getPort(args);
@@ -171,47 +172,47 @@ public class Console {
         int votingListID, personCC, electionID;
 
         switch (action) {
-            case "Person Register Student":
-            case "Person Register Teacher":
-            case "Person Register Employee":
+            case "Core.DataServerInterface.Person Register Student":
+            case "Core.DataServerInterface.Person Register Teacher":
+            case "Core.DataServerInterface.Person Register Employee":
                 buildPerson(actions[2]);
                 break;
-            case "Zone Faculty Add":
+            case "Zone Core.Faculty Add":
                 buildFaculty();
                 break;
-            case "Zone Faculty Edit":
+            case "Zone Core.Faculty Edit":
                 editFaculty();
                 break;
-            case "Zone Faculty Remove":
+            case "Zone Core.Faculty Remove":
                 removeFaculty(null);
                 break;
-            case "Zone Department Add":
+            case "Zone Core.Department Add":
                 buildDepartment(null);
                 break;
-            case "Zone Department Edit":
+            case "Zone Core.Department Edit":
                 editDepartment();
                 break;
-            case "Zone Department Remove":
+            case "Zone Core.Department Remove":
                 removeDepartment(null);
                 break;
-            case "Election General Student-Election Add":
-            case "Election General Teacher-Election Add":
-            case "Election General Employee-Election Add":
-            case "Election Nucleus Add":
+            case "Core.Election General Student-Core.Election Add":
+            case "Core.Election General Teacher-Core.Election Add":
+            case "Core.Election General Employee-Core.Election Add":
+            case "Core.Election Nucleus Add":
                 if (actions.length == 4) {
                     subtype = actions[2].split("-")[0];
                 } else subtype = pickDepartment(null);
 
                 buildElection(actions[1], subtype);
                 break;
-            case "Election General Student-Election VotingList Candidate Add":
-            case "Election General Teacher-Election VotingList Candidate Add":
-            case "Election General Employee-Election VotingList Candidate Add":
-            case "Election General Student-Election VotingList Candidate Remove":
-            case "Election General Teacher-Election VotingList Candidate Remove":
-            case "Election General Employee-Election VotingList Candidate Remove":
-            case "Election Nucleus VotingList Candidate Add":
-            case "Election Nucleus VotingList Candidate Remove":
+            case "Core.Election General Student-Core.Election Core.VotingList Candidate Add":
+            case "Core.Election General Teacher-Core.Election Core.VotingList Candidate Add":
+            case "Core.Election General Employee-Core.Election Core.VotingList Candidate Add":
+            case "Core.Election General Student-Core.Election Core.VotingList Candidate Remove":
+            case "Core.Election General Teacher-Core.Election Core.VotingList Candidate Remove":
+            case "Core.Election General Employee-Core.Election Core.VotingList Candidate Remove":
+            case "Core.Election Nucleus Core.VotingList Candidate Add":
+            case "Core.Election Nucleus Core.VotingList Candidate Remove":
                 if (actions.length == 6) {
                     subtype = actions[2].split("-")[0];
                 } else subtype = pickDepartment(null);
@@ -228,14 +229,14 @@ public class Console {
                     removeCandidate(votingListID, pickCandidate(votingListID));
                 }
                 break;
-            case "Election General Student-Election VotingList Create":
-            case "Election General Teacher-Election VotingList Create":
-            case "Election General Employee-Election VotingList Create":
-            case "Election General Student-Election VotingList Remove":
-            case "Election General Teacher-Election VotingList Remove":
-            case "Election General Employee-Election VotingList Remove":
-            case "Election Nucleus VotingList Create":
-            case "Election Nucleus VotingList Remove":
+            case "Core.Election General Student-Core.Election Core.VotingList Create":
+            case "Core.Election General Teacher-Core.Election Core.VotingList Create":
+            case "Core.Election General Employee-Core.Election Core.VotingList Create":
+            case "Core.Election General Student-Core.Election Core.VotingList Remove":
+            case "Core.Election General Teacher-Core.Election Core.VotingList Remove":
+            case "Core.Election General Employee-Core.Election Core.VotingList Remove":
+            case "Core.Election Nucleus Core.VotingList Create":
+            case "Core.Election Nucleus Core.VotingList Remove":
                 if (actions.length == 5) {
                     subtype = actions[2].split("-")[0];
                 } else subtype = pickDepartment(null);
@@ -248,30 +249,30 @@ public class Console {
                     removeVotingList(pickVotingList(electionID));
                 }
                 break;
-            case "Election General Student-Election VotingList Candidate Log":
-            case "Election General Teacher-Election VotingList Candidate Log":
-            case "Election General Employee-Election VotingList Candidate Log":
-            case "Election Nucleus VotingList Candidate Log":
+            case "Core.Election General Student-Core.Election Core.VotingList Candidate Log":
+            case "Core.Election General Teacher-Core.Election Core.VotingList Candidate Log":
+            case "Core.Election General Employee-Core.Election Core.VotingList Candidate Log":
+            case "Core.Election Nucleus Core.VotingList Candidate Log":
                 if (actions.length == 6) {
                     subtype = actions[2].split("-")[0];
                 } else subtype = pickDepartment(null);
 
                 logCandidates(pickVotingList(pickElection(actions[1], subtype)));
                 break;
-            case "Election General Student-Election Results":
-            case "Election General Teacher-Election Results":
-            case "Election General Employee-Election Results":
-            case "Election Nucleus Results":
+            case "Core.Election General Student-Core.Election Results":
+            case "Core.Election General Teacher-Core.Election Results":
+            case "Core.Election General Employee-Core.Election Results":
+            case "Core.Election Nucleus Results":
                 if (actions.length == 4) {
                     subtype = actions[2].split("-")[0];
                 } else subtype = pickDepartment(null);
 
                 logResults(pickElection(actions[1], subtype));
                 break;
-            case "Election General Student-Election VotingTable Add":
-            case "Election General Teacher-Election VotingTable Add":
-            case "Election General Employee-Election VotingTable Add":
-            case "Election Nucleus VotingTable Add":
+            case "Core.Election General Student-Core.Election Core.VotingTable Add":
+            case "Core.Election General Teacher-Core.Election Core.VotingTable Add":
+            case "Core.Election General Employee-Core.Election Core.VotingTable Add":
+            case "Core.Election Nucleus Core.VotingTable Add":
                 if (actions.length == 5) {
                     subtype = actions[2].split("-")[0];
                     buildVotingTable(pickElection(actions[1], subtype), pickDepartment(null));
@@ -280,10 +281,10 @@ public class Console {
                     buildVotingTable(pickElection(actions[1], departmentName), departmentName);
                 }
                 break;
-            case "Election General Student-Election VotingTable Remove":
-            case "Election General Teacher-Election VotingTable Remove":
-            case "Election General Employee-Election VotingTable Remove":
-            case "Election Nucleus VotingTable Remove":
+            case "Core.Election General Student-Core.Election Core.VotingTable Remove":
+            case "Core.Election General Teacher-Core.Election Core.VotingTable Remove":
+            case "Core.Election General Employee-Core.Election Core.VotingTable Remove":
+            case "Core.Election Nucleus Core.VotingTable Remove":
                 if (actions.length == 5) {
                     subtype = actions[2].split("-")[0];
                 } else subtype = pickDepartment(null);
