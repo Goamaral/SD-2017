@@ -6,9 +6,11 @@
         <element id="directory" name="lib">
           <element id="library" level="project" name="Struts 2" />
         </element>
-        <element id="module-output" name="HttpServer" />
-        <element id="directory" name="models">
-          <element id="module-output" name="Core" />
+        <element id="directory" name="classes">
+          <element id="directory" name="models">
+            <element id="module-output" name="Core" />
+          </element>
+          <element id="module-output" name="HttpServer" />
         </element>
       </element>
       <element id="javaee-facet-resources" facet="HttpServer/web/Web" />
