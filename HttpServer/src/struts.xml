@@ -15,7 +15,7 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 
   <package name="iVotas" extends="struts-default">
 	
-	<default-action-ref name="index" />
+	<default-action-ref name="home" />
 
 	<global-results>
 		<result name="exception">/error.jsp</result>
@@ -26,15 +26,22 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 		<exception-mapping exception="java.lang.Exception" result="exception" />
 	</global-exception-mappings>
 
-    <action name="index" class="iVotas.actions.Index" method="index">
-      <result name="success">/index.jsp</result>
+    <!-- Index page -->
+    <action name="home" class="iVotas.actions.Index" method="index">
+      <result name="success">/home.jsp</result>
+      <result name="platform" type="redirectAction">platform</result>
     </action>
 
     <action name="login" class="iVotas.actions.Index" method="login">
-        <result name="success">/home.jsp</result>
-        <result name="error" type="redirect">/home.jsp</result>
+        <result name="platform" type="redirectAction">platform</result>
+        <result name="home" type="redirectAction">home</result>
     </action>
 
+    <!-- Platform page -->
+    <action name="platform" class="iVotas.actions.Platform" method="index">
+        <result name="home" type="redirectAction">home</result>
+        <result name="success">/platform.jsp</result>
+    </action>
   </package>
 
 </struts>

@@ -26,9 +26,6 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
       e.printStackTrace();
     }
 
-    // set security policies
-    setSecurityPolicies();
-
     // set port and reference for RMI Server
     port = getPort(args);
     reference = getReference(args);
@@ -753,17 +750,13 @@ public class DataServer extends UnicastRemoteObject implements DataServerInterfa
   }
 
   private static void createAndBindRegistry() throws RemoteException {
+    //System.setProperty("java.rmi.server.hostname","127.0.1.1");
     Registry reg = LocateRegistry.createRegistry(port);
     reg.rebind(reference, server);
   }
 
   private static void lookupRegistry(int port, String reference) throws RemoteException, NotBoundException {
       LocateRegistry.getRegistry(port).lookup(reference);
-  }
-
-  private static void setSecurityPolicies() {
-    System.getProperties().put("java.security.policy", "policy.all");
-    System.setSecurityManager(new SecurityManager());
   }
 
   private DataServer() throws RemoteException {

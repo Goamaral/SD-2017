@@ -8,11 +8,10 @@
         </element>
         <element id="directory" name="classes">
           <element id="directory" name="iVotas">
-            <element id="directory" name="models">
-              <element id="module-output" name="Core" />
-            </element>
+            <element id="directory" name="models" />
           </element>
           <element id="module-output" name="HttpServer" />
+          <element id="module-output" name="Core" />
         </element>
       </element>
       <element id="javaee-facet-resources" facet="HttpServer/web/Web" />

@@ -1,59 +1,62 @@
 package iVotas.actions;
 
+import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
-import Core.*;
 
-import java.net.MalformedURLException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import Core.*;
+import iVotas.models.Registry;
 
 public class Index extends ActionSupport {
-    int cc;
-    String username;
-    String password;
+    private int cc;
+    private String username;
+    private String password;
 
-    // Controllers
-    public String index() {
-        return SUCCESS;
+    public String index() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        if (registry.isLoggedIn()) {
+            System.out.println(registry.getUserLoggedIn());
+            return "platform";
+        } else return SUCCESS;
     }
 
     // Login
-    public String login() throws Exception{
-        DataServerInterface registry;
-        System.out.println(cc + " " + username + " " + password);
+    public String login() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        registry = (DataServerInterface) Naming.lookup("iVotas");
-        Credential credential = registry.getCredentials(cc);
-        if (credential.username == username && credential.password == password) {
-            return SUCCESS;
+        if (this.username.equals("admin") && this.password.equals("admin")) {
+            registry.loginUser("admin");
+            return "platform";
         }
 
-        return ERROR;
+        System.out.println(registry.registry);
+
+        Credential credential = registry.registry.getCredentials(this.cc);
+
+        if (credential == null) return "home";
+
+        if (credential.username.equals(this.username) && credential.password.equals(this.password)) {
+            registry.loginUser(username);
+            return "platform";
+        }
+
+        return "home";
     }
 
-    public String getUsername() {
-        return username;
-    }
 
-    // Getters and setters
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public int getCc() {
-        return cc;
-    }
-
     public void setCc(String cc) {
-        this.cc = Integer.parseInt(cc);
+        if (cc.equals("")) {
+            this.cc = -1;
+        } else this.cc = Integer.parseInt(cc);
     }
 }
