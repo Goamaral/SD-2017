@@ -1,6 +1,9 @@
 package Core;
 
 import java.io.Serializable;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 public class Faculty implements Serializable {
 	public String name;

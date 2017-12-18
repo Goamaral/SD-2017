@@ -18,54 +18,76 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 	<default-action-ref name="home" />
 
 	<global-results>
-		<result name="exception">/error.jsp</result>
+      <result name="exception">/error.jsp</result>
 	</global-results>
 
 	<!-- all exceptions not caught by the application will lead to error.jsp -->
 	<global-exception-mappings>
-		<exception-mapping exception="java.lang.Exception" result="exception" />
+      <exception-mapping exception="java.lang.Exception" result="exception" />
 	</global-exception-mappings>
 
     <!-- Index page -->
-    <action name="home" class="iVotas.actions.Index" method="index">
-      <result name="success">/Home/index.jsp</result>
+    <action name="home" class="iVotas.actions.IndexAction">
+      <result name="success">/home.jsp</result>
       <result name="platform" type="redirectAction">platform</result>
     </action>
 
-    <action name="login" class="iVotas.actions.Index" method="login">
-        <result name="platform" type="redirectAction">platform</result>
-        <result name="console" type="redirectAction">console</result>
-        <result name="home" type="redirectAction">home</result>
+    <action name="login" class="iVotas.actions.IndexAction" method="login">
+      <result name="platform" type="redirectAction">platform</result>
+      <result name="console" type="redirectAction">console</result>
+      <result name="home" type="redirectAction">home</result>
     </action>
 
-    <action name="logout" class="iVotas.actions.Index" method="logout">
-        <result type="redirectAction">home</result>
+    <action name="logout" class="iVotas.actions.IndexAction" method="logout">
+      <result type="redirectAction">home</result>
     </action>
 
     <!-- Platform page -->
-    <action name="platform" class="iVotas.actions.Platform" method="index">
-        <result name="home" type="redirectAction">home</result>
-        <result name="console" type="redirectAction">console</result>
-        <result name="success">/Platform/index.jsp</result>
+    <action name="platform" class="iVotas.actions.PlatformAction">
+      <result name="home" type="redirectAction">home</result>
+      <result name="console" type="redirectAction">console</result>
+      <result name="success">/platform.jsp</result>
     </action>
 
     <!-- Console page -->
-    <action name="console" class="iVotas.actions.Console" method="index">
-        <result name="home" type="redirectAction">home</result>
-        <result name="platform" type="redirectAction">platform</result>
-        <result name="success">/Console/index.jsp</result>
+    <action name="console" class="iVotas.actions.ConsoleAction">
+      <result name="home" type="redirectAction">home</result>
+      <result name="platform" type="redirectAction">platform</result>
+      <result name="success">/console.jsp</result>
+    </action>
+      
+    <!-- Person -->
+    <action name="registerMemberForm" class="iVotas.actions.PersonAction" method="getRegisterMemberForm">
+      <result>/Person/registerMember.jsp</result>
     </action>
 
-    <action name="registerMemberForm" class="iVotas.actions.Console" method="getRegisterMemberForm">
-        <result>/Console/registerMember.jsp</result>
+    <action name="listDepartments" class="iVotas.actions.PersonAction" method="listDepartments">
+      <result>/Buildings/listDepartments.jsp</result>
     </action>
 
-    <action name="listDepartments" class="iVotas.actions.Console" method="listDepartments">
-        <result>/Core/listDepartments.jsp</result>
+    <action name="registerMember" class="iVotas.actions.PersonAction" method="registerMember">
+      <result type="redirectAction">platform</result>
     </action>
 
-    <action name="registerMember" class="iVotas.actions.Console" method="registerMember">
-        <result type="redirectAction">console</result>
+    <!-- Faculty -->
+    <action name="editFacultyForm" class="iVotas.actions.FacultyAction" method="getEditFacultyForm">
+      <result>/Buildings/editFacultyForm.jsp</result>
+    </action>
+
+    <action name="removeFacultyForm" class="iVotas.actions.FacultyAction" method="getRemoveFacultyForm">
+      <result>/Buildings/removeFacultyForm.jsp</result>
+    </action>
+      
+    <action name="editFaculty" class="iVotas.actions.FacultyAction" method="editFaculty">
+      <result type="redirectAction">platform</result>
+    </action>
+
+    <action name="createFaculty" class="iVotas.actions.FacultyAction" method="createFaculty">
+      <result type="redirectAction">platform</result>
+    </action>
+
+    <action name="removeFaculty" class="iVotas.actions.FacultyAction" method="removeFaculty">
+      <result type="redirectAction">platform</result>
     </action>
 
   </package>
