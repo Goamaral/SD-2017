@@ -35,8 +35,10 @@ public class Console extends ActionSupport {
         return SUCCESS;
     }
 
-    public String registerMember() {
-        System.out.println(this.person);
+    public String registerMember() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.registry.createPerson(this.person);
 
         return SUCCESS;
     }
