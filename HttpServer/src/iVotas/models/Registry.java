@@ -39,4 +39,8 @@ public class Registry {
     public void loginUser(String user) {
         this.session.put("user", user);
     }
+
+    public void logoutUser() {
+        this.session.put("user", null);
+    }
 }

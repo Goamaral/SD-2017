@@ -9,13 +9,12 @@ import java.rmi.RemoteException;
 
 public class Platform extends ActionSupport {
     private Registry registry;
-    public boolean loggedAsAdmin;
 
     public String index() throws RemoteException, NotBoundException {
         this.registry = new Registry(ActionContext.getContext().getSession());
 
         if (this.registry.isLoggedIn()) {
-            this.loggedAsAdmin = this.registry.isLoggedAsAdmin();
+            if (this.registry.isLoggedAsAdmin()) return "console";
             return SUCCESS;
         } else {
             return "home";

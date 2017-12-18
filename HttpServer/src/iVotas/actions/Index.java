@@ -17,21 +17,17 @@ public class Index extends ActionSupport {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
         if (registry.isLoggedIn()) {
-            System.out.println(registry.getUserLoggedIn());
             return "platform";
         } else return SUCCESS;
     }
 
-    // Login
     public String login() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
         if (this.username.equals("admin") && this.password.equals("admin")) {
             registry.loginUser("admin");
-            return "platform";
+            return "console";
         }
-
-        System.out.println(registry.registry);
 
         Credential credential = registry.registry.getCredentials(this.cc);
 
@@ -45,6 +41,12 @@ public class Index extends ActionSupport {
         return "home";
     }
 
+    public String logout() throws RemoteException, NotBoundException{
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.logoutUser();
+        return SUCCESS;
+    }
 
     public void setUsername(String username) {
         this.username = username;
