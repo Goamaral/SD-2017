@@ -1,7 +1,6 @@
 package iVotas.actions;
 
 import Core.Department;
-import Core.Faculty;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
 import iVotas.models.Registry;
@@ -42,6 +41,8 @@ public class DepartmentAction extends ActionSupport {
 
         return SUCCESS;
     }
+
+    public String getCreateDepartmentForm() { return SUCCESS; }
 
     public ArrayList<String> getFaculties() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());

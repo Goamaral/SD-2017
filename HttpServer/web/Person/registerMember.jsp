@@ -10,7 +10,7 @@
     <s:textfield name="person.phone" label="Telemovel" required="true"/>
     <s:textfield name="person.cc" label="Cartao Cidadao" required="true"/>
     <s:textfield name="person.ccExpire" label="Data expiracao" required="true"/>
-    <s:select label="Faculdade" list="faculties" id="faculties" onchange="loadDepartments()"/>
+    <s:select label="Faculdade" list="faculties" id="faculties" onchange="loadDepartmentsForPerson()"/>
     <s:select name="person.departmentName" label="Departamento" list="departments" id="departments"/>
     <s:submit value="Registar"/>
 </s:form>

@@ -111,6 +111,10 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
       <result type="redirectAction">platform</result>
     </action>
 
+    <action name="createDepartmentForm" class="iVotas.actions.DepartmentAction" method="getCreateDepartmentForm">
+        <result>/Buildings/createDepartmentForm.jsp</result>
+    </action>
+
   </package>
 
 </struts>
