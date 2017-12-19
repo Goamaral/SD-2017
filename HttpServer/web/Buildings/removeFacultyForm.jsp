@@ -2,6 +2,6 @@
 
 <h2>Remover Faculdade</h2>
 <s:form action="removeFaculty">
-    <s:select name="facultyName" label="Escolha Faculdade" list="faculties"/>
+    <s:select name="faculty.name" label="Escolha Faculdade" list="faculties"/>
     <s:submit value="Remover" />
 </s:form>

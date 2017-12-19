@@ -90,6 +90,27 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
       <result type="redirectAction">platform</result>
     </action>
 
+    <!-- Department -->
+    <action name="createDepartment" class="iVotas.actions.DepartmentAction" method="createDepartment">
+      <result type="redirectAction">platform</result>
+    </action>
+
+    <action name="editDepartmentForm" class="iVotas.actions.DepartmentAction" method="getEditDepartmentForm">
+      <result>/Buildings/editDepartmentForm.jsp</result>
+    </action>
+
+    <action name="editDepartment" class="iVotas.actions.DepartmentAction" method="editDepartment">
+      <result type="redirectAction">platform</result>
+    </action>
+
+    <action name="removeDepartmentForm" class="iVotas.actions.DepartmentAction" method="getRemoveDepartmentForm">
+      <result>/Buildings/removeDepartmentForm.jsp</result>
+    </action>
+
+    <action name="removeDepartment" class="iVotas.actions.DepartmentAction" method="removeDepartment">
+      <result type="redirectAction">platform</result>
+    </action>
+
   </package>
 
 </struts>

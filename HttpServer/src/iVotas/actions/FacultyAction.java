@@ -10,8 +10,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class FacultyAction extends ActionSupport {
-    private String facultyName;
-    private String newFacultyName;
+    private Faculty faculty;
+    private Faculty newFaculty;
 
     public String getEditFacultyForm() {
         return SUCCESS;
@@ -24,7 +24,7 @@ public class FacultyAction extends ActionSupport {
     public String editFaculty() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        registry.registry.updateFaculty(new Faculty(this.facultyName), new Faculty(this.newFacultyName));
+        registry.registry.updateFaculty(this.faculty, this.newFaculty);
 
         return SUCCESS;
     }
@@ -32,7 +32,7 @@ public class FacultyAction extends ActionSupport {
     public String createFaculty() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        registry.registry.createFaculty(this.facultyName);
+        registry.registry.createFaculty(this.faculty.name);
 
         return SUCCESS;
     }
@@ -40,7 +40,7 @@ public class FacultyAction extends ActionSupport {
     public String removeFaculty() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        registry.registry.removeFaculty(this.facultyName);
+        registry.registry.removeFaculty(this.faculty.name);
 
         return SUCCESS;
     }
@@ -48,32 +48,26 @@ public class FacultyAction extends ActionSupport {
     public ArrayList<String> getFaculties() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        ArrayList<Faculty> faculties = registry.registry.listFaculties();
+        ArrayList<String> facultyNames = registry.getFaculties();
 
-        ArrayList<String> facultiesNames = new ArrayList<>();
+        this.faculty = new Faculty(facultyNames.get(0));
 
-        for (Faculty faculty : faculties) {
-            facultiesNames.add(faculty.name);
-        }
-
-        this.facultyName = facultiesNames.get(0);
-
-        return facultiesNames;
+        return facultyNames;
     }
 
-    public String getFacultyName() {
-        return facultyName;
+    public Faculty getFaculty() {
+        return faculty;
     }
 
-    public void setFacultyName(String facultyName) {
-        this.facultyName = facultyName;
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
     }
 
-    public String getNewFacultyName() {
-        return newFacultyName;
+    public Faculty getNewFaculty() {
+        return newFaculty;
     }
 
-    public void setNewFacultyName(String newFacultyName) {
-        this.newFacultyName = newFacultyName;
+    public void setNewFaculty(Faculty newFaculty) {
+        this.newFaculty = newFaculty;
     }
 }
