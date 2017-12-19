@@ -17,6 +17,7 @@
             <button onclick="ajaxRender('/Person/index.jsp')">Registar membro</button>
             <button onclick="ajaxRender('/Buildings/faculty.jsp')">Faculdades</button>
             <button onclick="ajaxRender('/Buildings/department.jsp')">Departamentos</button>
+            <button onclick="ajaxRender('/Election/index.jsp')">Eleicoes</button>
         </div>
     </body>
 </html>

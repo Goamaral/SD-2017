@@ -115,6 +115,20 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
         <result>/Buildings/createDepartmentForm.jsp</result>
     </action>
 
+    <!-- Election -->
+    <action name="chooseElectionSubtype" class="iVotas.actions.ElectionAction" method="getElectionSubTypeForm">
+        <result name="Nucleous">/Election/nucleousSubTypeForm.jsp</result>
+        <result name="General">/Election/generalSubTypeForm.jsp</result>
+    </action>
+
+    <action name="createElectionForm" class="iVotas.actions.ElectionAction" method="getCreateElectionForm">
+        <result>/Election/createElectionForm.jsp</result>
+    </action>
+
+    <action name="createElection" class="iVotas.actions.ElectionAction" method="createElection">
+        <result type="redirectAction">platform</result>
+    </action>
+
   </package>
 
 </struts>

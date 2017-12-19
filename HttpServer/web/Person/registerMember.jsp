@@ -1,6 +1,6 @@
 <%@ taglib prefix="s" uri="/struts-tags"%>
 
-<h2>Registar</h2>
+<h2>Registar Membro</h2>
 <s:form action="registerMember">
     <s:hidden name="person.type" value="%{personType}" />
     <s:textfield name="person.name" label="Nome" required="true"/>
