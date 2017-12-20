@@ -1,7 +1,7 @@
 package iVotas.models;
 
 import Core.*;
-import com.opensymphony.xwork2.ActionContext;
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.struts2.dispatcher.SessionMap;
 
 import java.rmi.NotBoundException;
@@ -47,55 +47,100 @@ public class Registry {
 
     public ArrayList<String> getFaculties() throws RemoteException {
         ArrayList<Core.Faculty> faculties = this.registry.listFaculties();
+        ArrayList<String> facultyNames = new ArrayList<>();
 
-        ArrayList<String> facultiesNames = new ArrayList<>();
+        if (faculties.size() == 0) return facultyNames;
 
         for(Core.Faculty faculty : faculties) {
-            facultiesNames.add(faculty.name);
+            facultyNames.add(faculty.name);
         }
 
-        return facultiesNames;
+        this.save("FacultyName", facultyNames.get(0));
+
+        return facultyNames;
     }
 
     public ArrayList<String> getDepartments(String facultyName) throws RemoteException {
         ArrayList<Department> departments = this.registry.listDepartments(facultyName);
-
         ArrayList<String> departmentsNames = new ArrayList<>();
+
+        if (departments.size() == 0) return departmentsNames;
 
         for(Department department : departments) {
             departmentsNames.add(department.name);
         }
 
+        this.save("DepartmentName", departmentsNames.get(0));
+
         return departmentsNames;
     }
 
-    public void fetchElections() throws RemoteException {
+    public ArrayList<String> getElections() throws RemoteException {
         String type = (String) this.get("ElectionType");
         String subtype = (String) this.get("ElectionSubtype");
 
         ArrayList<Election> elections = this.registry.listElections(type, subtype);
+        ArrayList<String> electionNames = new ArrayList<>();
 
-        ArrayList<String> electionsNames = new ArrayList<>();
-        ArrayList<Integer> electionsIDs = new ArrayList<>();
+        if (elections.size() == 0) return electionNames;
 
         for (Election election : elections) {
-            electionsNames.add(election.name);
-            electionsIDs.add(election.id);
+            electionNames.add(election.name);
         }
 
-        this.save("ElectionsNamesList", electionsNames);
-        this.save("ElectionsIDsList", electionsIDs);
+        this.save("ElectionName", electionNames.get(0));
 
-        this.save("ElectionName", electionsNames.get(0));
-        this.save("ElectionID", electionsIDs.get(0));
-    }
-
-    public ArrayList<String> getElections() throws RemoteException {
-        return (ArrayList<String>) this.get("ElectionsNamesList");
+        return electionNames;
     }
 
     public ArrayList<Integer> getElectionsIDs() throws RemoteException {
-        return (ArrayList<Integer>) this.get("ElectionsIDsList");
+        String type = (String) this.get("ElectionType");
+        String subtype = (String) this.get("ElectionSubtype");
+
+        ArrayList<Election> elections = this.registry.listElections(type, subtype);
+        ArrayList<Integer> electionsIDs = new ArrayList<>();
+
+        if (elections.size() == 0) return electionsIDs;
+
+        for (Election election : elections) {
+            electionsIDs.add(election.id);
+        }
+
+        this.save("ElectionID", electionsIDs.get(0));
+
+        return electionsIDs;
+    }
+
+    public ArrayList<String> getVotingLists() throws RemoteException {
+        int electionID = (Integer) this.get("ElectionID");
+        ArrayList<VotingList> votingLists = this.registry.listVotingLists(electionID);
+        ArrayList<String> votingListsNames = new ArrayList<>();
+
+        if (votingLists.size() == 0) return votingListsNames;
+
+        for (VotingList votingList : votingLists) {
+            votingListsNames.add(votingList.name);
+        }
+
+        this.save("VotingListName", votingListsNames.get(0));
+
+        return votingListsNames;
+    }
+
+    public ArrayList<Integer> getVotingListsIDs() throws RemoteException {
+        int electionID = (Integer) this.get("ElectionID");
+        ArrayList<VotingList> votingLists = this.registry.listVotingLists(electionID);
+        ArrayList<Integer> votingListsIDs = new ArrayList<>();
+
+        if (votingLists.size() == 0) return  votingListsIDs;
+
+        for (VotingList votingList : votingLists) {
+            votingListsIDs.add(votingList.id);
+        }
+
+        this.save("VotingListID", votingListsIDs.get(0));
+
+        return votingListsIDs;
     }
 
     public void save(String key, Object value) {

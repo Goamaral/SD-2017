@@ -34,11 +34,7 @@ public class ElectionAction extends ActionSupport {
     public ArrayList<String> getFaculties() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        ArrayList<String> facultyNames = registry.getFaculties();
-
-        registry.save("FacultyName", facultyNames.get(0));
-
-        return facultyNames;
+        return registry.getFaculties();
     }
 
     public ArrayList<String> getDepartments() throws RemoteException, NotBoundException {

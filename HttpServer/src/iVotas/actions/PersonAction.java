@@ -10,10 +10,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class PersonAction extends ActionSupport {
-    private Person person;
-    private String personType;
-    private String facultyName;
-
     public String getRegisterMemberForm() {
         return SUCCESS;
     }
@@ -25,7 +21,7 @@ public class PersonAction extends ActionSupport {
     public String registerMember() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        registry.registry.createPerson(this.person);
+        registry.registry.createPerson((Person) registry.get("Person"));
 
         return SUCCESS;
     }
@@ -35,34 +31,42 @@ public class PersonAction extends ActionSupport {
 
         ArrayList<String> facultyNames = registry.getFaculties();
 
-        this.facultyName = facultyNames.get(0);
-
         return facultyNames;
     }
 
     public ArrayList<String> getDepartments() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        return registry.getDepartments(this.facultyName);
+        return registry.getDepartments((String) registry.get("FacultyName"));
     }
 
-    public void setPerson(Person person) {
-        this.person = person;
+    public void setPerson(Person person) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("Person", person);
     }
 
-    public Person getPerson() {
-        return this.person;
+    public Person getPerson() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return (Person) registry.get("Person");
     }
 
-    public String getPersonType() {
-        return personType;
+    public String getPersonType() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return (String) registry.get("PersonType");
     }
 
-    public void setPersonType(String personType) {
-        this.personType = personType;
+    public void setPersonType(String personType) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("PersonType", personType);
     }
 
-    public void setFacultyName(String facultyName) {
-        this.facultyName = facultyName;
+    public void setFacultyName(String facultyName) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("FacultyName", facultyName);
     }
 }

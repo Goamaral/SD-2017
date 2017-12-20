@@ -11,8 +11,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class VotingListAction extends ActionSupport {
-    private Boolean electionFetched = false;
-
     public String getCreateVotingListForm() { return SUCCESS; }
 
     public String createVotingList() throws RemoteException, NotBoundException {
@@ -23,27 +21,23 @@ public class VotingListAction extends ActionSupport {
         return SUCCESS;
     }
 
+    public String getRemoveVotingListForm() { return SUCCESS; }
+
+    public String listVotingLists() { return SUCCESS; }
+
+
+
 
     public ArrayList<String> getElections() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        if (!this.electionFetched) {
-            registry.fetchElections();
-            this.electionFetched = true;
-        }
-
-        return (ArrayList<String>) registry.get("ElectionsNamesList");
+        return registry.getElections();
     }
 
     public ArrayList<Integer> getElectionsIDs() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        if (!this.electionFetched) {
-            registry.fetchElections();
-            this.electionFetched = true;
-        }
-
-        return (ArrayList<Integer>) registry.get("ElectionsIDsList");
+        return registry.getElectionsIDs();
     }
 
     public VotingList getVotingList() throws RemoteException, NotBoundException {
@@ -56,5 +50,23 @@ public class VotingListAction extends ActionSupport {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
         registry.save("VotingList", votingList);
+    }
+
+    public void setElectionID(String electionID) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("ElectionID", Integer.parseInt(electionID));
+    }
+
+    public ArrayList<String> getVotingLists() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return registry.getVotingLists();
+    }
+
+    public ArrayList<Integer> getVotingListsIDs() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return registry.getVotingListsIDs();
     }
 }

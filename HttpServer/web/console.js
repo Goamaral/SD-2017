@@ -3,11 +3,8 @@ function ajax(method, url, callback) {
     xhr.open(method, url);
 
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200)
-                callback(xhr.responseText);
-        } else {
-            callback("Error: " + xhr.status);
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            callback(xhr.responseText);
         }
 
     };
@@ -22,7 +19,6 @@ function render(newContent) {
 }
 
 function logout() {
-    console.log("HI");
     window.location.href = "/logout.action";
 }
 
@@ -89,16 +85,36 @@ function selectElectionID() {
 
     electionsIDsSelect.selectedIndex = electionsSelect.selectedIndex;
 
-    return electionsSelect.options[electionsIDsSelect.selectedIndex].text;
+    return electionsIDsSelect.options[electionsIDsSelect.selectedIndex].text;
 }
 
 function loadVotingLists() {
     var electionID = selectElectionID();
 
     var callback = function (newContent) {
-        var votingListsSelect = document.getElementById("votingLists");
-        votingListsSelect.innerHTML = newContent;
+        var block =  document.createElement("div");
+        block.innerHTML = newContent;
+
+
+        var votingListsIDsSelectParentNode = document.getElementById("votingListsIDs").parentNode;
+        votingListsIDsSelectParentNode.innerHTML = "";
+        votingListsIDsSelectParentNode.appendChild(block.children[0]);
+
+        var votingListsSelectParentNode = document.getElementById("votingLists").parentNode.parentNode;
+        votingListsSelectParentNode.children[0].innerHTML = "";
+        votingListsSelectParentNode.children[1].innerHTML = "";
+        votingListsSelectParentNode.children[0].appendChild(block.children[0]);
+        votingListsSelectParentNode.children[1].appendChild(block.children[0]);
+
+
     }
 
     ajax("GET", "/listVotingLists.action?electionID=" + electionID, callback);
+}
+
+function selectVotingListID() {
+    var votingListsSelect = document.getElementById("votingLists");
+    var votingListsIDsSelect = document.getElementById("votingListsIDs");
+
+    votingListsIDsSelect.selectedIndex = votingListsSelect.selectedIndex;
 }
