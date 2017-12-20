@@ -25,7 +25,15 @@ public class VotingListAction extends ActionSupport {
 
     public String listVotingLists() { return SUCCESS; }
 
+    public String removeVotingList() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
 
+        int votingListID = (Integer) registry.get("VotingListID");
+
+        registry.registry.removeVotingList(votingListID);
+
+        return SUCCESS;
+    }
 
 
     public ArrayList<String> getElections() throws RemoteException, NotBoundException {
@@ -38,12 +46,6 @@ public class VotingListAction extends ActionSupport {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
         return registry.getElectionsIDs();
-    }
-
-    public VotingList getVotingList() throws RemoteException, NotBoundException {
-        Registry registry = new Registry(ActionContext.getContext().getSession());
-
-        return (VotingList) registry.get("VotingList");
     }
 
     public void setVotingList(VotingList votingList) throws RemoteException, NotBoundException {
@@ -68,5 +70,11 @@ public class VotingListAction extends ActionSupport {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
         return registry.getVotingListsIDs();
+    }
+
+    public void setVotingListID(int votingListID) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("VotingListID", votingListID);
     }
 }

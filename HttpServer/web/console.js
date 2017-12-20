@@ -105,8 +105,6 @@ function loadVotingLists() {
         votingListsSelectParentNode.children[1].innerHTML = "";
         votingListsSelectParentNode.children[0].appendChild(block.children[0]);
         votingListsSelectParentNode.children[1].appendChild(block.children[0]);
-
-
     }
 
     ajax("GET", "/listVotingLists.action?electionID=" + electionID, callback);
@@ -117,4 +115,11 @@ function selectVotingListID() {
     var votingListsIDsSelect = document.getElementById("votingListsIDs");
 
     votingListsIDsSelect.selectedIndex = votingListsSelect.selectedIndex;
+}
+
+function selectPersonCC() {
+    var peopleSelect = document.getElementById("people");
+    var peopleCCsSelect = document.getElementById("peopleCCs");
+
+    peopleCCsSelect.selectedIndex = peopleSelect.selectedIndex;
 }

@@ -1,3 +1,3 @@
-<button>Candidatos</button> TODO
+<button onclick="ajaxRender('/Candidate/index.jsp')">Candidatos</button> DOING
 <button onclick="ajaxRender('/createVotingListForm.action')">Criar</button>
-<button onclick="ajaxRender('/removeVotingListForm.action')">Remover</button> DOING
+<button onclick="ajaxRender('/removeVotingListForm.action')">Remover</button>

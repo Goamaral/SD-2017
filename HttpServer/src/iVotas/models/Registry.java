@@ -143,6 +143,56 @@ public class Registry {
         return votingListsIDs;
     }
 
+    public ArrayList<String> getPeople() throws RemoteException {
+        String electionType = (String) this.get("ElectionType");
+        String electionSubtype = (String) this.get("ElectionSubtype");
+
+        ArrayList<Person> people;
+        ArrayList<String> peopleNames = new ArrayList<>();
+
+        if (electionType.equals("General")) {
+            people = this.registry.listPeopleOfType(electionSubtype);
+        } else {
+            people = this.registry.listStudentsFromDepartment(electionSubtype);
+        }
+
+        if (people.size() == 0) return  peopleNames;
+
+
+        for (Person person : people) {
+            peopleNames.add(person.name);
+        }
+
+        this.save("PersonName", peopleNames.get(0));
+
+        return peopleNames;
+    }
+
+    public ArrayList<Integer> getPeopleCCs() throws RemoteException {
+        String electionType = (String) this.get("ElectionType");
+        String electionSubtype = (String) this.get("ElectionSubtype");
+
+        ArrayList<Person> people;
+        ArrayList<Integer> peopleCCs = new ArrayList<>();
+
+        if (electionType.equals("General")) {
+            people = this.registry.listPeopleOfType(electionSubtype);
+        } else {
+            people = this.registry.listStudentsFromDepartment(electionSubtype);
+        }
+
+        if (people.size() == 0) return  peopleCCs;
+
+
+        for (Person person : people) {
+            peopleCCs.add(person.cc);
+        }
+
+        this.save("PersonCC", peopleCCs.get(0));
+
+        return peopleCCs;
+    }
+
     public void save(String key, Object value) {
         this.session.put(key, value);
     }

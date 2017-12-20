@@ -149,6 +149,24 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
             <result>/VotingList/listVotingLists.jsp</result>
         </action>
 
+        <action name="removeVotingList" class="iVotas.actions.VotingListAction" method="removeVotingList">
+            <result type="redirectAction">platform</result>
+        </action>
+
+        <action name="addCandidateForm" class="iVotas.actions.CandidateAction" method="getAddCandidateForm">
+            <result>/Candidate/addCandidateForm.jsp</result>
+        </action>
+
+        <action name="removeCandidateForm" class="iVotas.actions.CandidateAction" method="getRemoveCandidateForm">
+            <result>/Candidate/removeCandidateForm.jsp</result>
+        </action>
+
+        <action name="listCandidates" class="iVotas.actions.CandidateAction" method="listCandidates">
+            <result>/Candidate/listCandidates.jsp</result>
+        </action>
+
+        <action name="addCandidate"></action>
+
     </package>
 
 </struts>
