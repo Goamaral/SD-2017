@@ -1,12 +1,5 @@
 <%@ taglib prefix="s" uri="/struts-tags"%>
 
-this.name = name;
-this.description = description;
-this.type = type;
-this.subtype = subtype;
-this.start = start;
-this.end = end;
-
 <h2>Criar Elecicao</h2>
 <s:form action="createElection">
     <s:hidden name="election.type" value="%{electionType}" />

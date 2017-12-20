@@ -129,6 +129,14 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
         <result type="redirectAction">platform</result>
     </action>
 
+    <action name="mainMenu" class="iVotas.actions.ElectionAction" method="getMainMenu">
+      <result>/Election/mainMenu.jsp</result>
+    </action>
+
+      <action name="createVotingListForm" class="iVotas.actions.VotingListAction" method="getCreateVotingListForm">
+          <result>/VotingList/createVotingListForm.jsp</result>
+      </action>
+
   </package>
 
 </struts>

@@ -7,17 +7,14 @@ import iVotas.models.Registry;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 
 public class DepartmentAction extends ActionSupport {
-    private Department department;
-    private Department newDepartment;
-    private String facultyName;
-
     public String createDepartment() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        registry.registry.createDepartment(this.department);
+        registry.registry.createDepartment((Department)registry.get("Department"));
 
         return SUCCESS;
     }
@@ -27,7 +24,7 @@ public class DepartmentAction extends ActionSupport {
     public String editDepartment() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        registry.registry.updateDepartment(this.department, this.newDepartment);
+        registry.registry.updateDepartment((Department)registry.get("Department"), (Department)registry.get("NewDepartment"));
 
         return SUCCESS;
     }
@@ -37,7 +34,9 @@ public class DepartmentAction extends ActionSupport {
     public String removeDepartment() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        registry.registry.removeDepartment(this.department.name);
+        Department department = (Department)registry.get("Department");
+
+        registry.registry.removeDepartment(department.name);
 
         return SUCCESS;
     }
@@ -49,7 +48,7 @@ public class DepartmentAction extends ActionSupport {
 
         ArrayList<String> facultyNames = registry.getFaculties();
 
-        this.facultyName = facultyNames.get(0);
+        registry.save("FacultyName", facultyNames.get(0));
 
         return facultyNames;
     }
@@ -57,22 +56,30 @@ public class DepartmentAction extends ActionSupport {
     public ArrayList<String> getDepartments() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        return registry.getDepartments(this.facultyName);
+        return registry.getDepartments((String)registry.get("FacultyName"));
     }
 
-    public Department getDepartment() {
-        return department;
+    public Department getDepartment() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return (Department)registry.get("Department");
     }
 
-    public void setDepartment(Department department) {
-        this.department = department;
+    public void setDepartment(Department department) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("Department", department);
     }
 
-    public Department getNewDepartment() {
-        return newDepartment;
+    public Department getNewDepartment() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return (Department)registry.get("NewDepartment");
     }
 
-    public void setNewDepartment(Department newDepartment) {
-        this.newDepartment = newDepartment;
+    public void setNewDepartment(Department newDepartment) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("NewDepartment", newDepartment);
     }
 }

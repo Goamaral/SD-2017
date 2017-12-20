@@ -11,29 +11,32 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class ElectionAction extends ActionSupport {
-    private String electionType;
-    private String electionSubtype;
-    private String facultyName;
-    private Election election;
+    public String getElectionSubTypeForm() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
 
-    public String getElectionSubTypeForm() { return this.electionType; }
+        return (String)registry.get("ElectionType");
+    }
 
     public String getCreateElectionForm() { return SUCCESS; }
 
     public String createElection() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        registry.registry.createElection(this.election);
+        registry.registry.createElection((Election)registry.get("Election"));
 
         return SUCCESS;
     }
+
+    public String getMainMenu() { return SUCCESS; }
+
+
 
     public ArrayList<String> getFaculties() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
         ArrayList<String> facultyNames = registry.getFaculties();
 
-        this.facultyName = facultyNames.get(0);
+        registry.save("FacultyName", facultyNames.get(0));
 
         return facultyNames;
     }
@@ -41,38 +44,54 @@ public class ElectionAction extends ActionSupport {
     public ArrayList<String> getDepartments() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        return registry.getDepartments(this.facultyName);
+        return registry.getDepartments((String)registry.get("FacultyName"));
     }
 
-    public String getElectionType() {
-        return electionType;
+    public String getElectionType() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return (String)registry.get("ElectionType");
     }
 
-    public void setElectionType(String electionType) {
-        this.electionType = electionType;
+    public void setElectionType(String electionType) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("ElectionType", electionType);
     }
 
-    public String getElectionSubtype() {
-        return electionSubtype;
+    public String getElectionSubtype() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return (String)registry.get("ElectionSubtype");
     }
 
-    public void setElectionSubtype(String electionSubtype) {
-        this.electionSubtype = electionSubtype;
+    public void setElectionSubtype(String electionSubtype) throws NotBoundException, RemoteException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("ElectionSubtype", electionSubtype);
     }
 
-    public String getFacultyName() {
-        return facultyName;
+    public String getFacultyName() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return (String)registry.get("FacultyName");
     }
 
-    public void setFacultyName(String facultyName) {
-        this.facultyName = facultyName;
+    public void setFacultyName(String facultyName) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("FacultyName", facultyName);
     }
 
-    public Election getElection() {
-        return election;
+    public Election getElection() throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        return (Election)registry.get("Election");
     }
 
-    public void setElection(Election election) {
-        this.election = election;
+    public void setElection(Election election) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("Election", election);
     }
 }

@@ -20,7 +20,6 @@ public class Registry {
 
         if(!this.session.containsKey("Registry")) {
             this.registry = (DataServerInterface) LocateRegistry.getRegistry(7000).lookup("iVotas");
-            this.session.put("Registry", registry);
         } else {
            this.registry = (DataServerInterface) this.session.get("Registry");
         }
@@ -68,5 +67,13 @@ public class Registry {
         }
 
         return departmentsNames;
+    }
+
+    public void save(String key, Object value) {
+        this.session.put(key, value);
+    }
+
+    public Object get(String key) {
+        return this.session.get(key);
     }
 }

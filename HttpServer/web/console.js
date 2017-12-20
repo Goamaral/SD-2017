@@ -75,9 +75,9 @@ function updateNewFaculty() {
     newFacultyName.value = selectedFacultyName;
 }
 
-function getCreateElectionForm() {
+function getMainMenu() {
     var departmentsSelect = document.getElementById("departments");
     var selectedDepartmentName = departmentsSelect.options[departmentsSelect.selectedIndex].text;
 
-    ajaxRender("/createElectionForm.action?electionSubtype=" + selectedDepartmentName);
+    ajaxRender("/mainMenu.action?electionSubtype=" + selectedDepartmentName);
 }
