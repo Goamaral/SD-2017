@@ -8,5 +8,5 @@
     <s:select list="votingLists" label="Lista" id="votingLists" onchange="selectVotingListID()" />
     <s:select name="personCC" list="peopleCCs" id="peopleCCs" style="display: none" />
     <s:select list="people" label="Membro" id="people" onchange="selectPersonCC()" />
-    <s:submit label="Adicionar" />
+    <s:submit value="Adicionar" />
 </s:form>

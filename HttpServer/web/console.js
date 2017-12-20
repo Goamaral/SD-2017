@@ -67,9 +67,7 @@ function loadDepartmentsForDepartment() {
 function updateNewFaculty() {
     var newFacultyName = document.getElementById("newFacultyName");
     var facultiesSelect = document.getElementById("faculties");
-    var selectedFacultyName = facultiesSelect.options[facultiesSelect.selectedIndex].text;
-
-    newFacultyName.value = selectedFacultyName;
+    newFacultyName.value = facultiesSelect.options[facultiesSelect.selectedIndex].text;
 }
 
 function getMainMenu() {
@@ -115,6 +113,8 @@ function selectVotingListID() {
     var votingListsIDsSelect = document.getElementById("votingListsIDs");
 
     votingListsIDsSelect.selectedIndex = votingListsSelect.selectedIndex;
+
+    return votingListsIDsSelect.options[votingListsIDsSelect.selectedIndex];
 }
 
 function selectPersonCC() {
@@ -122,4 +122,43 @@ function selectPersonCC() {
     var peopleCCsSelect = document.getElementById("peopleCCs");
 
     peopleCCsSelect.selectedIndex = peopleSelect.selectedIndex;
+}
+
+function loadCandidates() {
+    var votingListID = selectVotingListID();
+
+    var callback = function (newContent) {
+        var block =  document.createElement("div");
+        block.innerHTML = newContent;
+
+
+        var candidatesCCsSelectParentNode = document.getElementById("candidatesCCs").parentNode;
+        candidatesCCsSelectParentNode.innerHTML = "";
+        candidatesCCsSelectParentNode.appendChild(block.children[0]);
+
+        var candidatesSelectParentNode = document.getElementById("candidates").parentNode.parentNode;
+        candidatesSelectParentNode.children[0].innerHTML = "";
+        candidatesSelectParentNode.children[1].innerHTML = "";
+        candidatesSelectParentNode.children[0].appendChild(block.children[0]);
+        candidatesSelectParentNode.children[1].appendChild(block.children[0]);
+    }
+
+    ajax("GET", "/listCandidates.action?votingListID=" + votingListID, callback);
+}
+
+function selectCandidateCC() {
+    var candidatesSelect = document.getElementById("candidates");
+    var candidatesCCsSelect = document.getElementById("candidatesCCs");
+
+    candidatesCCsSelect.selectedIndex = candidatesSelect.selectedIndex;
+}
+
+function loadCandidatesBeans() {
+    var votingListID = selectVotingListID();
+
+    var callback = function (newContent) {
+        document.getElementById("candidates").innerHTML = newContent;
+    }
+
+    ajax("GET", "/listCandidatesBeans.action?votingListID=" + votingListID, callback);
 }

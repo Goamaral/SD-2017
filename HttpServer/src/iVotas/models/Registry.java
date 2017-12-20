@@ -193,6 +193,40 @@ public class Registry {
         return peopleCCs;
     }
 
+    public ArrayList<String> getCandidates() throws RemoteException {
+        int votingListID = (Integer) this.get("VotingListID");
+
+        ArrayList<Person> candidates = this.registry.listCandidates(votingListID);
+        ArrayList<String> candidatesNames = new ArrayList<>();
+
+        if (candidates.size() == 0) return candidatesNames;
+
+        for (Person candidate : candidates) {
+            candidatesNames.add(candidate.name);
+        }
+
+        this.save("CandidateName", candidatesNames.get(0));
+
+        return candidatesNames;
+    }
+
+    public ArrayList<Integer> getCandidatesCCs() throws RemoteException {
+        int votingListID = (Integer) this.get("VotingListID");
+
+        ArrayList<Person> candidates = this.registry.listCandidates(votingListID);
+        ArrayList<Integer> candidatesCCs = new ArrayList<>();
+
+        if (candidates.size() == 0) return candidatesCCs;
+
+        for (Person candidate : candidates) {
+            candidatesCCs.add(candidate.cc);
+        }
+
+        this.save("CandidateCC", candidatesCCs.get(0));
+
+        return candidatesCCs;
+    }
+
     public void save(String key, Object value) {
         this.session.put(key, value);
     }

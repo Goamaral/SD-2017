@@ -8,12 +8,11 @@
   <component name="ChangeListManager">
     <list default="true" id="e23fc5f9-93af-42e7-9e25-edb669072b40" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/HttpServer/src/iVotas/actions/VotingListAction.java" afterPath="$PROJECT_DIR$/HttpServer/src/iVotas/actions/VotingListAction.java" />
+      <change beforePath="$PROJECT_DIR$/HttpServer/src/iVotas/actions/CandidateAction.java" afterPath="$PROJECT_DIR$/HttpServer/src/iVotas/actions/CandidateAction.java" />
       <change beforePath="$PROJECT_DIR$/HttpServer/src/iVotas/models/Registry.java" afterPath="$PROJECT_DIR$/HttpServer/src/iVotas/models/Registry.java" />
       <change beforePath="$PROJECT_DIR$/HttpServer/src/struts.xml" afterPath="$PROJECT_DIR$/HttpServer/src/struts.xml" />
-      <change beforePath="$PROJECT_DIR$/HttpServer/web/VotingList/index.jsp" afterPath="$PROJECT_DIR$/HttpServer/web/VotingList/index.jsp" />
-      <change beforePath="$PROJECT_DIR$/HttpServer/web/VotingList/listVotingLists.jsp" afterPath="$PROJECT_DIR$/HttpServer/web/VotingList/listVotingLists.jsp" />
-      <change beforePath="$PROJECT_DIR$/HttpServer/web/VotingList/removeVotingListForm.jsp" afterPath="$PROJECT_DIR$/HttpServer/web/VotingList/removeVotingListForm.jsp" />
+      <change beforePath="$PROJECT_DIR$/HttpServer/web/Candidate/addCandidateForm.jsp" afterPath="$PROJECT_DIR$/HttpServer/web/Candidate/addCandidateForm.jsp" />
+      <change beforePath="$PROJECT_DIR$/HttpServer/web/Candidate/index.jsp" afterPath="$PROJECT_DIR$/HttpServer/web/Candidate/index.jsp" />
       <change beforePath="$PROJECT_DIR$/HttpServer/web/console.js" afterPath="$PROJECT_DIR$/HttpServer/web/console.js" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
@@ -47,8 +46,18 @@
             <state />
           </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="237">
-              <caret line="167" column="45" lean-forward="false" selection-start-line="167" selection-start-column="45" selection-end-line="167" selection-end-column="45" />
+            <state relative-caret-position="171">
+              <caret line="176" column="53" lean-forward="false" selection-start-line="176" selection-start-column="31" selection-end-line="176" selection-end-column="53" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="listCandidatesDetailed.jsp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/HttpServer/web/Candidate/listCandidatesDetailed.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="10" column="17" lean-forward="false" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -57,8 +66,8 @@
       <file leaf-file-name="CandidateAction.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/HttpServer/src/iVotas/actions/CandidateAction.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+            <state relative-caret-position="135">
+              <caret line="107" column="47" lean-forward="true" selection-start-line="107" selection-start-column="33" selection-end-line="107" selection-end-column="47" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -69,18 +78,8 @@
       <file leaf-file-name="DataServerInterface.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Core/src/Core/DataServerInterface.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="522">
+            <state relative-caret-position="195">
               <caret line="38" column="23" lean-forward="false" selection-start-line="38" selection-start-column="23" selection-end-line="38" selection-end-column="23" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="addCandidateForm.jsp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/HttpServer/web/Candidate/addCandidateForm.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" column="9" lean-forward="true" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -89,25 +88,15 @@
       <file leaf-file-name="Registry.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/HttpServer/src/iVotas/models/Registry.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="317">
-              <caret line="193" column="5" lean-forward="false" selection-start-line="193" selection-start-column="5" selection-end-line="193" selection-end-column="5" />
+            <state relative-caret-position="252">
+              <caret line="222" column="9" lean-forward="false" selection-start-line="222" selection-start-column="9" selection-end-line="222" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#6096#6097#0" expanded="true" />
-                <element signature="e#6140#6141#0" expanded="true" />
-                <element signature="e#6177#6178#0" expanded="true" />
-                <element signature="e#6221#6222#0" expanded="true" />
+                <element signature="e#7183#7184#0" expanded="true" />
+                <element signature="e#7227#7228#0" expanded="true" />
+                <element signature="e#7264#7265#0" expanded="true" />
+                <element signature="e#7308#7309#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.jsp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/HttpServer/web/VotingList/index.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="39" lean-forward="false" selection-start-line="0" selection-start-column="39" selection-end-line="0" selection-end-column="39" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -115,18 +104,28 @@
       <file leaf-file-name="index.jsp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/HttpServer/web/Candidate/index.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="46" lean-forward="false" selection-start-line="0" selection-start-column="30" selection-end-line="0" selection-end-column="46" />
+            <state relative-caret-position="30">
+              <caret line="2" column="84" lean-forward="false" selection-start-line="2" selection-start-column="84" selection-end-line="2" selection-end-column="84" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="console.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="console.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/HttpServer/web/console.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="237">
-              <caret line="123" column="63" lean-forward="false" selection-start-line="123" selection-start-column="63" selection-end-line="123" selection-end-column="63" />
+            <state relative-caret-position="192">
+              <caret line="159" column="69" lean-forward="false" selection-start-line="159" selection-start-column="69" selection-end-line="159" selection-end-column="69" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="addCandidateForm.jsp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/HttpServer/web/Candidate/addCandidateForm.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="92" lean-forward="false" selection-start-line="7" selection-start-column="74" selection-end-line="7" selection-end-column="92" />
               <folding />
             </state>
           </provider>
@@ -145,10 +144,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>sele</find>
-      <find>action</find>
-      <find>index</find>
-      <find>getC</find>
       <find>LCore</find>
       <find>LCo</find>
       <find>regi</find>
@@ -175,6 +170,10 @@
       <find>setElectionIDsetElectionID</find>
       <find>setElectionID</find>
       <find>getElectionsIDs</find>
+      <find>getC</find>
+      <find>getCa</find>
+      <find>setVo</find>
+      <find>setP</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -191,8 +190,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/HttpServer/src/iVotas/actions/Console.java" />
-        <option value="$PROJECT_DIR$/HttpServer/src/iVotas/actions/Index.java" />
         <option value="$PROJECT_DIR$/HttpServer/src/iVotas/actions/Platform.java" />
         <option value="$PROJECT_DIR$/HttpServer/src/iVotas/actions/ConsoleAction.java" />
         <option value="$PROJECT_DIR$/HttpServer/web/Faculty/index.jsp" />
@@ -233,15 +230,17 @@
         <option value="$PROJECT_DIR$/HttpServer/src/iVotas/actions/PersonAction.java" />
         <option value="$PROJECT_DIR$/HttpServer/src/iVotas/actions/VotingListAction.java" />
         <option value="$PROJECT_DIR$/HttpServer/web/VotingList/removeVotingListForm.jsp" />
-        <option value="$PROJECT_DIR$/HttpServer/web/Candidate/index.jsp" />
         <option value="$PROJECT_DIR$/HttpServer/web/Candidate/addCandidate.jsp" />
-        <option value="$PROJECT_DIR$/HttpServer/web/console.js" />
-        <option value="$PROJECT_DIR$/HttpServer/src/iVotas/models/Registry.java" />
         <option value="$PROJECT_DIR$/HttpServer/web/VotingList/index.jsp" />
-        <option value="$PROJECT_DIR$/HttpServer/src/struts.xml" />
-        <option value="$PROJECT_DIR$/HttpServer/src/iVotas/actions/CandidateAction.java" />
-        <option value="$PROJECT_DIR$/HttpServer/web/Candidate/addCandidateForm.jsp" />
         <option value="$PROJECT_DIR$/HttpServer/web/VotingList/listVotingLists.jsp" />
+        <option value="$PROJECT_DIR$/HttpServer/src/struts.xml" />
+        <option value="$PROJECT_DIR$/HttpServer/src/iVotas/models/Registry.java" />
+        <option value="$PROJECT_DIR$/HttpServer/web/Candidate/addCandidateForm.jsp" />
+        <option value="$PROJECT_DIR$/HttpServer/web/Candidate/removeCandidateForm.jsp" />
+        <option value="$PROJECT_DIR$/HttpServer/web/Candidate/index.jsp" />
+        <option value="$PROJECT_DIR$/HttpServer/src/iVotas/actions/CandidateAction.java" />
+        <option value="$PROJECT_DIR$/HttpServer/web/Candidate/listCandidatesDetailed.jsp" />
+        <option value="$PROJECT_DIR$/HttpServer/web/console.js" />
       </list>
     </option>
   </component>
@@ -498,12 +497,6 @@
               <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
               <item name="web" type="462c0819:PsiDirectoryNode" />
               <item name="Candidate" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="HttpServer" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="VotingList" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -764,12 +757,12 @@
       <workItem from="1513475509557" duration="27208000" />
       <workItem from="1513566681104" duration="24324000" />
       <workItem from="1513727827610" duration="4436000" />
-      <workItem from="1513780501826" duration="17277000" />
+      <workItem from="1513780501826" duration="21910000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="124842000" />
+    <option name="totallyTimeSpent" value="129475000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -873,24 +866,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/DataServer/src/DataServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="146">
-          <caret line="752" column="6" lean-forward="false" selection-start-line="752" selection-start-column="6" selection-end-line="752" selection-end-column="6" />
-          <folding>
-            <element signature="method#runBackupServer#0;class#DataServer#0" expanded="false" />
-            <element signature="method#listStudentsFromDepartment#0;class#DataServer#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/HttpServer/web/WEB-INF/lib/struts2-core-2.3.16.3.jar!/template/xhtml/head.ftl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-45">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/HttpServer/web/Platform.java" />
     <entry file="file://$PROJECT_DIR$/HttpServer/web/home.jsp">
       <provider selected="true" editor-type-id="text-editor">
@@ -1077,20 +1052,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
           <caret line="1" column="71" lean-forward="false" selection-start-line="1" selection-start-column="59" selection-end-line="1" selection-end-column="71" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/web/Election/createElectionForm.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="30" lean-forward="false" selection-start-line="3" selection-start-column="30" selection-end-line="3" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/web/Election/generalSubTypeForm.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="68" lean-forward="false" selection-start-line="3" selection-start-column="68" selection-end-line="3" selection-end-column="68" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1232,73 +1194,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/web/console.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="237">
-          <caret line="123" column="63" lean-forward="false" selection-start-line="123" selection-start-column="63" selection-end-line="123" selection-end-column="63" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/src/iVotas/models/Registry.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="193" column="5" lean-forward="false" selection-start-line="193" selection-start-column="5" selection-end-line="193" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#6096#6097#0" expanded="true" />
-            <element signature="e#6140#6141#0" expanded="true" />
-            <element signature="e#6177#6178#0" expanded="true" />
-            <element signature="e#6221#6222#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/web/VotingList/index.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="39" lean-forward="false" selection-start-line="0" selection-start-column="39" selection-end-line="0" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/web/Candidate/index.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="46" lean-forward="false" selection-start-line="0" selection-start-column="30" selection-end-line="0" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/Core/DataServerInterface.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="38" column="23" lean-forward="false" selection-start-line="38" selection-start-column="23" selection-end-line="38" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/src/struts.xml">
-      <provider editor-type-id="com.intellij.struts2.graph.fileEditor.Struts2GraphFileEditorProvider">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="237">
-          <caret line="167" column="45" lean-forward="false" selection-start-line="167" selection-start-column="45" selection-end-line="167" selection-end-column="45" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HttpServer/src/iVotas/actions/CandidateAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/HttpServer/web/VotingList/listVotingLists.jsp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -1315,10 +1210,109 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/Core/DataServerInterface.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="38" column="23" lean-forward="false" selection-start-line="38" selection-start-column="23" selection-end-line="38" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/src/iVotas/models/Registry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="222" column="9" lean-forward="false" selection-start-line="222" selection-start-column="9" selection-end-line="222" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#7183#7184#0" expanded="true" />
+            <element signature="e#7227#7228#0" expanded="true" />
+            <element signature="e#7264#7265#0" expanded="true" />
+            <element signature="e#7308#7309#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/VotingList/index.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="75" lean-forward="false" selection-start-line="1" selection-start-column="75" selection-end-line="1" selection-end-column="75" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/Election/createElectionForm.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="30" lean-forward="false" selection-start-line="3" selection-start-column="30" selection-end-line="3" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/Election/generalSubTypeForm.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="68" lean-forward="false" selection-start-line="3" selection-start-column="68" selection-end-line="3" selection-end-column="68" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/Candidate/index.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="84" lean-forward="false" selection-start-line="2" selection-start-column="84" selection-end-line="2" selection-end-column="84" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/src/struts.xml">
+      <provider editor-type-id="com.intellij.struts2.graph.fileEditor.Struts2GraphFileEditorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="176" column="53" lean-forward="false" selection-start-line="176" selection-start-column="31" selection-end-line="176" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/src/iVotas/actions/CandidateAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="107" column="47" lean-forward="true" selection-start-line="107" selection-start-column="33" selection-end-line="107" selection-end-column="47" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/Candidate/removeCandidateForm.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="94" lean-forward="true" selection-start-line="4" selection-start-column="4" selection-end-line="7" selection-end-column="94" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/HttpServer/web/Candidate/addCandidateForm.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="9" lean-forward="true" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
+        <state relative-caret-position="105">
+          <caret line="7" column="92" lean-forward="false" selection-start-line="7" selection-start-column="74" selection-end-line="7" selection-end-column="92" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/Candidate/listCandidatesDetailed.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="17" lean-forward="false" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HttpServer/web/console.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="159" column="69" lean-forward="false" selection-start-line="159" selection-start-column="69" selection-end-line="159" selection-end-column="69" />
           <folding />
         </state>
       </provider>
