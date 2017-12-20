@@ -9,10 +9,6 @@ import Core.*;
 import iVotas.models.Registry;
 
 public class IndexAction extends ActionSupport {
-    private int cc;
-    private String username;
-    private String password;
-
     public String execute() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
@@ -24,16 +20,21 @@ public class IndexAction extends ActionSupport {
     public String login() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
-        if (this.username.equals("admin") && this.password.equals("admin")) {
+        String username = (String) registry.get("Username");
+        String password = (String) registry.get("Password");
+
+        if (username.equals("admin") && password.equals("admin")) {
             registry.loginUser("admin");
             return "console";
         }
 
-        Credential credential = registry.registry.getCredentials(this.cc);
+        int cc = (Integer) registry.get("CC");
+
+        Credential credential = registry.registry.getCredentials(cc);
 
         if (credential == null) return "home";
 
-        if (credential.username.equals(this.username) && credential.password.equals(this.password)) {
+        if (credential.username.equals(username) && credential.password.equals(password)) {
             registry.loginUser(username);
             return "platform";
         }
@@ -45,20 +46,27 @@ public class IndexAction extends ActionSupport {
         Registry registry = new Registry(ActionContext.getContext().getSession());
 
         registry.logoutUser();
+
         return SUCCESS;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUsername(String username) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("Username", username);
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("Password", password);
     }
 
-    public void setCc(String cc) {
-        if (cc.equals("")) {
-            this.cc = -1;
-        } else this.cc = Integer.parseInt(cc);
+    public void setCc(String cc) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        if (!cc.equals("")) {
+            registry.save("CC", Integer.parseInt(cc));
+        } else registry.save("CC", -1);
     }
 }

@@ -9,11 +9,12 @@
     </head>
     <body>
         <header>
-            <h1 style="display: inline-block">iVotas - Consola de Administracao</h1>
+            <h1 style="display: inline-block">iVotas</h1>
             <button onclick="logout()" style="display: inline-block; float: right">Logout</button>
         </header>
 
         <div id="console">
+            <h2>Consola de Administracao</h2>
             <button onclick="ajaxRender('/Person/index.jsp')">Registar membro</button>
             <button onclick="ajaxRender('/Buildings/faculty.jsp')">Faculdades</button>
             <button onclick="ajaxRender('/Buildings/department.jsp')">Departamentos</button>

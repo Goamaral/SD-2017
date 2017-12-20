@@ -22,6 +22,7 @@ function render(newContent) {
 }
 
 function logout() {
+    console.log("HI");
     window.location.href = "/logout.action";
 }
 
@@ -80,4 +81,24 @@ function getMainMenu() {
     var selectedDepartmentName = departmentsSelect.options[departmentsSelect.selectedIndex].text;
 
     ajaxRender("/mainMenu.action?electionSubtype=" + selectedDepartmentName);
+}
+
+function selectElectionID() {
+    var electionsSelect = document.getElementById("elections");
+    var electionsIDsSelect = document.getElementById("electionsIDs");
+
+    electionsIDsSelect.selectedIndex = electionsSelect.selectedIndex;
+
+    return electionsSelect.options[electionsIDsSelect.selectedIndex].text;
+}
+
+function loadVotingLists() {
+    var electionID = selectElectionID();
+
+    var callback = function (newContent) {
+        var votingListsSelect = document.getElementById("votingLists");
+        votingListsSelect.innerHTML = newContent;
+    }
+
+    ajax("GET", "/listVotingLists.action?electionID=" + electionID, callback);
 }

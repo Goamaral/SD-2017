@@ -69,6 +69,35 @@ public class Registry {
         return departmentsNames;
     }
 
+    public void fetchElections() throws RemoteException {
+        String type = (String) this.get("ElectionType");
+        String subtype = (String) this.get("ElectionSubtype");
+
+        ArrayList<Election> elections = this.registry.listElections(type, subtype);
+
+        ArrayList<String> electionsNames = new ArrayList<>();
+        ArrayList<Integer> electionsIDs = new ArrayList<>();
+
+        for (Election election : elections) {
+            electionsNames.add(election.name);
+            electionsIDs.add(election.id);
+        }
+
+        this.save("ElectionsNamesList", electionsNames);
+        this.save("ElectionsIDsList", electionsIDs);
+
+        this.save("ElectionName", electionsNames.get(0));
+        this.save("ElectionID", electionsIDs.get(0));
+    }
+
+    public ArrayList<String> getElections() throws RemoteException {
+        return (ArrayList<String>) this.get("ElectionsNamesList");
+    }
+
+    public ArrayList<Integer> getElectionsIDs() throws RemoteException {
+        return (ArrayList<Integer>) this.get("ElectionsIDsList");
+    }
+
     public void save(String key, Object value) {
         this.session.put(key, value);
     }
