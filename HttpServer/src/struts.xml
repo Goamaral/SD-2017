@@ -133,6 +133,7 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
             <result>/Election/mainMenu.jsp</result>
         </action>
 
+        <!-- VotingList -->
         <action name="createVotingListForm" class="iVotas.actions.VotingListAction" method="getCreateVotingListForm">
             <result>/VotingList/createVotingListForm.jsp</result>
         </action>
@@ -153,6 +154,7 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
             <result type="redirectAction">platform</result>
         </action>
 
+        <!-- Candidate -->
         <action name="addCandidateForm" class="iVotas.actions.CandidateAction" method="getAddCandidateForm">
             <result>/Candidate/addCandidateForm.jsp</result>
         </action>
@@ -175,6 +177,31 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
 
         <action name="listCandidatesDetailed" class="iVotas.actions.CandidateAction" method="listCandidatesDetailed">
             <result>/Candidate/listCandidatesDetailed.jsp</result>
+        </action>
+
+        <action name="listCandidatesBeans" class="iVotas.actions.CandidateAction" method="listCandidatesBeans">
+            <result>/Candidate/listCandidatesBeans.jsp</result>
+        </action>
+
+        <action name="listVotingListsCandidates" class="iVotas.actions.CandidateAction" method="listVotingListsCandidates">
+            <result>/Candidate/listVotingListsCandidates.jsp</result>
+        </action>
+
+        <!-- VotingTable -->
+        <action name="createVotingTableForm" class="iVotas.actions.VotingTableAction" method="getCreateVotingTableForm">
+            <result>/VotingTable/createVotingTableForm.jsp</result>
+        </action>
+
+        <action name="createVotingTable" class="iVotas.actions.VotingTableAction" method="createVotingTable">
+            <result type="redirectAction">platform</result>
+        </action>
+
+        <action name="removeVotingTableForm" class="iVotas.actions.VotingTableAction" method="getRemoveVotingTableForm">
+            <result>/VotingTable/removeVotingTable.jsp</result>
+        </action>
+
+        <action name="removeVotingTable" class="iVotas.actions.VotingTableAction" method="removeVotingTable">
+            <result type="redirectAction">platform</result>
         </action>
 
     </package>

@@ -177,6 +177,14 @@ and should reside on the classpath of the webapp (generally /WEB-INF/classes). -
             <result>/Candidate/listCandidatesDetailed.jsp</result>
         </action>
 
+        <action name="listCandidatesBeans" class="iVotas.actions.CandidateAction" method="listCandidatesBeans">
+            <result>/Candidate/listCandidatesBeans.jsp</result>
+        </action>
+
+        <action name="listVotingListsCandidates" class="iVotas.actions.CandidateAction" method="listVotingListsCandidates">
+            <result>/Candidate/listVotingListsCandidates.jsp</result>
+        </action>
+
     </package>
 
 </struts>

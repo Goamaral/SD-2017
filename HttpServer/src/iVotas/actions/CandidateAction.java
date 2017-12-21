@@ -38,6 +38,12 @@ public class CandidateAction extends ActionSupport {
         return SUCCESS;
     }
 
+    public String listCandidatesDetailed() { return SUCCESS; }
+
+    public String listCandidatesBeans() { return SUCCESS; }
+
+    public String listVotingListsCandidates() { return SUCCESS; }
+
 
     public ArrayList<Integer> getVotingListsIDs() throws RemoteException, NotBoundException {
         Registry registry = new Registry(ActionContext.getContext().getSession());
@@ -111,5 +117,11 @@ public class CandidateAction extends ActionSupport {
         int votingListID = (Integer)registry.get("VotingListID");
 
         return registry.registry.listCandidates(votingListID);
+    }
+
+    public void setElectionID(String electionID) throws RemoteException, NotBoundException {
+        Registry registry = new Registry(ActionContext.getContext().getSession());
+
+        registry.save("ElectionID", Integer.parseInt(electionID));
     }
 }

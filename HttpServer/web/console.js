@@ -114,7 +114,12 @@ function selectVotingListID() {
 
     votingListsIDsSelect.selectedIndex = votingListsSelect.selectedIndex;
 
-    return votingListsIDsSelect.options[votingListsIDsSelect.selectedIndex];
+    if (votingListsIDsSelect.options[votingListsIDsSelect.selectedIndex] === undefined) {
+        return -1;
+    } else {
+        return votingListsIDsSelect.options[votingListsIDsSelect.selectedIndex].text;
+    }
+
 }
 
 function selectPersonCC() {
@@ -161,4 +166,27 @@ function loadCandidatesBeans() {
     }
 
     ajax("GET", "/listCandidatesBeans.action?votingListID=" + votingListID, callback);
+}
+
+function loadVotingListsSecundary() {
+    var electionID = selectElectionID();
+
+    var callback = function (newContent) {
+        var block =  document.createElement("div");
+        block.innerHTML = newContent;
+
+
+        var oldChild = document.getElementById("votingListsIDs");
+        var parent = oldChild.parentNode;
+        parent.replaceChild(block.children[0], oldChild);
+
+
+        oldChild = document.getElementById("votingLists");
+        parent = oldChild.parentNode;
+        parent.replaceChild(block.children[1], oldChild);
+
+        loadCandidatesBeans();
+    }
+
+    ajax("GET", "/listVotingListsCandidates.action?electionID=" + electionID, callback);
 }
